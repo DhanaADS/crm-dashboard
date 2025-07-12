@@ -37,7 +37,7 @@ export default function HomePage() {
     }
 
     checkAuth()
-  }, [])
+  }, [router, supabase.auth]) // ✅ FIX: added to satisfy ESLint and Vercel build
 
   const handleLogout = async () => {
     await supabase.auth.signOut()

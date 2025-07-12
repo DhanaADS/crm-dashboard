@@ -10,16 +10,18 @@ import {
   Title,
   Tooltip,
   Legend,
+  ChartData,
+  ChartOptions,
 } from 'chart.js'
 import { useEffect, useState } from 'react'
 
 ChartJS.register(LineElement, PointElement, CategoryScale, LinearScale, Title, Tooltip, Legend)
 
 export default function AnalyticsChart() {
-  const [chartData, setChartData] = useState<any>(null)
+  const [chartData, setChartData] = useState<ChartData<'line'> | null>(null)
 
   useEffect(() => {
-    const data = {
+    const data: ChartData<'line'> = {
       labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
       datasets: [
         {
@@ -35,7 +37,7 @@ export default function AnalyticsChart() {
     setChartData(data)
   }, [])
 
-  const options = {
+  const options: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
