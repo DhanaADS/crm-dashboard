@@ -1,24 +1,36 @@
 'use client'
+
 import { useEffect, useState } from 'react'
+import { FaSun, FaMoon } from 'react-icons/fa'
 
 export default function DarkModeToggle() {
   const [isDark, setIsDark] = useState(false)
 
   useEffect(() => {
-    const stored = localStorage.getItem('theme') || 'light'
-    setIsDark(stored === 'dark')
-  }, [])
-
-  const toggleTheme = () => {
-    const newTheme = isDark ? 'light' : 'dark'
-    localStorage.setItem('theme', newTheme)
-    document.documentElement.classList.toggle('dark', newTheme === 'dark')
-    setIsDark(!isDark)
-  }
+    const root = window.document.documentElement
+    if (isDark) {
+      root.classList.add('dark')
+    } else {
+      root.classList.remove('dark')
+    }
+  }, [isDark])
 
   return (
-    <button onClick={toggleTheme} className="border px-4 py-2 rounded bg-gray-100 dark:bg-gray-800 text-black dark:text-white">
-      {isDark ? '🌞 Light Mode' : '🌙 Dark Mode'}
+    <button
+      onClick={() => setIsDark(!isDark)}
+      className="flex items-center space-x-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 px-3 py-1 rounded-full transition duration-300 shadow-md"
+    >
+      {isDark ? (
+        <>
+          <FaMoon className="text-blue-400" />
+          <span className="text-sm">Dark</span>
+        </>
+      ) : (
+        <>
+          <FaSun className="text-yellow-500" />
+          <span className="text-sm">Light</span>
+        </>
+      )}
     </button>
   )
 }

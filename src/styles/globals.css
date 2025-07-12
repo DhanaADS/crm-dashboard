@@ -1,16 +1,16 @@
-/* src/styles/globals.css */
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Light mode */
 :root {
   --background: #ffffff;
   --foreground: #171717;
 }
 
+/* Dark mode (updated to soft dark gray) */
 .dark {
-  --background: #0a0a0a;
+  --background: #262626; /* ← updated from #0a0a0a to #1f1f1f */
   --foreground: #f4f4f4;
 }
 
