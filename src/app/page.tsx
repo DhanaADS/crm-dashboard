@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 import SkeletonCard from '@/components/SkeletonCard'
-import DarkModeToggle from '@/components/DarkModeToggle'
 import AnalyticsChart from '@/components/AnalyticsChart'
 
 const allowedEmails = [
@@ -47,23 +46,22 @@ export default function HomePage() {
 
   if (!authChecked) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-black text-white">
+      <main className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
         <p className="text-sm">Checking authentication...</p>
       </main>
     )
   }
 
   return (
-    <main className="relative min-h-screen p-6">
-      {/* 🔄 Dark Mode + Logout Row */}
-      <div className="fixed top-4 right-6 z-50 flex items-center gap-3">
+    <main className="relative min-h-screen p-6 bg-gray-900 text-white">
+      {/* 🔒 Logout Button Top-Right */}
+      <div className="fixed top-4 right-6 z-50">
         <button
           onClick={handleLogout}
           className="px-3 py-2 text-sm bg-red-600 hover:bg-red-700 text-white rounded shadow"
         >
           🔓 Logout
         </button>
-        <DarkModeToggle />
       </div>
 
       {/* ✅ Page Title */}
@@ -79,17 +77,17 @@ export default function HomePage() {
           </>
         ) : (
           <>
-            <div className="bg-white dark:bg-gray-800 p-4 rounded shadow">💡 Real Card 1</div>
-            <div className="bg-white dark:bg-gray-800 p-4 rounded shadow">📊 Real Card 2</div>
-            <div className="bg-white dark:bg-gray-800 p-4 rounded shadow">🚀 Real Card 3</div>
+            <div className="bg-gray-800 p-4 rounded shadow">💡 Real Card 1</div>
+            <div className="bg-gray-800 p-4 rounded shadow">📊 Real Card 2</div>
+            <div className="bg-gray-800 p-4 rounded shadow">🚀 Real Card 3</div>
           </>
         )}
       </div>
 
       {/* 📊 Analytics Section */}
       <div className="mt-6 flex justify-end pr-4">
-        <div className="w-[400px] bg-white dark:bg-gray-900 p-4 rounded shadow">
-          <h2 className="text-lg font-semibold text-center mb-4 text-gray-800 dark:text-gray-200">
+        <div className="w-[400px] bg-gray-800 p-4 rounded shadow">
+          <h2 className="text-lg font-semibold text-center mb-4 text-white">
             Analytics Overview
           </h2>
           <AnalyticsChart />
