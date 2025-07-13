@@ -9,7 +9,12 @@ export default function GmailAuthButton() {
     <div className="text-white p-4 bg-zinc-800 rounded-md shadow-md w-fit">
       {!session ? (
         <button
-          onClick={() => signIn('google')}
+          onClick={() =>
+            signIn('google', {
+              callbackUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/dashboard`,
+              prompt: 'select_account'
+            })
+          }
           className="bg-green-600 px-4 py-2 rounded text-white hover:bg-green-700"
         >
           📩 Connect Gmail
