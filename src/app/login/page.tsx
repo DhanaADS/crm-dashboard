@@ -12,16 +12,15 @@ export default function LoginPage() {
   const router = useRouter()
 
   useEffect(() => {
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session?.user) {
-        router.push('/dashboard')
-      }
-    })
+    const { data: subscription } =
+      supabase.auth.onAuthStateChange((event, session) => {
+        if (session?.user?.email) {
+          router.push('/dashboard')
+        }
+      }) || { data: { subscription: { unsubscribe: () => {} } } }
 
     return () => {
-      subscription.unsubscribe()
+      subscription?.unsubscribe?.()
     }
   }, [supabase, router])
 
@@ -31,12 +30,12 @@ export default function LoginPage() {
         {/* ✅ Logo */}
         <div className="flex justify-center mb-4">
           <Image
-  src="/assets/ads-logo.png"
-  alt="ADS Logo"
-  width={60}
-  height={60}
-  className="mb-2 object-contain"
-/>
+            src="/assets/ads-logo.png"
+            alt="ADS Logo"
+            width={60}
+            height={60}
+            className="mb-2 object-contain"
+          />
         </div>
 
         <h1 className="text-xl font-semibold text-center mb-6">
@@ -67,8 +66,7 @@ export default function LoginPage() {
                 email_input_label: 'Email address',
                 button_label: 'Send Magic Link',
                 link_text: '',
-                confirmation_text:
-                  'Check your email for the login link!',
+                confirmation_text: 'Check your email for the login link!',
               },
             },
           }}
