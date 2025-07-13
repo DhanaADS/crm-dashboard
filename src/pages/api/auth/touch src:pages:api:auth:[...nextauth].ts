@@ -18,17 +18,19 @@ export default NextAuth({
   ],
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async jwt({ token, account }) {
-      if (account) {
-        token.accessToken = account.access_token
-        token.refreshToken = account.refresh_token
-      }
-      return token
-    },
-    async session({ session, token }) {
-      session.accessToken = token.accessToken
-      session.refreshToken = token.refreshToken
-      return session
-    },
+  async session({ session, token }) {
+    return {
+      ...session,
+      accessToken: token.accessToken,
+      refreshToken: token.refreshToken,
+    }
   },
+  async jwt({ token, account }) {
+    if (account) {
+      token.accessToken = account.access_token
+      token.refreshToken = account.refresh_token
+    }
+    return token
+  },
+},
 })
