@@ -20,32 +20,47 @@ const allowedEmails = [
 export default function HomePage() {
   const [loading, setLoading] = useState(true)
   const [authChecked, setAuthChecked] = useState(false)
+  const [emails, setEmails] = useState<any[]>([])
 
   const supabase = createClientComponentClient()
   const router = useRouter()
 
   useEffect(() => {
-  const checkAuth = async () => {
-    try {
-      const response = await supabase.auth.getSession()
-      const session = response?.data?.session
-      const email = session?.user?.email || ''
+    const checkAuth = async () => {
+      try {
+        const response = await supabase.auth.getSession()
+        const session = response?.data?.session
+        const email = session?.user?.email || ''
 
-      if (!session || !session.user || !allowedEmails.includes(email)) {
-  await supabase.auth.signOut()
-  router.push('/login')
-} else {
-  setAuthChecked(true)
-  setTimeout(() => setLoading(false), 1000)
-}
-    } catch (err) {
-      console.error('Auth Check Failed:', err)
-      router.push('/login')
+        if (!session || !session.user || !allowedEmails.includes(email)) {
+          await supabase.auth.signOut()
+          router.push('/login')
+        } else {
+          setAuthChecked(true)
+          setTimeout(() => setLoading(false), 1000)
+        }
+      } catch (err) {
+        console.error('Auth Check Failed:', err)
+        router.push('/login')
+      }
     }
-  }
 
-  checkAuth()
-}, [router, supabase])
+    checkAuth()
+  }, [router, supabase])
+
+  useEffect(() => {
+    const fetchInbox = async () => {
+      try {
+        const res = await fetch('/api/gmail/preview')
+        const data = await res.json()
+        if (data?.inbox) setEmails(data.inbox)
+      } catch (err) {
+        console.error('Inbox fetch error:', err)
+      }
+    }
+
+    if (authChecked) fetchInbox()
+  }, [authChecked])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -86,10 +101,25 @@ export default function HomePage() {
         <div className="mt-3">
           <GmailAuthButton />
         </div>
+
+        {/* 📥 Inbox Preview */}
+        {emails.length > 0 && (
+          <div className="mt-6 bg-gray-800 text-white p-4 rounded shadow max-w-2xl w-full mx-auto">
+            <h2 className="text-lg font-semibold mb-3">📥 Latest Unread Emails</h2>
+            <ul className="space-y-2 text-sm">
+              {emails.map((email) => (
+                <li key={email.id} className="border-b border-gray-700 pb-2">
+                  <p className="font-medium">🧾 {email.subject}</p>
+                  <p className="text-xs text-gray-400">{email.snippet}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
       {/* Cards */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mt-6">
         {loading ? (
           <>
             <SkeletonCard />

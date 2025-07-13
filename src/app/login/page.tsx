@@ -18,20 +18,22 @@ export default function LoginPage() {
   ]
 
   useEffect(() => {
-    const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
-      const userEmail = session?.user?.email || ''
-      if (allowedAdmins.includes(userEmail)) {
-        router.push('/dashboard')
-      } else {
-        alert('Access denied: You are not an authorized admin.')
-        await supabase.auth.signOut()
-      }
-    })
+  const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
+    if (!session || !session.user?.email) return // ✅ Don't block unauthenticated user
 
-    return () => {
-      data.subscription.unsubscribe()
+    const userEmail = session.user.email
+    if (allowedAdmins.includes(userEmail)) {
+      router.push('/dashboard')
+    } else {
+      alert('Access denied: You are not an authorized admin.')
+      await supabase.auth.signOut()
     }
-  }, [supabase, router])
+  })
+
+  return () => {
+    data.subscription.unsubscribe()
+  }
+}, [supabase, router])
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-black text-white">
