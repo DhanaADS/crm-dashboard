@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import Image from 'next/image'
 
 import SkeletonCard from '@/components/SkeletonCard'
 import AnalyticsChart from '@/components/AnalyticsChart'
@@ -37,7 +38,7 @@ export default function HomePage() {
     }
 
     checkAuth()
-  }, [router, supabase.auth]) // ✅ FIX: added to satisfy ESLint and Vercel build
+  }, [router, supabase.auth])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -54,8 +55,15 @@ export default function HomePage() {
 
   return (
     <main className="relative min-h-screen p-6 bg-gray-900 text-white">
-      {/* 🔒 Logout Button Top-Right */}
-      <div className="fixed top-4 right-6 z-50">
+      {/* 🔒 Logout Button + Logo (Top-Right) */}
+      <div className="fixed top-4 right-6 z-50 flex items-center gap-4">
+        <Image
+          src="/assets/ads-logo.png"
+          alt="ADS Logo"
+          width={36}
+          height={36}
+          className="object-contain"
+        />
         <button
           onClick={handleLogout}
           className="px-3 py-2 text-sm bg-red-600 hover:bg-red-700 text-white rounded shadow"

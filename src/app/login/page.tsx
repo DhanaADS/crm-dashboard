@@ -5,6 +5,7 @@ import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 
 export default function LoginPage() {
   const supabase = createClientComponentClient()
@@ -15,7 +16,7 @@ export default function LoginPage() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
-        router.push('/dashboard') // ✅ redirect after login
+        router.push('/dashboard')
       }
     })
 
@@ -27,36 +28,50 @@ export default function LoginPage() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-black text-white">
       <div className="auth-ui w-full max-w-sm p-6 bg-zinc-900 rounded-xl shadow-md">
+        {/* ✅ Logo */}
+        <div className="flex justify-center mb-4">
+          <Image
+  src="/assets/ads-logo.png"
+  alt="ADS Logo"
+  width={60}
+  height={60}
+  className="mb-2 object-contain"
+/>
+        </div>
+
         <h1 className="text-xl font-semibold text-center mb-6">
-          🔐 Login to ADS Dashboard
+          Login to ADS Dashboard
         </h1>
 
         <Auth
           supabaseClient={supabase}
           view="magic_link"
           appearance={{
-  theme: ThemeSupa,
-  className: {
-    container: 'flex flex-col items-center gap-2',
-    button: 'py-2 px-4 text-sm bg-green-500 hover:bg-green-600 text-white rounded-md mx-auto',
-    input: 'rounded bg-gray-800 border border-gray-700 text-white px-3 py-2',
-    label: 'text-sm font-medium text-white',
-  },
-}}
+            theme: ThemeSupa,
+            className: {
+              container: 'flex flex-col items-center gap-2',
+              button:
+                'py-2 px-4 text-sm bg-green-500 hover:bg-green-600 text-white rounded-md mx-auto',
+              input:
+                'rounded bg-gray-800 border border-gray-700 text-white px-3 py-2',
+              label: 'text-sm font-medium text-white',
+            },
+          }}
           theme="dark"
           providers={['google']}
           showLinks={false}
           magicLink={true}
           localization={{
-  variables: {
-    magic_link: {
-      email_input_label: 'Email address', // ✅ Correct key
-      button_label: 'Send Magic Link',
-      link_text: '',
-      confirmation_text: 'Check your email for the login link!',
-    }
-  }
-}}
+            variables: {
+              magic_link: {
+                email_input_label: 'Email address',
+                button_label: 'Send Magic Link',
+                link_text: '',
+                confirmation_text:
+                  'Check your email for the login link!',
+              },
+            },
+          }}
         />
 
         <p className="mt-6 text-center text-sm text-gray-400">
@@ -64,6 +79,7 @@ export default function LoginPage() {
         </p>
       </div>
 
+      {/* Optional styling for Auth form size */}
       <style jsx global>{`
         .auth-ui form {
           max-width: 13rem !important;
