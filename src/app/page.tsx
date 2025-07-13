@@ -55,18 +55,18 @@ export default function HomePage() {
   }, [router, supabase])
 
   useEffect(() => {
-    const fetchInbox = async () => {
-      try {
-        const res = await fetch('/api/gmail/preview')
-        const data = await res.json()
-        if (data?.messages) setEmails(data.messages) // ✅ FIXED LINE
-      } catch (err) {
-        console.error('Inbox fetch error:', err)
-      }
+  const fetchInbox = async () => {
+    try {
+      const res = await fetch('/api/gmail/preview')
+      const data = await res.json()
+      if (data?.messages) setEmails(data.messages) // ✅ FIXED KEY
+    } catch (err) {
+      console.error('Inbox fetch error:', err)
     }
+  }
 
-    if (authChecked) fetchInbox()
-  }, [authChecked])
+  if (authChecked) fetchInbox()
+}, [authChecked])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
