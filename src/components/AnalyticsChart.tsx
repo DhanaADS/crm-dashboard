@@ -11,7 +11,6 @@ import {
   Tooltip,
   Legend,
   ChartData,
-  ChartOptions,
 } from 'chart.js'
 import { useEffect, useState } from 'react'
 
@@ -28,7 +27,7 @@ export default function AnalyticsChart() {
           label: 'Leads',
           data: [5, 7, 3, 8, 6, 7, 4],
           fill: false,
-          borderColor: '#6366f1', // Indigo-500
+          borderColor: '#6366f1',
           tension: 0.4,
         },
       ],
@@ -37,7 +36,7 @@ export default function AnalyticsChart() {
     setChartData(data)
   }, [])
 
-  const options: ChartOptions<'line'> = {
+  const options = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
