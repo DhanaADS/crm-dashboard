@@ -11,17 +11,27 @@ export default function LoginPage() {
   const supabase = createClientComponentClient()
   const router = useRouter()
 
-  useEffect(() => {
-  const { data } = supabase.auth.onAuthStateChange((event, session) => {
-    if (session?.user?.email) {
-      router.push('/dashboard')
-    }
-  })
+  const allowedAdmins = [
+    'dhana@aggrandizedigital.com',
+    'saravana@aggrandizedigital.com',
+    'veera@aggrandizedigital.com',
+  ]
 
-  return () => {
-    data.subscription.unsubscribe()
-  }
-}, [supabase, router])
+  useEffect(() => {
+    const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
+      const userEmail = session?.user?.email || ''
+      if (allowedAdmins.includes(userEmail)) {
+        router.push('/dashboard')
+      } else {
+        alert('Access denied: You are not an authorized admin.')
+        await supabase.auth.signOut()
+      }
+    })
+
+    return () => {
+      data.subscription.unsubscribe()
+    }
+  }, [supabase, router])
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-black text-white">

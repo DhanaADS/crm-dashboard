@@ -32,11 +32,12 @@ export default function HomePage() {
       const email = session?.user?.email || ''
 
       if (!session || !session.user || !allowedEmails.includes(email)) {
-        router.push('/login')
-      } else {
-        setAuthChecked(true)
-        setTimeout(() => setLoading(false), 1000)
-      }
+  await supabase.auth.signOut()
+  router.push('/login')
+} else {
+  setAuthChecked(true)
+  setTimeout(() => setLoading(false), 1000)
+}
     } catch (err) {
       console.error('Auth Check Failed:', err)
       router.push('/login')
