@@ -16,6 +16,14 @@ const handler = NextAuth({
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
+  pages: {
+    signIn: '/login',
+    // ✅ This will redirect after successful login
+    signOut: '/',
+    error: '/login',
+    verifyRequest: '/',
+    newUser: '/', // optional, if you want to handle first-time logins
+  },
   callbacks: {
     async jwt({ token, account }) {
       if (account) {

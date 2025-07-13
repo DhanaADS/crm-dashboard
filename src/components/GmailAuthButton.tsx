@@ -11,7 +11,7 @@ export default function GmailAuthButton() {
         <button
           onClick={() =>
             signIn('google', {
-              callbackUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/dashboard`,
+              callbackUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/`,
               prompt: 'select_account'
             })
           }
