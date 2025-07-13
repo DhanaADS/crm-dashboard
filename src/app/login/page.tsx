@@ -36,7 +36,7 @@ export default function LoginPage() {
           view="magic_link"
           appearance={{
   theme: ThemeSupa,
-  style: {
+  className: {
     container: 'flex flex-col items-center gap-2',
     button: 'py-2 px-4 text-sm bg-green-500 hover:bg-green-600 text-white rounded-md mx-auto',
     input: 'rounded bg-gray-800 border border-gray-700 text-white px-3 py-2',
