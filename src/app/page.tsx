@@ -25,23 +25,22 @@ export default function HomePage() {
   const router = useRouter()
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const response = await supabase.auth.getSession()
-      const session = response?.data?.session
-      const email = session?.user?.email || ''
+  const checkAuth = async () => {
+    const response = await supabase.auth.getSession()
+    const session = response?.data?.session
 
-      if (!session || !allowedEmails.includes(email)) {
-        // Use relative routing fallback
-        window.location.href = '/login'
-        return
-      }
+    const email = session?.user?.email || ''
 
+    if (!session || !session.user || !allowedEmails.includes(email)) {
+      router.push('/login')
+    } else {
       setAuthChecked(true)
       setTimeout(() => setLoading(false), 1000)
     }
+  }
 
-    checkAuth()
-  }, [router, supabase.auth])
+  checkAuth()
+}, [router, supabase])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
