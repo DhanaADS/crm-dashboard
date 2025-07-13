@@ -2,15 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Light mode */
+/* Light mode (fallback, not default) */
 :root {
   --background: #ffffff;
   --foreground: #171717;
 }
 
-/* Dark mode (updated to soft dark gray) */
-.dark {
-  --background: #262626; /* ← updated from #0a0a0a to #1f1f1f */
+/* ✅ Default to dark mode */
+html {
+  color-scheme: dark;
+}
+
+/* Dark mode with soft gray tones */
+.dark,
+html {
+  --background: #1f1f1f; /* softer than pure black */
   --foreground: #f4f4f4;
 }
 
