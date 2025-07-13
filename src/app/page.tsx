@@ -9,7 +9,6 @@ import dynamic from 'next/dynamic'
 import SkeletonCard from '@/components/SkeletonCard'
 import AnalyticsChart from '@/components/AnalyticsChart'
 
-// ✅ Dynamic import to avoid hydration mismatch
 const GmailAuthButton = dynamic(() => import('@/components/GmailAuthButton'), { ssr: false })
 
 const allowedEmails = [
@@ -26,30 +25,23 @@ export default function HomePage() {
   const router = useRouter()
 
   useEffect(() => {
-  const checkAuth = async () => {
-    const response = await supabase.auth.getSession()
+    const checkAuth = async () => {
+      const response = await supabase.auth.getSession()
+      const session = response?.data?.session
+      const email = session?.user?.email || ''
 
-    if (!response || !response.data || !response.data.session) {
-      router.push('/login')
-      return
-    }
+      if (!session || !allowedEmails.includes(email)) {
+        // Use relative routing fallback
+        window.location.href = '/login'
+        return
+      }
 
-    const session = response.data.session
-    const email = session.user?.email || ''
-
-    if (!allowedEmails.includes(email)) {
-      router.push('/login')
-    } else {
       setAuthChecked(true)
       setTimeout(() => setLoading(false), 1000)
     }
-  }
 
-  checkAuth()
-}, [router, supabase.auth])
-
-  checkAuth()
-}, [router, supabase.auth])
+    checkAuth()
+  }, [router, supabase.auth])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -66,7 +58,7 @@ export default function HomePage() {
 
   return (
     <main className="relative min-h-screen p-6 bg-gray-900 text-white">
-      {/* 🔓 Logout Button - Top Left */}
+      {/* 🔓 Logout Button */}
       <div className="absolute top-4 left-4 z-50">
         <button
           onClick={handleLogout}
@@ -76,7 +68,7 @@ export default function HomePage() {
         </button>
       </div>
 
-      {/* 🎯 Centered Header Section */}
+      {/* Header Section */}
       <div className="flex flex-col items-center mt-10 mb-6">
         <Image
           src="/assets/ads-logo.png"
@@ -87,7 +79,6 @@ export default function HomePage() {
         />
         <h1 className="text-3xl font-bold text-center">ADS Dashboard</h1>
 
-        {/* 📩 Gmail Auth Button */}
         <div className="mt-3">
           <GmailAuthButton />
         </div>
@@ -110,7 +101,7 @@ export default function HomePage() {
         )}
       </div>
 
-      {/* 📊 Analytics */}
+      {/* Analytics */}
       <div className="mt-6 flex justify-end pr-4">
         <div className="w-[400px] bg-gray-800 p-4 rounded shadow">
           <h2 className="text-lg font-semibold text-center mb-4 text-white">
