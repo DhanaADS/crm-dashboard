@@ -47,12 +47,12 @@ export default function HomePage() {
 
   if (!authChecked) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
-        <p className="text-sm">Checking authentication...</p>
-      </main>
-    )
-  }
+  <main className="relative min-h-screen p-6 bg-gray-900 text-white">
 
+    {/* ✅ Logo top-right */}
+    <div className="flex justify-end mb-4">
+      <img src="/assets/logo-white.png" alt="ADS Logo" className="w-20 h-20 object-contain" />
+    </div>
   return (
     <main className="relative min-h-screen p-6 bg-gray-900 text-white">
       {/* 🔒 Logout Button + Logo (Top-Right) */}
