@@ -28,17 +28,25 @@ export default function HomePage() {
   useEffect(() => {
   const checkAuth = async () => {
     const response = await supabase.auth.getSession()
-    const { data } = response || {}
-    const session = data?.session
-    const email = session?.user?.email || ''
 
-    if (!session || !allowedEmails.includes(email)) {
+    if (!response || !response.data || !response.data.session) {
+      router.push('/login')
+      return
+    }
+
+    const session = response.data.session
+    const email = session.user?.email || ''
+
+    if (!allowedEmails.includes(email)) {
       router.push('/login')
     } else {
       setAuthChecked(true)
       setTimeout(() => setLoading(false), 1000)
     }
   }
+
+  checkAuth()
+}, [router, supabase.auth])
 
   checkAuth()
 }, [router, supabase.auth])
