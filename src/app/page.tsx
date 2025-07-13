@@ -59,7 +59,7 @@ export default function HomePage() {
       try {
         const res = await fetch('/api/gmail/preview')
         const data = await res.json()
-        if (data?.inbox) setEmails(data.inbox)
+        if (data?.messages) setEmails(data.messages) // ✅ FIXED LINE
       } catch (err) {
         console.error('Inbox fetch error:', err)
       }
