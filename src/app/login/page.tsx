@@ -48,15 +48,15 @@ export default function LoginPage() {
           showLinks={false}
           magicLink={true}
           localization={{
-            variables: {
-              magic_link: {
-                email_label: 'Email address',
-                button_label: 'Send Magic Link',
-                link_text: '',
-                confirmation_text: 'Check your email for the login link!',
-              },
-            },
-          }}
+  variables: {
+    magic_link: {
+      email_input_label: 'Email address', // ✅ Correct key
+      button_label: 'Send Magic Link',
+      link_text: '',
+      confirmation_text: 'Check your email for the login link!',
+    }
+  }
+}}
         />
 
         <p className="mt-6 text-center text-sm text-gray-400">
