@@ -45,7 +45,7 @@ export default function HomePage() {
     router.push('/login')
   }
 
-  // 🔁 Loading auth state
+  // ⏳ While auth is checking
   if (!authChecked) {
     return (
       <main className="relative min-h-screen p-6 bg-gray-900 text-white">
@@ -63,8 +63,14 @@ export default function HomePage() {
 
   return (
     <main className="relative min-h-screen p-6 bg-gray-900 text-white">
-      {/* 🔒 Logout Button + Logo (Top-Right) */}
-      <div className="fixed top-4 right-6 z-50 flex items-center gap-4">
+      {/* 🔄 Top Bar: Logout left, logo right */}
+      <div className="flex justify-between items-center mb-6 px-4">
+        <button
+          onClick={handleLogout}
+          className="px-3 py-2 text-sm bg-red-600 hover:bg-red-700 text-white rounded shadow"
+        >
+          🔓 Logout
+        </button>
         <Image
           src="/assets/ads-logo.png"
           alt="ADS Logo"
@@ -72,12 +78,6 @@ export default function HomePage() {
           height={40}
           className="object-contain"
         />
-        <button
-          onClick={handleLogout}
-          className="px-3 py-2 text-sm bg-red-600 hover:bg-red-700 text-white rounded shadow"
-        >
-          🔓 Logout
-        </button>
       </div>
 
       {/* ✅ Page Title */}
