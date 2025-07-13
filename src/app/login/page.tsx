@@ -35,16 +35,14 @@ export default function LoginPage() {
           supabaseClient={supabase}
           view="magic_link"
           appearance={{
-            theme: ThemeSupa,
-            className: {
-              label: 'text-xs mb-1 text-left w-full text-gray-300',
-              input: 'rounded-md px-3 py-2 text-sm w-72',
-              button:
-                'py-2 px-4 text-sm bg-green-500 hover:bg-green-600 text-white rounded-md mx-auto',
-              container: 'flex flex-col items-center gap-2',
-              buttonContainer: 'flex justify-center w-full',
-            },
-          }}
+  theme: ThemeSupa,
+  style: {
+    container: 'flex flex-col items-center gap-2',
+    button: 'py-2 px-4 text-sm bg-green-500 hover:bg-green-600 text-white rounded-md mx-auto',
+    input: 'rounded bg-gray-800 border border-gray-700 text-white px-3 py-2',
+    label: 'text-sm font-medium text-white',
+  },
+}}
           theme="dark"
           providers={['google']}
           showLinks={false}
