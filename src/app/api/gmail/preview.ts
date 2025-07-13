@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
+import type { gmail_v1 } from 'googleapis'
 
 const GMAIL_API = 'https://gmail.googleapis.com/gmail/v1/users/me/messages'
 
-export async function GET(req: NextRequest) {
+export async function GET(_: NextRequest) {
   const supabase = createServerComponentClient({ cookies })
   const {
     data: { session },
@@ -24,29 +25,29 @@ export async function GET(req: NextRequest) {
       },
     })
 
-    const listData = await listRes.json()
+    const listData: gmail_v1.Schema$ListMessagesResponse = await listRes.json()
 
     if (!listData.messages || listData.messages.length === 0) {
       return NextResponse.json({ messages: [] })
     }
 
-    // Step 2: Fetch each message's snippet
+    // Step 2: Fetch each message's metadata
     const emailPreviews = await Promise.all(
-      listData.messages.map(async (msg: any) => {
+      listData.messages.map(async (msg: gmail_v1.Schema$Message) => {
         const detailRes = await fetch(`${GMAIL_API}/${msg.id}`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         })
 
-        const detail = await detailRes.json()
+        const detail: gmail_v1.Schema$Message = await detailRes.json()
 
-        const headers = detail.payload.headers
-        const fromHeader = headers.find((h: any) => h.name === 'From')
-        const subjectHeader = headers.find((h: any) => h.name === 'Subject')
+        const headers = detail.payload?.headers || []
+        const fromHeader = headers.find((h) => h.name === 'From')
+        const subjectHeader = headers.find((h) => h.name === 'Subject')
 
         return {
-          id: detail.id,
+          id: detail.id || '',
           from: fromHeader?.value || 'Unknown Sender',
           subject: subjectHeader?.value || '(No Subject)',
           snippet: detail.snippet || '',

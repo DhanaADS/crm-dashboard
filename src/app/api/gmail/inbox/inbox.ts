@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
-import { google } from 'googleapis'
+import { google, gmail_v1 } from 'googleapis'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const supabase = createServerSupabaseClient({ req, res })
@@ -35,15 +35,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const messages = response.data.messages || []
 
     const emailDetails = await Promise.all(
-      messages.map(async (msg) => {
+      messages.map(async (msg: gmail_v1.Schema$Message) => {
         const full = await gmail.users.messages.get({
           userId: 'me',
           id: msg.id!,
         })
 
         const headers = full.data.payload?.headers || []
-        const subject = headers.find((h) => h.name === 'Subject')?.value || '(No Subject)'
-        const from = headers.find((h) => h.name === 'From')?.value || '(Unknown Sender)'
+        const subject =
+          headers.find((h) => h.name === 'Subject')?.value || '(No Subject)'
+        const from =
+          headers.find((h) => h.name === 'From')?.value || '(Unknown Sender)'
 
         return {
           id: msg.id,
@@ -54,7 +56,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     )
 
     res.status(200).json({ messages: emailDetails })
-  } catch (error: any) {
+  } catch (error) {
     console.error('Gmail API Error:', error)
     res.status(500).json({ error: 'Failed to fetch inbox' })
   }
