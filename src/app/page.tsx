@@ -4,9 +4,13 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import Image from 'next/image'
+import dynamic from 'next/dynamic'
 
 import SkeletonCard from '@/components/SkeletonCard'
 import AnalyticsChart from '@/components/AnalyticsChart'
+
+// ✅ Dynamic import to avoid hydration mismatch
+const GmailAuthButton = dynamic(() => import('@/components/GmailAuthButton'), { ssr: false })
 
 const allowedEmails = [
   'dhana@aggrandizedigital.com',
@@ -75,6 +79,11 @@ export default function HomePage() {
           className="mb-4 object-contain"
         />
         <h1 className="text-3xl font-bold text-center">ADS Dashboard</h1>
+
+        {/* 📩 Gmail Auth Button */}
+        <div className="mt-3">
+          <GmailAuthButton />
+        </div>
       </div>
 
       {/* Cards */}
