@@ -12,17 +12,16 @@ export default function LoginPage() {
   const router = useRouter()
 
   useEffect(() => {
-    const { data: subscription } =
-      supabase.auth.onAuthStateChange((event, session) => {
-        if (session?.user?.email) {
-          router.push('/dashboard')
-        }
-      }) || { data: { subscription: { unsubscribe: () => {} } } }
-
-    return () => {
-      subscription?.unsubscribe?.()
+  const subscription = supabase.auth.onAuthStateChange((event, session) => {
+    if (session?.user?.email) {
+      router.push('/dashboard')
     }
-  }, [supabase, router])
+  })
+
+  return () => {
+    subscription?.unsubscribe()
+  }
+}, [supabase, router])
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-black text-white">
