@@ -55,32 +55,27 @@ export default function HomePage() {
 
   return (
     <main className="relative min-h-screen p-6 bg-gray-900 text-white">
-      {/* 🔄 Header: Logout left, Logo center */}
-      <div className="relative h-20 mb-6">
-        {/* 🔓 Logout Button - Absolute Left */}
-        <div className="absolute left-0 top-1/2 -translate-y-1/2">
-          <button
-            onClick={handleLogout}
-            className="ml-4 px-3 py-2 text-sm bg-red-600 hover:bg-red-700 text-white rounded shadow"
-          >
-            🔓 Logout
-          </button>
-        </div>
-
-        {/* 🖼 Logo - Perfect Center */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <Image
-            src="/assets/ads-logo.png"
-            alt="ADS Logo"
-            width={72}
-            height={72}
-            className="object-contain"
-          />
-        </div>
+      {/* 🔓 Logout Button - Top Left */}
+      <div className="absolute top-4 left-4 z-50">
+        <button
+          onClick={handleLogout}
+          className="px-3 py-2 text-sm bg-red-600 hover:bg-red-700 text-white rounded shadow"
+        >
+          🔓 Logout
+        </button>
       </div>
 
-      {/* ✅ Page Title */}
-      <h1 className="text-3xl font-bold mb-6 text-center">ADS Dashboard</h1>
+      {/* 🎯 Centered Header Section */}
+      <div className="flex flex-col items-center mt-10 mb-6">
+        <Image
+          src="/assets/ads-logo.png"
+          alt="ADS Logo"
+          width={80}
+          height={80}
+          className="mb-4 object-contain"
+        />
+        <h1 className="text-3xl font-bold text-center">ADS Dashboard</h1>
+      </div>
 
       {/* Cards */}
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
