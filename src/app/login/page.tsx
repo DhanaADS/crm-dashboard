@@ -34,7 +34,7 @@ export default function LoginPage() {
         <Auth
           supabaseClient={supabase}
           view="magic_link"
-          appearance={{
+          aappearance={{
   theme: ThemeSupa,
   className: {
     container: 'flex flex-col items-center gap-2',
