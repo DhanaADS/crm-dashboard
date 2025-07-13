@@ -33,10 +33,6 @@ export const authOptions: NextAuthOptions = {
       return token
     },
   },
-  // Optional: If you don’t have custom error page, comment this out
-  // pages: {
-  //   error: '/auth/error',
-  // },
 }
 
 const handler = NextAuth(authOptions)
