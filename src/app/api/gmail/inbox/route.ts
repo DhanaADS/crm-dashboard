@@ -4,6 +4,24 @@ import { getToken } from 'next-auth/jwt'
 
 const GMAIL_API = 'https://gmail.googleapis.com/gmail/v1/users/me/messages'
 
+interface GmailMessage {
+  id: string
+}
+
+interface GmailHeader {
+  name: string
+  value: string
+}
+
+interface GmailPayload {
+  headers: GmailHeader[]
+}
+
+interface GmailMessageDetail {
+  id: string
+  payload: GmailPayload
+}
+
 export async function GET(req: NextRequest) {
   const token = await getToken({ req })
 
@@ -19,18 +37,19 @@ export async function GET(req: NextRequest) {
     })
 
     const data = await res.json()
-    const messageIds = data.messages?.map((msg: any) => msg.id) || []
+    const messageIds = (data.messages as GmailMessage[] | undefined)?.map((msg) => msg.id) || []
 
     const messages = await Promise.all(
       messageIds.map(async (id: string) => {
         const msgRes = await fetch(`${GMAIL_API}/${id}`, {
           headers: { Authorization: `Bearer ${token.accessToken}` },
         })
-        const msgData = await msgRes.json()
+
+        const msgData: GmailMessageDetail = await msgRes.json()
         const headers = msgData.payload.headers
 
-        const subject = headers.find((h: any) => h.name === 'Subject')?.value || '(No subject)'
-        const from = headers.find((h: any) => h.name === 'From')?.value || '(Unknown sender)'
+        const subject = headers.find((h) => h.name === 'Subject')?.value || '(No subject)'
+        const from = headers.find((h) => h.name === 'From')?.value || '(Unknown sender)'
 
         return { id, subject, from }
       })

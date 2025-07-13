@@ -17,10 +17,16 @@ const allowedEmails = [
   'veera@aggrandizedigital.com',
 ]
 
+type EmailItem = {
+  id: string
+  subject: string
+  snippet: string
+}
+
 export default function HomePage() {
   const [loading, setLoading] = useState(true)
   const [authChecked, setAuthChecked] = useState(false)
-  const [emails, setEmails] = useState<any[]>([])
+  const [emails, setEmails] = useState<EmailItem[]>([])
 
   const supabase = createClientComponentClient()
   const router = useRouter()

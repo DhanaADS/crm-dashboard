@@ -7,33 +7,33 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 
+const allowedAdmins = [
+  'dhana@aggrandizedigital.com',
+  'saravana@aggrandizedigital.com',
+  'veera@aggrandizedigital.com',
+]
+
 export default function LoginPage() {
   const supabase = createClientComponentClient()
   const router = useRouter()
 
-  const allowedAdmins = [
-    'dhana@aggrandizedigital.com',
-    'saravana@aggrandizedigital.com',
-    'veera@aggrandizedigital.com',
-  ]
-
   useEffect(() => {
-  const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
-    if (!session || !session.user?.email) return // ✅ Don't block unauthenticated user
+    const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!session || !session.user?.email) return
 
-    const userEmail = session.user.email
-    if (allowedAdmins.includes(userEmail)) {
-      router.push('/dashboard')
-    } else {
-      alert('Access denied: You are not an authorized admin.')
-      await supabase.auth.signOut()
+      const userEmail = session.user.email
+      if (allowedAdmins.includes(userEmail)) {
+        router.push('/dashboard')
+      } else {
+        alert('Access denied: You are not an authorized admin.')
+        await supabase.auth.signOut()
+      }
+    })
+
+    return () => {
+      data.subscription.unsubscribe()
     }
-  })
-
-  return () => {
-    data.subscription.unsubscribe()
-  }
-}, [supabase, router])
+  }, [supabase, router]) // ✅ Now clean and ESLint-safe
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-black text-white">
