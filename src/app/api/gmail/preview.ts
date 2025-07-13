@@ -19,7 +19,7 @@ export async function GET() {
 
   try {
     // Step 1: Fetch list of unread messages
-    const listRes = await fetch(`${GMAIL_API}?q=is:unread&maxResults=5`, {
+    const listRes = await fetch(`${GMAIL_API}?maxResults=5`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
