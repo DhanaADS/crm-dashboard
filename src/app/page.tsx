@@ -26,16 +26,20 @@ export default function HomePage() {
 
   useEffect(() => {
   const checkAuth = async () => {
-    const response = await supabase.auth.getSession()
-    const session = response?.data?.session
+    try {
+      const response = await supabase.auth.getSession()
+      const session = response?.data?.session
+      const email = session?.user?.email || ''
 
-    const email = session?.user?.email || ''
-
-    if (!session || !session.user || !allowedEmails.includes(email)) {
+      if (!session || !session.user || !allowedEmails.includes(email)) {
+        router.push('/login')
+      } else {
+        setAuthChecked(true)
+        setTimeout(() => setLoading(false), 1000)
+      }
+    } catch (err) {
+      console.error('Auth Check Failed:', err)
       router.push('/login')
-    } else {
-      setAuthChecked(true)
-      setTimeout(() => setLoading(false), 1000)
     }
   }
 
