@@ -1,12 +1,16 @@
 // src/app/layout.tsx
-import '../styles/globals.css'
-import { ReactNode } from 'react'
+'use client'
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+import './globals.css'
+import { SessionProvider } from 'next-auth/react' // ✅ import
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark">
-      <body className="bg-gray-900 text-white">
-        {children}
+    <html lang="en">
+      <body>
+        <SessionProvider> {/* ✅ wrap your app */}
+          {children}
+        </SessionProvider>
       </body>
     </html>
   )
