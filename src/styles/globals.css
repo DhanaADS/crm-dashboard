@@ -2,24 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Light mode (fallback, not default) */
+/* Fallback Light Mode (not used now) */
 :root {
   --background: #ffffff;
   --foreground: #171717;
 }
 
-/* ✅ Default to dark mode */
+/* ✅ Global Default Dark Mode */
 html {
+  --background: #1f1f1f; /* soft dark */
+  --foreground: #f4f4f4;
+  background-color: var(--background);
+  color: var(--foreground);
   color-scheme: dark;
 }
 
-/* Dark mode with soft gray tones */
-.dark,
-html {
-  --background: #1f1f1f; /* softer than pure black */
-  --foreground: #f4f4f4;
-}
-
+/* Ensure body picks it up */
 body {
   @apply bg-[var(--background)] text-[var(--foreground)] transition-colors duration-300;
 }
