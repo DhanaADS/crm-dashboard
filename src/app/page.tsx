@@ -45,14 +45,22 @@ export default function HomePage() {
     router.push('/login')
   }
 
+  // 🔁 Loading auth state
   if (!authChecked) {
     return (
-  <main className="relative min-h-screen p-6 bg-gray-900 text-white">
+      <main className="relative min-h-screen p-6 bg-gray-900 text-white">
+        <div className="flex justify-end mb-4">
+          <img
+            src="/assets/logo-white.png"
+            alt="ADS Logo"
+            className="w-24 h-auto object-contain"
+          />
+        </div>
+        <p className="text-sm text-center">Checking authentication...</p>
+      </main>
+    )
+  }
 
-    {/* ✅ Logo top-right */}
-    <div className="flex justify-end mb-4">
-      <img src="/assets/logo-white.png" alt="ADS Logo" className="w-20 h-20 object-contain" />
-    </div>
   return (
     <main className="relative min-h-screen p-6 bg-gray-900 text-white">
       {/* 🔒 Logout Button + Logo (Top-Right) */}
@@ -60,8 +68,8 @@ export default function HomePage() {
         <Image
           src="/assets/ads-logo.png"
           alt="ADS Logo"
-          width={36}
-          height={36}
+          width={40}
+          height={40}
           className="object-contain"
         />
         <button
