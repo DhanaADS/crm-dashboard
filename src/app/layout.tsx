@@ -1,7 +1,6 @@
 // src/app/layout.tsx
 'use client'
-
-import './globals.css'
+import '../styles/globals.css'
 import { SessionProvider } from 'next-auth/react' // ✅ import
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
