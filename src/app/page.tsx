@@ -45,17 +45,9 @@ export default function HomePage() {
     router.push('/login')
   }
 
-  // ⏳ While auth is checking
   if (!authChecked) {
     return (
       <main className="relative min-h-screen p-6 bg-gray-900 text-white">
-        <div className="flex justify-end mb-4">
-          <img
-            src="/assets/logo-white.png"
-            alt="ADS Logo"
-            className="w-24 h-auto object-contain"
-          />
-        </div>
         <p className="text-sm text-center">Checking authentication...</p>
       </main>
     )
@@ -63,19 +55,24 @@ export default function HomePage() {
 
   return (
     <main className="relative min-h-screen p-6 bg-gray-900 text-white">
-      {/* 🔄 Top Bar: Logout left, logo right */}
-      <div className="flex justify-between items-center mb-6 px-4">
-        <button
-          onClick={handleLogout}
-          className="px-3 py-2 text-sm bg-red-600 hover:bg-red-700 text-white rounded shadow"
-        >
-          🔓 Logout
-        </button>
+      {/* 🔄 Top bar: Logout left, Logo center */}
+      <div className="relative flex items-center justify-center mb-6">
+        {/* 🔓 Logout Left */}
+        <div className="absolute left-4">
+          <button
+            onClick={handleLogout}
+            className="px-3 py-2 text-sm bg-red-600 hover:bg-red-700 text-white rounded shadow"
+          >
+            🔓 Logout
+          </button>
+        </div>
+
+        {/* 🖼 Centered Logo */}
         <Image
           src="/assets/ads-logo.png"
           alt="ADS Logo"
-          width={80}
-          height={80}
+          width={70}
+          height={70}
           className="object-contain"
         />
       </div>
