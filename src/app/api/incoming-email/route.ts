@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { simpleParser } from 'mailparser';
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
@@ -9,15 +8,13 @@ const supabase = createClient(
 
 export async function POST(req: NextRequest) {
   try {
-    const rawBody = await req.text();
-    console.log('📩 Raw Body:', rawBody);
+    const formData = await req.formData();
 
-    const parsed = await simpleParser(rawBody);
-    const from = parsed.from?.text || 'Unknown Sender';
-    const subject = parsed.subject || '(No Subject)';
+    const from = formData.get('from')?.toString() || 'Unknown Sender';
+    const subject = formData.get('subject')?.toString() || '(No Subject)';
     const body =
-      parsed.text?.trim() ||
-      (typeof parsed.html === 'string' ? parsed.html.replace(/<[^>]*>/g, '').trim() : '') ||
+      formData.get('body-plain')?.toString().trim() ||
+      formData.get('stripped-text')?.toString().trim() ||
       '(No body)';
 
     console.log('✅ Parsed:', { from, subject, body });
@@ -35,10 +32,10 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ from, subject, body }, { status: 200 });
   } catch (err) {
-  const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-  console.error('❌ Handler Error:', errorMessage);
-  return NextResponse.json({ error: errorMessage }, { status: 500 });
- }
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+    console.error('❌ Handler Error:', errorMessage);
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
+  }
 }
 
 export async function GET() {
