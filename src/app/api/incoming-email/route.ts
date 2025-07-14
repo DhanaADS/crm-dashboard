@@ -15,19 +15,22 @@ export async function POST(req: NextRequest) {
         : '') ||
       '(No body)';
 
-    // 🪵 Debug: Log the parsed email content
-    console.log('📨 Received Email:', { from, subject, body });
+    // 🪵 Log full details for debugging
+    console.log('📨 Parsed Email:', {
+      from,
+      subject,
+      body,
+    });
 
     return NextResponse.json({ from, subject, body });
   } catch (error) {
-    console.error('❌ Webhook Error:', error);
+    console.error('❌ Error parsing email:', error);
     return NextResponse.json({ error: 'Webhook failed to process email' }, { status: 500 });
   }
 }
 
-// ✅ Optional: Handle GET requests (visible in browser for manual check)
 export async function GET() {
   return NextResponse.json({
-    message: '✅ Webhook is live. To test, send a POST request (like Mailgun will).',
+    message: '✅ Webhook is live. To test, send a POST request (llike Mailgun will).',
   });
 }
