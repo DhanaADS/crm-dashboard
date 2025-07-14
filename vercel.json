@@ -1,0 +1,8 @@
+{
+  "functions": {
+    "api/incoming-email.ts": {
+      "memory": 512,
+      "maxDuration": 10
+    }
+  }
+}
