@@ -5,7 +5,7 @@ import type { gmail_v1 } from 'googleapis'
 
 const GMAIL_API = 'https://gmail.googleapis.com/gmail/v1/users/me/messages'
 
-export async function GET(_req: NextRequest) {
+export async function GET() {
   const supabase = createServerComponentClient({ cookies })
   const {
     data: { session },
