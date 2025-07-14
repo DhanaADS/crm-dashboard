@@ -21,6 +21,7 @@ type EmailItem = {
   id: string
   subject: string
   snippet: string
+  from: string
 }
 
 export default function HomePage() {
@@ -55,18 +56,18 @@ export default function HomePage() {
   }, [router, supabase])
 
   useEffect(() => {
-  const fetchInbox = async () => {
-    try {
-      const res = await fetch('/api/gmail/preview')
-      const data = await res.json()
-      if (data?.messages) setEmails(data.messages) // ✅ FIXED KEY
-    } catch (err) {
-      console.error('Inbox fetch error:', err)
+    const fetchInbox = async () => {
+      try {
+        const res = await fetch('/api/gmail/preview')
+        const data = await res.json()
+        if (data?.inbox) setEmails(data.inbox)
+      } catch (err) {
+        console.error('Inbox fetch error:', err)
+      }
     }
-  }
 
-  if (authChecked) fetchInbox()
-}, [authChecked])
+    if (authChecked) fetchInbox()
+  }, [authChecked])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -111,12 +112,13 @@ export default function HomePage() {
         {/* 📥 Inbox Preview */}
         {emails.length > 0 && (
           <div className="mt-6 bg-gray-800 text-white p-4 rounded shadow max-w-2xl w-full mx-auto">
-            <h2 className="text-lg font-semibold mb-3">📥 Latest Unread Emails</h2>
+            <h2 className="text-lg font-semibold mb-3">📥 Latest Emails</h2>
             <ul className="space-y-2 text-sm">
               {emails.map((email) => (
                 <li key={email.id} className="border-b border-gray-700 pb-2">
-                  <p className="font-medium">🧾 {email.subject}</p>
-                  <p className="text-xs text-gray-400">{email.snippet}</p>
+                  <p className="font-medium">✉️ <strong>{email.subject}</strong></p>
+                  <p className="text-xs text-gray-400">From: {email.from}</p>
+                  <p className="text-xs text-gray-500">{email.snippet}</p>
                 </li>
               ))}
             </ul>

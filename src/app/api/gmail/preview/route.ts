@@ -1,71 +1,52 @@
 // src/app/api/gmail/preview/route.ts
-import { NextResponse } from 'next/server'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
 
-interface GmailMessage {
-  id: string
-}
+import { google } from 'googleapis';
+import { cookies } from 'next/headers';
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 
-interface GmailHeader {
-  name: string
-  value: string
-}
-
-interface GmailPayload {
-  headers: GmailHeader[]
-}
-
-interface GmailMessageDetail {
-  id: string
-  snippet: string
-  payload: GmailPayload
-}
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const supabase = createRouteHandlerClient({ cookies })
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
+  const supabase = createServerComponentClient({ cookies });
+  const { data: { session } } = await supabase.auth.getSession();
 
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!session?.provider_token) {
+    return Response.json({ error: 'Not authenticated' }, { status: 401 });
   }
 
-  const accessToken = session.provider_token
+  const auth = new google.auth.OAuth2();
+  auth.setCredentials({ access_token: session.provider_token });
 
-  const res = await fetch(
-    `https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=5`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }
-  )
+  const gmail = google.gmail({ version: 'v1', auth });
 
-  const { messages }: { messages?: GmailMessage[] } = await res.json()
-  if (!messages) return NextResponse.json({ inbox: [] })
+  try {
+    // Get latest 10 messages without filtering
+    const msgListRes = await gmail.users.messages.list({
+      userId: 'me',
+      maxResults: 10,
+    });
 
-  const emailPreviews = await Promise.all(
-    messages.map(async (msg: GmailMessage) => {
-      const detailRes = await fetch(
-        `https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}?format=metadata&metadataHeaders=Subject`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      )
-      const detail: GmailMessageDetail = await detailRes.json()
+    const messageIds = msgListRes.data.messages || [];
 
-      return {
-        id: msg.id,
-        snippet: detail.snippet,
-        subject:
-          detail.payload?.headers?.find((h) => h.name === 'Subject')?.value || '',
-      }
-    })
-  )
+    const inbox = await Promise.all(
+      messageIds.map(async (msg) => {
+        const fullMsg = await gmail.users.messages.get({
+          userId: 'me',
+          id: msg.id!,
+        });
 
-  return NextResponse.json({ inbox: emailPreviews })
+        const headers = fullMsg.data.payload?.headers || [];
+        const subject = headers.find((h) => h.name === 'Subject')?.value || 'No Subject';
+        const from = headers.find((h) => h.name === 'From')?.value || 'Unknown Sender';
+        const snippet = fullMsg.data.snippet || '';
+
+        return { id: msg.id, from, subject, snippet };
+      })
+    );
+
+    return Response.json({ inbox });
+  } catch (err) {
+    console.error('Error fetching Gmail preview:', err);
+    return Response.json({ error: 'Failed to fetch emails' }, { status: 500 });
+  }
 }
