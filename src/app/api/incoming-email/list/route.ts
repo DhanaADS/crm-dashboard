@@ -23,7 +23,7 @@ export async function GET() {
       id: item.id,
       subject: item.subject || '(No Subject)',
       from: item.from_email || 'Unknown Sender',
-      snippet: (item.body || '').slice(0, 80),
+      snippet: (item.body || '').replace(/[\r\n]+/g, ' ').replace(/[^\x00-\x7F]/g, '').slice(0, 80),
     }));
 
     return NextResponse.json({ inbox });

@@ -13,11 +13,20 @@ export async function POST(req: NextRequest) {
 
     const from = params.get('from') || 'Unknown Sender';
     const subject = params.get('subject') || '(No Subject)';
-    const body = params.get('body-plain')?.trim() || '(No body)';
+
+    // 🔧 Clean body properly
+    let body = params.get('body-plain') || '';
+    body = body
+      .replace(/[\r\n]+/g, ' ')        // remove newlines
+      .replace(/[^\x00-\x7F]/g, '')    // remove non-ASCII characters
+      .replace(/\s+/g, ' ')            // normalize spaces
+      .trim();
+
+    if (!body) body = '(No body)';
 
     console.log('✅ Clean Parsed:', { from, subject, body });
 
-    // Step 2: Optional deduplication (based on from + subject + body hash)
+    // 🔁 Optional deduplication
     const exists = await supabase
       .from('incoming_emails')
       .select('id')
