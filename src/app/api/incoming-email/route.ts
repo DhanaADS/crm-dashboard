@@ -34,10 +34,11 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ from, subject, body }, { status: 200 });
-  } catch (err: any) {
-    console.error('❌ Handler Error:', err.message);
-    return NextResponse.json({ error: err.message }, { status: 500 });
-  }
+  } catch (err) {
+  const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+  console.error('❌ Handler Error:', errorMessage);
+  return NextResponse.json({ error: errorMessage }, { status: 500 });
+ }
 }
 
 export async function GET() {
