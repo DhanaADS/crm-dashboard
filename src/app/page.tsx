@@ -17,12 +17,27 @@ const allowedEmails = [
   'veera@aggrandizedigital.com',
 ]
 
+type EmailItem = {
+  id: string
+  subject: string
+  snippet: string
+  from: string
+}
+
+type IncomingEmail = {
+  id: string
+  from_email: string
+  subject: string
+  body: string
+  received_at: string
+}
+
 export default function HomePage() {
   const [loading, setLoading] = useState(true)
   const [authChecked, setAuthChecked] = useState(false)
-  const [emails, setEmails] = useState([])
-  const [emailStatus, setEmailStatus] = useState('idle')
-  const [incomingEmails, setIncomingEmails] = useState([])
+  const [emails, setEmails] = useState<EmailItem[]>([])
+  const [incomingEmails, setIncomingEmails] = useState<IncomingEmail[]>([])
+  const [emailStatus, setEmailStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
 
   const supabase = createClientComponentClient()
   const router = useRouter()
@@ -54,7 +69,7 @@ export default function HomePage() {
     try {
       setEmailStatus('loading')
       const res = await fetch('/api/gmail/preview')
-      const data = await res.json()
+      const data: { inbox?: EmailItem[] } = await res.json()
 
       if (data?.inbox?.length > 0) {
         setEmails(data.inbox)
@@ -69,21 +84,18 @@ export default function HomePage() {
     }
   }
 
-  const fetchIncomingEmails = async () => {
-    const { data, error } = await supabase
-      .from('incoming_emails')
-      .select('*')
-      .order('received_at', { ascending: false })
-      .limit(10)
-    if (error) console.error('Supabase error:', error.message)
-    else setIncomingEmails(data)
-  }
-
   useEffect(() => {
-    if (authChecked) {
-      fetchInbox()
-      fetchIncomingEmails()
+    if (!authChecked) return
+
+    fetchInbox()
+
+    const fetchIncomingEmails = async () => {
+      const res = await fetch('/api/incoming-email/list')
+      const json: { emails: IncomingEmail[] } = await res.json()
+      setIncomingEmails(json.emails)
     }
+
+    fetchIncomingEmails()
   }, [authChecked])
 
   const handleLogout = async () => {
@@ -101,6 +113,7 @@ export default function HomePage() {
 
   return (
     <main className="relative min-h-screen p-6 bg-gray-900 text-white">
+      {/* 🔓 Logout Button */}
       <div className="absolute top-4 left-4 z-50">
         <button
           onClick={handleLogout}
@@ -110,6 +123,7 @@ export default function HomePage() {
         </button>
       </div>
 
+      {/* Header Section */}
       <div className="flex flex-col items-center mt-10 mb-6">
         <Image
           src="/assets/ads-logo.png"
@@ -124,6 +138,7 @@ export default function HomePage() {
           <GmailAuthButton />
         </div>
 
+        {/* Status Indicator */}
         {emailStatus === 'loading' && (
           <p className="text-sm text-yellow-400 mt-2">🔄 Fetching inbox preview...</p>
         )}
@@ -142,9 +157,10 @@ export default function HomePage() {
           </div>
         )}
 
+        {/* 📥 Inbox Preview */}
         {emails.length > 0 && (
           <div className="mt-6 bg-gray-800 text-white p-4 rounded shadow max-w-2xl w-full mx-auto">
-            <h2 className="text-lg font-semibold mb-3">📥 Gmail Preview</h2>
+            <h2 className="text-lg font-semibold mb-3">📥 Latest Emails</h2>
             <ul className="space-y-2 text-sm">
               {emails.map((email) => (
                 <li key={email.id} className="border-b border-gray-700 pb-2">
@@ -157,11 +173,12 @@ export default function HomePage() {
           </div>
         )}
 
+        {/* 📩 Stored Incoming Emails */}
         {incomingEmails.length > 0 && (
           <div className="mt-6 bg-gray-800 text-white p-4 rounded shadow max-w-2xl w-full mx-auto">
-            <h2 className="text-lg font-semibold mb-3">📬 CRM Incoming Emails</h2>
+            <h2 className="text-lg font-semibold mb-3">🗂 Stored Emails</h2>
             <ul className="space-y-2 text-sm">
-              {incomingEmails.map((email: any) => (
+              {incomingEmails.map((email) => (
                 <li key={email.id} className="border-b border-gray-700 pb-2">
                   <p className="font-medium">📨 <strong>{email.subject}</strong></p>
                   <p className="text-xs text-gray-400">From: {email.from_email}</p>
@@ -173,6 +190,7 @@ export default function HomePage() {
         )}
       </div>
 
+      {/* Cards */}
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mt-6">
         {loading ? (
           <>
@@ -189,6 +207,7 @@ export default function HomePage() {
         )}
       </div>
 
+      {/* Analytics */}
       <div className="mt-6 flex justify-end pr-4">
         <div className="w-[400px] bg-gray-800 p-4 rounded shadow">
           <h2 className="text-lg font-semibold text-center mb-4 text-white">
