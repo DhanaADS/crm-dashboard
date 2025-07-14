@@ -9,10 +9,13 @@ export async function POST(req: NextRequest) {
 
     const from = parsed.from?.text || 'Unknown Sender'
     const subject = parsed.subject || '(No Subject)'
-    const body =
-      parsed.text?.trim() ||
-      parsed.html?.replace(/<[^>]*>/g, '').trim() ||
-      '(No body)'
+
+    let body = '(No body)'
+    if (parsed.text) {
+      body = parsed.text.trim()
+    } else if (typeof parsed.html === 'string') {
+      body = parsed.html.replace(/<[^>]*>/g, '').trim()
+    }
 
     console.log('Parsed Email:', { from, subject, body })
 
