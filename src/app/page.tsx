@@ -28,6 +28,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true)
   const [authChecked, setAuthChecked] = useState(false)
   const [emails, setEmails] = useState<EmailItem[]>([])
+  const [emailStatus, setEmailStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
 
   const supabase = createClientComponentClient()
   const router = useRouter()
@@ -55,17 +56,26 @@ export default function HomePage() {
     checkAuth()
   }, [router, supabase])
 
-  useEffect(() => {
-    const fetchInbox = async () => {
-      try {
-        const res = await fetch('/api/gmail/preview')
-        const data = await res.json()
-        if (data?.inbox) setEmails(data.inbox)
-      } catch (err) {
-        console.error('Inbox fetch error:', err)
-      }
-    }
+  const fetchInbox = async () => {
+    try {
+      setEmailStatus('loading')
+      const res = await fetch('/api/gmail/preview')
+      const data = await res.json()
 
+      if (data?.inbox?.length > 0) {
+        setEmails(data.inbox)
+        setEmailStatus('success')
+      } else {
+        setEmails([])
+        setEmailStatus('success')
+      }
+    } catch (err) {
+      console.error('Inbox fetch error:', err)
+      setEmailStatus('error')
+    }
+  }
+
+  useEffect(() => {
     if (authChecked) fetchInbox()
   }, [authChecked])
 
@@ -108,6 +118,25 @@ export default function HomePage() {
         <div className="mt-3">
           <GmailAuthButton />
         </div>
+
+        {/* Status Indicator */}
+        {emailStatus === 'loading' && (
+          <p className="text-sm text-yellow-400 mt-2">🔄 Fetching inbox preview...</p>
+        )}
+        {emailStatus === 'success' && emails.length === 0 && (
+          <p className="text-sm text-gray-400 mt-2">📭 No new emails found.</p>
+        )}
+        {emailStatus === 'error' && (
+          <div className="text-sm text-red-500 mt-2">
+            ❌ Failed to fetch inbox.
+            <button
+              onClick={fetchInbox}
+              className="ml-3 px-3 py-1 text-xs bg-red-600 hover:bg-red-700 rounded"
+            >
+              Retry
+            </button>
+          </div>
+        )}
 
         {/* 📥 Inbox Preview */}
         {emails.length > 0 && (
