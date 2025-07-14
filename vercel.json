@@ -1,6 +1,6 @@
 {
   "functions": {
-    "api/incoming-email.ts": {
+    "src/app/api/incoming-email/route.ts": {
       "memory": 512,
       "maxDuration": 10
     }
