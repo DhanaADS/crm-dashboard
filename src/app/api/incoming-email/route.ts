@@ -1,27 +1,26 @@
-// src/app/api/incoming-email/route.ts
-import { simpleParser } from 'mailparser'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server';
+import { simpleParser } from 'mailparser';
 
 export async function POST(req: NextRequest) {
-  try {
-    const rawBody = await req.text()
-    const parsed = await simpleParser(rawBody)
+  const rawBody = await req.text();
+  const parsed = await simpleParser(rawBody);
 
-    const from = parsed.from?.text || 'Unknown Sender'
-    const subject = parsed.subject || '(No Subject)'
+  const from = parsed.from?.text || 'Unknown Sender';
+  const subject = parsed.subject || '(No Subject)';
+  const body =
+    parsed.text?.trim() ||
+    (parsed.html && typeof parsed.html === 'string'
+      ? parsed.html.replace(/<[^>]*>/g, '').trim()
+      : '') ||
+    '(No body)';
 
-    let body = '(No body)'
-    if (parsed.text) {
-      body = parsed.text.trim()
-    } else if (typeof parsed.html === 'string') {
-      body = parsed.html.replace(/<[^>]*>/g, '').trim()
-    }
+  return NextResponse.json({ from, subject, body });
+}
 
-    console.log('Parsed Email:', { from, subject, body })
-
-    return NextResponse.json({ from, subject, body }, { status: 200 })
-  } catch (error) {
-    console.error('Email parse failed:', error)
-    return NextResponse.json({ error: 'Failed to parse email' }, { status: 500 })
-  }
+// ✅ TEMPORARY - for 405 debugging
+export async function GET() {
+  return NextResponse.json({
+    message:
+      '✅ Webhook is live. To test, send a POST request (like Mailgun will).',
+  });
 }
