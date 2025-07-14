@@ -1,52 +1,54 @@
-// src/app/api/gmail/preview/route.ts
+import { NextRequest, NextResponse } from 'next/server'
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
+import type { gmail_v1 } from 'googleapis'
 
-import { google } from 'googleapis';
-import { cookies } from 'next/headers';
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+const GMAIL_API = 'https://gmail.googleapis.com/gmail/v1/users/me/messages'
 
-export const dynamic = 'force-dynamic';
+export async function GET(_req: NextRequest) {
+  const supabase = createServerComponentClient({ cookies })
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
 
-export async function GET() {
-  const supabase = createServerComponentClient({ cookies });
-  const { data: { session } } = await supabase.auth.getSession();
-
-  if (!session?.provider_token) {
-    return Response.json({ error: 'Not authenticated' }, { status: 401 });
+  const accessToken = session?.provider_token
+  if (!accessToken) {
+    return NextResponse.json({ error: 'Not authenticated with Google' }, { status: 401 })
   }
 
-  const auth = new google.auth.OAuth2();
-  auth.setCredentials({ access_token: session.provider_token });
-
-  const gmail = google.gmail({ version: 'v1', auth });
-
   try {
-    // Get latest 10 messages without filtering
-    const msgListRes = await gmail.users.messages.list({
-      userId: 'me',
-      maxResults: 10,
-    });
+    const listRes = await fetch(`${GMAIL_API}?maxResults=10`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
 
-    const messageIds = msgListRes.data.messages || [];
+    const listData: gmail_v1.Schema$ListMessagesResponse = await listRes.json()
+    if (!listData.messages || listData.messages.length === 0) {
+      return NextResponse.json({ inbox: [] })
+    }
 
-    const inbox = await Promise.all(
-      messageIds.map(async (msg) => {
-        const fullMsg = await gmail.users.messages.get({
-          userId: 'me',
-          id: msg.id!,
-        });
+    const emailPreviews = await Promise.all(
+      listData.messages.map(async (msg) => {
+        const detailRes = await fetch(`${GMAIL_API}/${msg.id}`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        })
+        const detail: gmail_v1.Schema$Message = await detailRes.json()
 
-        const headers = fullMsg.data.payload?.headers || [];
-        const subject = headers.find((h) => h.name === 'Subject')?.value || 'No Subject';
-        const from = headers.find((h) => h.name === 'From')?.value || 'Unknown Sender';
-        const snippet = fullMsg.data.snippet || '';
+        const headers = detail.payload?.headers || []
+        const fromHeader = headers.find((h) => h.name === 'From')
+        const subjectHeader = headers.find((h) => h.name === 'Subject')
 
-        return { id: msg.id, from, subject, snippet };
+        return {
+          id: detail.id || '',
+          from: fromHeader?.value || 'Unknown Sender',
+          subject: subjectHeader?.value || '(No Subject)',
+          snippet: detail.snippet || '',
+        }
       })
-    );
+    )
 
-    return Response.json({ inbox });
+    return NextResponse.json({ inbox: emailPreviews })
   } catch (err) {
-    console.error('Error fetching Gmail preview:', err);
-    return Response.json({ error: 'Failed to fetch emails' }, { status: 500 });
+    console.error('Gmail API error:', err)
+    return NextResponse.json({ error: 'Failed to fetch Gmail data' }, { status: 500 })
   }
 }

@@ -8,20 +8,23 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'No auth code provided' }, { status: 400 })
   }
 
+  const redirectUri = process.env.NEXT_PUBLIC_SITE_URL + '/api/gmail/callback'
+  console.log('OAuth Redirect URI:', redirectUri)
+
   const oauth2Client = new google.auth.OAuth2(
     process.env.GMAIL_CLIENT_ID,
     process.env.GMAIL_CLIENT_SECRET,
-    process.env.NEXT_PUBLIC_SITE_URL + '/api/gmail/callback'
+    redirectUri
   )
 
   try {
     const { tokens } = await oauth2Client.getToken(code)
     oauth2Client.setCredentials(tokens)
 
-    // You can now use the OAuth client to call Gmail APIs
-    // or store tokens if needed
+    const redirectTarget = new URL('/dashboard', process.env.NEXT_PUBLIC_SITE_URL)
+    console.log('Redirecting to dashboard at:', redirectTarget.toString())
 
-    return NextResponse.redirect(new URL('/dashboard', process.env.NEXT_PUBLIC_SITE_URL))
+    return NextResponse.redirect(redirectTarget)
   } catch (error) {
     console.error('OAuth callback error:', error)
     return NextResponse.json({ error: 'OAuth token exchange failed' }, { status: 500 })
