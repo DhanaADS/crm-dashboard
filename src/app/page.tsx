@@ -24,19 +24,10 @@ type EmailItem = {
   from: string
 }
 
-type IncomingEmail = {
-  id: string
-  from_email: string
-  subject: string
-  body: string
-  received_at: string
-}
-
 export default function HomePage() {
   const [loading, setLoading] = useState(true)
   const [authChecked, setAuthChecked] = useState(false)
   const [emails, setEmails] = useState<EmailItem[]>([])
-  const [incomingEmails, setIncomingEmails] = useState<IncomingEmail[]>([])
   const [emailStatus, setEmailStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
 
   const supabase = createClientComponentClient()
@@ -66,36 +57,26 @@ export default function HomePage() {
   }, [router, supabase])
 
   const fetchInbox = async () => {
-  try {
-    setEmailStatus('loading')
-    const res = await fetch('/api/gmail/preview')
-    const data = await res.json()
+    try {
+      setEmailStatus('loading')
+      const res = await fetch('/api/emails')
+      const data: { inbox?: EmailItem[] } = await res.json()
 
-    if (Array.isArray(data?.inbox) && data.inbox.length > 0) {
-      setEmails(data.inbox)
-      setEmailStatus('success')
-    } else {
-      setEmails([])
-      setEmailStatus('success')
+      if (Array.isArray(data.inbox) && data.inbox.length > 0) {
+        setEmails(data.inbox)
+        setEmailStatus('success')
+      } else {
+        setEmails([])
+        setEmailStatus('success')
+      }
+    } catch (err) {
+      console.error('Inbox fetch error:', err)
+      setEmailStatus('error')
     }
-  } catch (err) {
-    console.error('Inbox fetch error:', err)
-    setEmailStatus('error')
   }
-}
 
   useEffect(() => {
-    if (!authChecked) return
-
-    fetchInbox()
-
-    const fetchIncomingEmails = async () => {
-      const res = await fetch('/api/incoming-email/list')
-      const json: { emails: IncomingEmail[] } = await res.json()
-      setIncomingEmails(json.emails)
-    }
-
-    fetchIncomingEmails()
+    if (authChecked) fetchInbox()
   }, [authChecked])
 
   const handleLogout = async () => {
@@ -157,32 +138,27 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* 📥 Inbox Preview */}
+        {/* 📥 Inbox Viewer */}
         {emails.length > 0 && (
           <div className="mt-6 bg-gray-800 text-white p-4 rounded shadow max-w-2xl w-full mx-auto">
-            <h2 className="text-lg font-semibold mb-3">📥 Latest Emails</h2>
-            <ul className="space-y-2 text-sm">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">📥 Latest Emails</h2>
+              <button
+                onClick={fetchInbox}
+                className="text-xs bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded"
+              >
+                🔄 Refresh
+              </button>
+            </div>
+            <ul className="space-y-3">
               {emails.map((email) => (
-                <li key={email.id} className="border-b border-gray-700 pb-2">
-                  <p className="font-medium">✉️ <strong>{email.subject}</strong></p>
-                  <p className="text-xs text-gray-400">From: {email.from}</p>
-                  <p className="text-xs text-gray-500">{email.snippet}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {/* 📩 Stored Incoming Emails */}
-        {incomingEmails.length > 0 && (
-          <div className="mt-6 bg-gray-800 text-white p-4 rounded shadow max-w-2xl w-full mx-auto">
-            <h2 className="text-lg font-semibold mb-3">🗂 Stored Emails</h2>
-            <ul className="space-y-2 text-sm">
-              {incomingEmails.map((email) => (
-                <li key={email.id} className="border-b border-gray-700 pb-2">
-                  <p className="font-medium">📨 <strong>{email.subject}</strong></p>
-                  <p className="text-xs text-gray-400">From: {email.from_email}</p>
-                  <p className="text-xs text-gray-500">{email.body}</p>
+                <li
+                  key={email.id}
+                  className="border border-gray-700 rounded p-3 hover:bg-gray-700 transition"
+                >
+                  <p className="font-semibold text-white">✉️ {email.subject}</p>
+                  <p className="text-xs text-gray-400 mt-1">From: {email.from}</p>
+                  <p className="text-xs text-gray-500 mt-1">{email.snippet}</p>
                 </li>
               ))}
             </ul>
