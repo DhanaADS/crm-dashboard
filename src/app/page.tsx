@@ -66,23 +66,23 @@ export default function HomePage() {
   }, [router, supabase])
 
   const fetchInbox = async () => {
-    try {
-      setEmailStatus('loading')
-      const res = await fetch('/api/gmail/preview')
-      const data: { inbox?: EmailItem[] } = await res.json()
+  try {
+    setEmailStatus('loading')
+    const res = await fetch('/api/gmail/preview')
+    const data = await res.json()
 
-      if (data?.inbox?.length > 0) {
-        setEmails(data.inbox)
-        setEmailStatus('success')
-      } else {
-        setEmails([])
-        setEmailStatus('success')
-      }
-    } catch (err) {
-      console.error('Inbox fetch error:', err)
-      setEmailStatus('error')
+    if (Array.isArray(data?.inbox) && data.inbox.length > 0) {
+      setEmails(data.inbox)
+      setEmailStatus('success')
+    } else {
+      setEmails([])
+      setEmailStatus('success')
     }
+  } catch (err) {
+    console.error('Inbox fetch error:', err)
+    setEmailStatus('error')
   }
+}
 
   useEffect(() => {
     if (!authChecked) return
