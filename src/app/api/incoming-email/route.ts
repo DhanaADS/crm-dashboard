@@ -10,27 +10,22 @@ export async function POST(req: NextRequest) {
     const subject = parsed.subject || '(No Subject)';
     const body =
       parsed.text?.trim() ||
-      (parsed.html && typeof parsed.html === 'string'
+      (typeof parsed.html === 'string'
         ? parsed.html.replace(/<[^>]*>/g, '').trim()
         : '') ||
       '(No body)';
 
-    // 🪵 Log full details for debugging
-    console.log('📨 Parsed Email:', {
-      from,
-      subject,
-      body,
-    });
+    console.log('📩 Email received:', { from, subject, body });
 
     return NextResponse.json({ from, subject, body });
   } catch (error) {
-    console.error('❌ Error parsing email:', error);
-    return NextResponse.json({ error: 'Webhook failed to process email' }, { status: 500 });
+    console.error('❌ Email parse failed:', error);
+    return NextResponse.json({ error: 'Webhook error' }, { status: 500 });
   }
 }
 
 export async function GET() {
   return NextResponse.json({
-    message: '✅ Webhook is live. To test, send a POST request (llike Mailgun will).',
+    message: '✅ Webhook is live. To test, send a POST request (like Mailgun will).',
   });
 }
