@@ -8,16 +8,28 @@ const supabase = createClient(
 
 export async function POST(req: NextRequest) {
   try {
-    const formData = await req.formData();
+    const rawBody = await req.text();
+    const params = new URLSearchParams(rawBody);
 
-    const from = formData.get('from')?.toString() || 'Unknown Sender';
-    const subject = formData.get('subject')?.toString() || '(No Subject)';
-    const body =
-      formData.get('body-plain')?.toString().trim() ||
-      formData.get('stripped-text')?.toString().trim() ||
-      '(No body)';
+    const from = params.get('from') || 'Unknown Sender';
+    const subject = params.get('subject') || '(No Subject)';
+    const body = params.get('body-plain')?.trim() || '(No body)';
 
-    console.log('✅ Parsed:', { from, subject, body });
+    console.log('✅ Clean Parsed:', { from, subject, body });
+
+    // Step 2: Optional deduplication (based on from + subject + body hash)
+    const exists = await supabase
+      .from('incoming_emails')
+      .select('id')
+      .eq('from_email', from)
+      .eq('subject', subject)
+      .eq('body', body)
+      .limit(1)
+      .maybeSingle();
+
+    if (exists.data) {
+      return NextResponse.json({ message: 'Duplicate email skipped.' }, { status: 200 });
+    }
 
     const { error } = await supabase.from('incoming_emails').insert({
       from_email: from,
@@ -39,5 +51,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
-  return NextResponse.json({ message: '✅ Webhook live. POST to store email.' });
+  return NextResponse.json({
+    message: '✅ Webhook live. POST to store email cleanly.',
+  });
 }
