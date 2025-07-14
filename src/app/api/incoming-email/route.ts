@@ -16,9 +16,11 @@ export async function POST(req: NextRequest) {
     const from = parsed.from?.text || 'Unknown Sender'
     const subject = parsed.subject || '(No Subject)'
     const body =
-      parsed.text?.trim() ||
-      parsed.html?.replace(/<[^>]*>/g, '').trim() ||
-      '(No body)'
+  typeof parsed.text === 'string' && parsed.text.trim()
+    ? parsed.text.trim()
+    : typeof parsed.html === 'string'
+    ? parsed.html.replace(/<[^>]*>/g, '').trim()
+    : '(No body)'
 
     return NextResponse.json({ from, subject, body })
   } catch (error) {
