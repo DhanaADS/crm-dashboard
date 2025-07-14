@@ -1,30 +1,24 @@
 // src/app/api/incoming-email/route.ts
-import { NextRequest, NextResponse } from 'next/server'
 import { simpleParser } from 'mailparser'
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-}
+import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(req: NextRequest) {
   try {
-    const buffer = await req.arrayBuffer()
-    const parsed = await simpleParser(Buffer.from(buffer))
+    const rawBody = await req.text()
+    const parsed = await simpleParser(rawBody)
 
     const from = parsed.from?.text || 'Unknown Sender'
     const subject = parsed.subject || '(No Subject)'
     const body =
-  typeof parsed.text === 'string' && parsed.text.trim()
-    ? parsed.text.trim()
-    : typeof parsed.html === 'string'
-    ? parsed.html.replace(/<[^>]*>/g, '').trim()
-    : '(No body)'
+      parsed.text?.trim() ||
+      parsed.html?.replace(/<[^>]*>/g, '').trim() ||
+      '(No body)'
 
-    return NextResponse.json({ from, subject, body })
+    console.log('Parsed Email:', { from, subject, body })
+
+    return NextResponse.json({ from, subject, body }, { status: 200 })
   } catch (error) {
-    console.error('Email parsing error:', error)
+    console.error('Email parse failed:', error)
     return NextResponse.json({ error: 'Failed to parse email' }, { status: 500 })
   }
 }
