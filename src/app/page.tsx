@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import Image from 'next/image'
 
-import CalendarWidget from '@/components/CalendarWidget'
+// 🛠️ Make sure this file exists: src/components/CalendarWidget.tsx
+import CalendarWidget from '../components/CalendarWidget'
 
 const allowedEmails = [
   'dhana@aggrandizedigital.com',
