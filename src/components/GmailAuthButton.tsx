@@ -11,9 +11,9 @@ export default function GmailAuthButton() {
         <button
           onClick={() =>
             signIn('google', {
-              callbackUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/`,
-              prompt: 'select_account'
-            })
+  callbackUrl: 'http://localhost:3000/',
+  prompt: 'select_account'
+})
           }
           className="bg-green-600 px-4 py-2 rounded text-white hover:bg-green-700"
         >

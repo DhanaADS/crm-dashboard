@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",  // current directory = /src
+    "paths": {
+      "@/*": ["./*"]  // @/components/ → /src/components/
+    }
+  }
+}
