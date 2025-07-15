@@ -22,7 +22,6 @@ export default function HomePage() {
   const [authChecked, setAuthChecked] = useState(false)
   const [emails, setEmails] = useState<EmailItem[]>([])
   const [emailStatus, setEmailStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
-  const [activeTab, setActiveTab] = useState<'gmail' | 'whatsapp' | 'telegram'>('gmail')
 
   const supabase = createClientComponentClient()
   const router = useRouter()
@@ -69,17 +68,53 @@ export default function HomePage() {
   }
 
   useEffect(() => {
-    if (authChecked && activeTab === 'gmail') fetchInbox()
-  }, [authChecked, activeTab])
+    if (authChecked) fetchInbox()
+  }, [authChecked])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
     router.push('/login')
   }
 
-  const renderEmailTable = () => (
-    <>
-      <div className="flex items-center justify-between mb-4">
+  if (!authChecked) {
+    return (
+      <main className="relative min-h-screen p-6 bg-gray-900 text-white">
+        <p className="text-sm text-center">Checking authentication...</p>
+      </main>
+    )
+  }
+
+  return (
+    <main className="relative min-h-screen bg-gray-900 text-white px-6 py-10">
+      {/* Logout */}
+      <div className="absolute top-4 left-4 z-50">
+        <button
+          onClick={handleLogout}
+          className="px-3 py-2 text-sm bg-red-600 hover:bg-red-700 text-white rounded shadow"
+        >
+          🔓 Logout
+        </button>
+      </div>
+
+      {/* Header */}
+      <div className="flex flex-col items-center justify-center mb-8">
+        <Image
+          src="/assets/ads-logo.png"
+          alt="ADS Logo"
+          width={60}
+          height={60}
+          className="object-contain"
+        />
+        <h1 className="text-2xl font-bold mt-2">ADS Dashboard</h1>
+        <div className="flex space-x-4 mt-4">
+          <button className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded shadow">Gmail</button>
+          <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow">WhatsApp</button>
+          <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">Telegram</button>
+        </div>
+      </div>
+
+      {/* Email Table Filters */}
+      <div className="flex items-center justify-between mb-4 max-w-5xl mx-auto">
         <div className="text-sm">Showing emails for: <strong>Gmail</strong></div>
         <div>
           <select className="bg-gray-800 text-white px-3 py-1 rounded border border-gray-700">
@@ -93,7 +128,8 @@ export default function HomePage() {
         </div>
       </div>
 
-      <div className="overflow-auto rounded shadow border border-gray-800 bg-gray-950">
+      {/* Email Table */}
+      <div className="overflow-auto rounded shadow border border-gray-800 max-w-5xl mx-auto bg-[#121212]">
         <table className="w-full text-sm">
           <thead className="bg-gray-800">
             <tr>
@@ -128,57 +164,6 @@ export default function HomePage() {
           </tbody>
         </table>
       </div>
-    </>
-  )
-
-  const renderPlaceholder = (label: string) => (
-    <div className="text-center text-gray-500 bg-gray-800 py-20 rounded shadow">
-      <p>🔧 {label} integration coming soon...</p>
-    </div>
-  )
-
-  return (
-    <main className="relative min-h-screen bg-gray-900 text-white px-6 py-10">
-      <div className="absolute top-4 left-4 z-50">
-        <button
-          onClick={handleLogout}
-          className="px-3 py-2 text-sm bg-red-600 hover:bg-red-700 text-white rounded shadow"
-        >
-          🔓 Logout
-        </button>
-      </div>
-
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center space-x-4">
-          <Image
-            src="/assets/ads-logo.png"
-            alt="ADS Logo"
-            width={60}
-            height={60}
-            className="object-contain"
-          />
-          <h1 className="text-2xl font-bold">ADS Dashboard</h1>
-        </div>
-        <div className="flex space-x-4">
-          <button
-            className={`px-4 py-2 rounded shadow ${activeTab === 'gmail' ? 'bg-blue-600' : 'bg-gray-700 hover:bg-gray-600'} text-white`}
-            onClick={() => setActiveTab('gmail')}
-          >Gmail</button>
-          <button
-            className={`px-4 py-2 rounded shadow ${activeTab === 'whatsapp' ? 'bg-blue-600' : 'bg-gray-700 hover:bg-gray-600'} text-white`}
-            onClick={() => setActiveTab('whatsapp')}
-          >WhatsApp</button>
-          <button
-            className={`px-4 py-2 rounded shadow ${activeTab === 'telegram' ? 'bg-blue-600' : 'bg-gray-700 hover:bg-gray-600'} text-white`}
-            onClick={() => setActiveTab('telegram')}
-          >Telegram</button>
-        </div>
-      </div>
-
-      {/* Tabs Content */}
-      {activeTab === 'gmail' && renderEmailTable()}
-      {activeTab === 'whatsapp' && renderPlaceholder('WhatsApp')}
-      {activeTab === 'telegram' && renderPlaceholder('Telegram')}
     </main>
   )
 }
