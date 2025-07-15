@@ -3,15 +3,16 @@
 import React from 'react'
 
 type EmailFiltersProps = {
-  source: 'Gmail' | 'WhatsApp' | 'Telegram'
+  source?: 'Gmail' | 'WhatsApp' | 'Telegram'
 }
 
-export default function EmailFilters({ source }: EmailFiltersProps) {
+export default function EmailFilters({ source = 'Gmail' }: EmailFiltersProps) {
   return (
     <div className="flex items-center justify-between mb-4 max-w-5xl mx-auto">
       <div className="text-sm">
         Showing messages for: <strong>{source}</strong>
       </div>
+
       {source === 'Gmail' && (
         <div>
           <select
