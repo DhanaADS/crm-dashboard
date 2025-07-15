@@ -4,12 +4,9 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import Image from 'next/image'
-import dynamic from 'next/dynamic'
 
 import SkeletonCard from '@/components/SkeletonCard'
-import AnalyticsChart from '@/components/AnalyticsChart'
-
-const GmailAuthButton = dynamic(() => import('@/components/GmailAuthButton'), { ssr: false })
+import CalendarWidget from '@/components/CalendarWidget'
 
 const allowedEmails = [
   'dhana@aggrandizedigital.com',
@@ -105,93 +102,64 @@ export default function HomePage() {
       </div>
 
       {/* Header Section */}
-      <div className="flex flex-col items-center mt-10 mb-6">
-        <Image
-          src="/assets/ads-logo.png"
-          alt="ADS Logo"
-          width={80}
-          height={80}
-          className="mb-4 object-contain"
-        />
-        <h1 className="text-3xl font-bold text-center">ADS Dashboard</h1>
-
-        <div className="mt-3">
-          <GmailAuthButton />
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mt-10 mb-6">
+        <div className="flex flex-col items-center md:items-start">
+          <Image
+            src="/assets/ads-logo.png"
+            alt="ADS Logo"
+            width={80}
+            height={80}
+            className="mb-4 object-contain"
+          />
+          <h1 className="text-3xl font-bold text-center md:text-left">ADS Dashboard</h1>
         </div>
-
-        {/* Status Indicator */}
-        {emailStatus === 'loading' && (
-          <p className="text-sm text-yellow-400 mt-2">🔄 Fetching inbox preview...</p>
-        )}
-        {emailStatus === 'success' && emails.length === 0 && (
-          <p className="text-sm text-gray-400 mt-2">📭 No new emails found.</p>
-        )}
-        {emailStatus === 'error' && (
-          <div className="text-sm text-red-500 mt-2">
-            ❌ Failed to fetch inbox.
-            <button
-              onClick={fetchInbox}
-              className="ml-3 px-3 py-1 text-xs bg-red-600 hover:bg-red-700 rounded"
-            >
-              Retry
-            </button>
-          </div>
-        )}
-
-        {/* 📥 Inbox Viewer */}
-        {emails.length > 0 && (
-          <div className="mt-6 bg-gray-800 text-white p-4 rounded shadow max-w-2xl w-full mx-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold">📥 Latest Emails</h2>
-              <button
-                onClick={fetchInbox}
-                className="text-xs bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded"
-              >
-                🔄 Refresh
-              </button>
-            </div>
-            <ul className="space-y-3">
-              {emails.map((email) => (
-                <li
-                  key={email.id}
-                  className="border border-gray-700 rounded p-3 hover:bg-gray-700 transition"
-                >
-                  <p className="font-semibold text-white">✉️ {email.subject}</p>
-                  <p className="text-xs text-gray-400 mt-1">From: {email.from}</p>
-                  <p className="text-xs text-gray-500 mt-1">{email.snippet}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
-
-      {/* Cards */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mt-6">
-        {loading ? (
-          <>
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
-          </>
-        ) : (
-          <>
-            <div className="bg-gray-800 p-4 rounded shadow">💡 Real Card 1</div>
-            <div className="bg-gray-800 p-4 rounded shadow">📊 Real Card 2</div>
-            <div className="bg-gray-800 p-4 rounded shadow">🚀 Real Card 3</div>
-          </>
-        )}
-      </div>
-
-      {/* Analytics */}
-      <div className="mt-6 flex justify-end pr-4">
-        <div className="w-[400px] bg-gray-800 p-4 rounded shadow">
-          <h2 className="text-lg font-semibold text-center mb-4 text-white">
-            Analytics Overview
-          </h2>
-          <AnalyticsChart />
+        <div className="mt-4 md:mt-0">
+          <CalendarWidget />
         </div>
       </div>
-    </main>
-  )
-}
+
+      {/* Status Indicator */}
+      {emailStatus === 'loading' && (
+        <p className="text-sm text-yellow-400 mt-2 text-center">🔄 Fetching inbox preview...</p>
+      )}
+      {emailStatus === 'success' && emails.length === 0 && (
+        <p className="text-sm text-gray-400 mt-2 text-center">📭 No new emails found.</p>
+      )}
+      {emailStatus === 'error' && (
+        <div className="text-sm text-red-500 mt-2 text-center">
+          ❌ Failed to fetch inbox.
+          <button
+            onClick={fetchInbox}
+            className="ml-3 px-3 py-1 text-xs bg-red-600 hover:bg-red-700 rounded"
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
+      {/* 📥 Inbox Preview – Modern UI */}
+      // Cleaned-up content
+{emails.length > 0 && (
+  <div className="mt-6 bg-gray-900 text-white p-4 rounded-lg shadow-lg max-w-3xl w-full mx-auto">
+    <h2 className="text-xl font-semibold mb-4">📬 Inbox</h2>
+    <ul className="space-y-4">
+      {emails.map((email) => (
+        <li
+          key={email.id}
+          className="bg-gray-800 hover:bg-gray-700 transition-all p-4 rounded-md shadow border border-gray-700"
+        >
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="text-lg font-bold truncate">{email.subject || '📭 (No Subject)'}</h3>
+            <span className="text-xs text-gray-400">{new Date().toLocaleDateString()}</span>
+          </div>
+          <p className="text-sm text-gray-300">
+            <span className="text-blue-400 font-medium">{email.from}</span>
+          </p>
+          <p className="text-sm text-gray-400 mt-1 line-clamp-2">
+            {email.snippet || '(No body)'}
+          </p>
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
