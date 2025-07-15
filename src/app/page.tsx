@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import Image from 'next/image'
 
-import SkeletonCard from '@/components/SkeletonCard'
 import CalendarWidget from '@/components/CalendarWidget'
 
 const allowedEmails = [
@@ -138,28 +137,30 @@ export default function HomePage() {
       )}
 
       {/* 📥 Inbox Preview – Modern UI */}
-      // Cleaned-up content
-{emails.length > 0 && (
-  <div className="mt-6 bg-gray-900 text-white p-4 rounded-lg shadow-lg max-w-3xl w-full mx-auto">
-    <h2 className="text-xl font-semibold mb-4">📬 Inbox</h2>
-    <ul className="space-y-4">
-      {emails.map((email) => (
-        <li
-          key={email.id}
-          className="bg-gray-800 hover:bg-gray-700 transition-all p-4 rounded-md shadow border border-gray-700"
-        >
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-lg font-bold truncate">{email.subject || '📭 (No Subject)'}</h3>
-            <span className="text-xs text-gray-400">{new Date().toLocaleDateString()}</span>
-          </div>
-          <p className="text-sm text-gray-300">
-            <span className="text-blue-400 font-medium">{email.from}</span>
-          </p>
-          <p className="text-sm text-gray-400 mt-1 line-clamp-2">
-            {email.snippet || '(No body)'}
-          </p>
-        </li>
-      ))}
-    </ul>
-  </div>
-)}
+      {emails.length > 0 && (
+        <div className="mt-6 bg-gray-900 text-white p-4 rounded-lg shadow-lg max-w-3xl w-full mx-auto">
+          <h2 className="text-xl font-semibold mb-4">📬 Inbox</h2>
+          <ul className="space-y-4">
+            {emails.map((email) => (
+              <li
+                key={email.id}
+                className="bg-gray-800 hover:bg-gray-700 transition-all p-4 rounded-md shadow border border-gray-700"
+              >
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="text-lg font-bold truncate">{email.subject || '📭 (No Subject)'}</h3>
+                  <span className="text-xs text-gray-400">{new Date().toLocaleDateString()}</span>
+                </div>
+                <p className="text-sm text-gray-300">
+                  <span className="text-blue-400 font-medium">{email.from}</span>
+                </p>
+                <p className="text-sm text-gray-400 mt-1 line-clamp-2">
+                  {email.snippet || '(No body)'}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </main>
+  )
+}
