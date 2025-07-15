@@ -77,9 +77,68 @@ export default function HomePage() {
     router.push('/login')
   }
 
+  const renderEmailTable = () => (
+    <>
+      <div className="flex items-center justify-between mb-4">
+        <div className="text-sm">Showing emails for: <strong>Gmail</strong></div>
+        <div>
+          <select className="bg-gray-800 text-white px-3 py-1 rounded border border-gray-700">
+            <option>All Filters</option>
+            <option>Name</option>
+            <option>ID</option>
+            <option>Subject</option>
+            <option>Body</option>
+            <option>Date</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="overflow-auto rounded shadow border border-gray-800 bg-gray-950">
+        <table className="w-full text-sm">
+          <thead className="bg-gray-800">
+            <tr>
+              <th className="p-3 text-left font-semibold">Select</th>
+              <th className="p-3 text-left font-semibold">Name</th>
+              <th className="p-3 text-left font-semibold">ID</th>
+              <th className="p-3 text-left font-semibold">Subject</th>
+              <th className="p-3 text-left font-semibold">Body</th>
+              <th className="p-3 text-left font-semibold">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {emailStatus === 'loading' && (
+              <tr><td colSpan={6} className="text-center p-4">🔄 Loading emails...</td></tr>
+            )}
+            {emailStatus === 'error' && (
+              <tr><td colSpan={6} className="text-center text-red-400 p-4">❌ Error loading inbox</td></tr>
+            )}
+            {emailStatus === 'success' && emails.length === 0 && (
+              <tr><td colSpan={6} className="text-center text-gray-400 p-4">📭 No emails found</td></tr>
+            )}
+            {emails.map((email) => (
+              <tr key={email.id} className="border-t border-gray-800 hover:bg-gray-800">
+                <td className="p-3"><input type="checkbox" className="form-checkbox" /></td>
+                <td className="p-3">{email.from.split('<')[0].trim()}</td>
+                <td className="p-3 text-xs text-gray-400">{email.id.slice(0, 8)}</td>
+                <td className="p-3 font-medium">{email.subject || '(No Subject)'}</td>
+                <td className="p-3 text-gray-300 truncate max-w-xs">{email.snippet || '(No body)'}</td>
+                <td className="p-3 text-xs text-gray-400">{new Date().toLocaleDateString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  )
+
+  const renderPlaceholder = (label: string) => (
+    <div className="text-center text-gray-500 bg-gray-800 py-20 rounded shadow">
+      <p>🔧 {label} integration coming soon...</p>
+    </div>
+  )
+
   return (
     <main className="relative min-h-screen bg-gray-900 text-white px-6 py-10">
-      {/* Logout */}
       <div className="absolute top-4 left-4 z-50">
         <button
           onClick={handleLogout}
@@ -89,7 +148,6 @@ export default function HomePage() {
         </button>
       </div>
 
-      {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center space-x-4">
           <Image
@@ -103,78 +161,24 @@ export default function HomePage() {
         </div>
         <div className="flex space-x-4">
           <button
-            className={`px-4 py-2 rounded shadow ${activeTab === 'gmail' ? 'bg-blue-600 text-white' : 'bg-gray-700 hover:bg-gray-600'}`}
+            className={`px-4 py-2 rounded shadow ${activeTab === 'gmail' ? 'bg-blue-600' : 'bg-gray-700 hover:bg-gray-600'} text-white`}
             onClick={() => setActiveTab('gmail')}
-          >
-            Gmail
-          </button>
+          >Gmail</button>
           <button
-            className={`px-4 py-2 rounded shadow ${activeTab === 'whatsapp' ? 'bg-blue-600 text-white' : 'bg-gray-700 hover:bg-gray-600'}`}
+            className={`px-4 py-2 rounded shadow ${activeTab === 'whatsapp' ? 'bg-blue-600' : 'bg-gray-700 hover:bg-gray-600'} text-white`}
             onClick={() => setActiveTab('whatsapp')}
-          >
-            WhatsApp
-          </button>
+          >WhatsApp</button>
           <button
-            className={`px-4 py-2 rounded shadow ${activeTab === 'telegram' ? 'bg-blue-600 text-white' : 'bg-gray-700 hover:bg-gray-600'}`}
+            className={`px-4 py-2 rounded shadow ${activeTab === 'telegram' ? 'bg-blue-600' : 'bg-gray-700 hover:bg-gray-600'} text-white`}
             onClick={() => setActiveTab('telegram')}
-          >
-            Telegram
-          </button>
+          >Telegram</button>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="text-sm">Showing {activeTab} data</div>
-        <select className="bg-gray-800 text-white px-3 py-1 rounded border border-gray-700">
-          <option>All Filters</option>
-          <option>Name</option>
-          <option>ID</option>
-          <option>Subject</option>
-          <option>Body</option>
-          <option>Date</option>
-        </select>
-      </div>
-
-      {/* Table */}
-      <div className="overflow-auto rounded shadow border border-gray-800">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-800">
-            <tr>
-              <th className="p-3 text-left font-semibold">Select</th>
-              <th className="p-3 text-left font-semibold">Name</th>
-              <th className="p-3 text-left font-semibold">ID</th>
-              <th className="p-3 text-left font-semibold">Subject</th>
-              <th className="p-3 text-left font-semibold">Body</th>
-              <th className="p-3 text-left font-semibold">Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {activeTab === 'gmail' && emailStatus === 'loading' && (
-              <tr><td colSpan={6} className="text-center p-4">🔄 Loading emails...</td></tr>
-            )}
-            {activeTab === 'gmail' && emailStatus === 'error' && (
-              <tr><td colSpan={6} className="text-center text-red-400 p-4">❌ Error loading inbox</td></tr>
-            )}
-            {activeTab === 'gmail' && emailStatus === 'success' && emails.length === 0 && (
-              <tr><td colSpan={6} className="text-center text-gray-400 p-4">📭 No emails found</td></tr>
-            )}
-            {activeTab === 'gmail' && emails.map((email) => (
-              <tr key={email.id} className="border-t border-gray-800 hover:bg-gray-800">
-                <td className="p-3"><input type="checkbox" className="form-checkbox" /></td>
-                <td className="p-3">{email.from.split('<')[0].trim()}</td>
-                <td className="p-3 text-xs text-gray-400">{email.id.slice(0, 8)}</td>
-                <td className="p-3 font-medium">{email.subject || '(No Subject)'}</td>
-                <td className="p-3 text-gray-300 truncate max-w-xs">{email.snippet || '(No body)'}</td>
-                <td className="p-3 text-xs text-gray-400">{new Date().toLocaleDateString()}</td>
-              </tr>
-            ))}
-            {activeTab !== 'gmail' && (
-              <tr><td colSpan={6} className="text-center p-4 text-gray-400">🔧 Coming soon: {activeTab} integration</td></tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      {/* Tabs Content */}
+      {activeTab === 'gmail' && renderEmailTable()}
+      {activeTab === 'whatsapp' && renderPlaceholder('WhatsApp')}
+      {activeTab === 'telegram' && renderPlaceholder('Telegram')}
     </main>
   )
 }
