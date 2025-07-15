@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import Image from 'next/image'
 
-// 🛠️ Make sure this file exists: src/components/CalendarWidget.tsx
+// ✅ Calendar widget import (make sure the component exists)
 import CalendarWidget from '../components/CalendarWidget'
 
 const allowedEmails = [
@@ -22,7 +22,6 @@ type EmailItem = {
 }
 
 export default function HomePage() {
-  const [loading, setLoading] = useState(true)
   const [authChecked, setAuthChecked] = useState(false)
   const [emails, setEmails] = useState<EmailItem[]>([])
   const [emailStatus, setEmailStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
@@ -42,7 +41,6 @@ export default function HomePage() {
           router.push('/login')
         } else {
           setAuthChecked(true)
-          setTimeout(() => setLoading(false), 1000)
         }
       } catch (err) {
         console.error('Auth Check Failed:', err)
