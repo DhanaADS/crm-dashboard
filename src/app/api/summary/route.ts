@@ -37,16 +37,16 @@ export async function POST(req: NextRequest) {
     const { message, emailId } = await req.json()
 
     // ✅ Backend safeguard: avoid duplicate summaries
-const { data: existing, error: fetchError } = await supabase
-  .from('incoming_emails')
-  .select('summary')
-  .eq('id', emailId)
-  .single()
+    const { data: existing } = await supabase
+      .from('incoming_emails')
+      .select('summary')
+      .eq('id', emailId)
+      .single()
 
-if (existing?.summary) {
-  console.log(`Summary already exists for email ID ${emailId}`)
-  return NextResponse.json({ summary: existing.summary })
-}
+    if (existing?.summary) {
+      console.log(`Summary already exists for email ID ${emailId}`)
+      return NextResponse.json({ summary: existing.summary })
+    }
 
     if (!message || !emailId) {
       return NextResponse.json({ error: 'Missing email body or ID' }, { status: 400 })

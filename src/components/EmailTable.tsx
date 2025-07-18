@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 
 type EmailItem = {
   id: string
@@ -14,32 +14,37 @@ type EmailItem = {
 type EmailTableProps = {
   emails?: EmailItem[]
   status: 'idle' | 'loading' | 'success' | 'error'
-  onRefresh?: () => void // ⏳ Hook for manual refresh
+  onRefresh?: () => void
 }
 
 export default function EmailTable({ emails = [], status, onRefresh }: EmailTableProps) {
   const [view, setView] = useState<'summary' | 'message'>('summary')
   const [summaries, setSummaries] = useState<Record<string, string>>({})
+  const summariesRef = useRef(summaries)
 
-  // Manual + Auto refresh
+  // Keep ref in sync to avoid stale closure
+  useEffect(() => {
+    summariesRef.current = summaries
+  }, [summaries])
+
+  // Auto refresh inbox every 30 minutes
   useEffect(() => {
     const interval = setInterval(() => {
       console.log('[Auto Refresh] Fetching inbox...')
       onRefresh?.()
-    }, 30 * 60 * 1000) // Every 30 min
+    }, 30 * 60 * 1000)
 
     return () => clearInterval(interval)
   }, [onRefresh])
 
+  // Fetch summaries when view is 'summary'
   useEffect(() => {
     const fetchSummaries = async () => {
       if (view !== 'summary') return
 
       for (const email of emails) {
-        if (!summaries[email.id] && email.body) {
+        if (!summariesRef.current[email.id] && email.body) {
           try {
-            console.log('Sending for summary:', { emailId: email.id, message: email.body })
-
             const res = await fetch('/api/summary', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
