@@ -95,67 +95,72 @@ export default function HomePage() {
         </button>
       </div>
 
-      <section className="min-h-screen px-8 py-6">
-        <div className="flex-1">
+      <section className="min-h-screen px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="flex flex-col items-center justify-center mb-8">
-  <Image
-    src="/assets/ads-logo.png"
-    alt="ADS Logo"
-    width={60}
-    height={60}
-    className="object-contain"
-  />
-  <h1 className="text-2xl font-bold mt-2">ADS Dashboard</h1>
+            <Image
+              src="/assets/ads-logo.png"
+              alt="ADS Logo"
+              width={60}
+              height={60}
+              className="object-contain"
+            />
+            <h1 className="text-2xl font-bold mt-2">ADS Dashboard</h1>
 
-  {/* ✅ Official-colors-based interactive buttons */}
-  <div className="flex gap-2 mt-3">
-    <button
-      onClick={() => {
-        setActiveTab('gmail')
-        fetchInbox()
-      }}
-      className={`text-sm font-semibold px-4 py-1.5 rounded shadow transition
-        ${activeTab === 'gmail'
-          ? 'bg-[#D93025] text-white'
-          : 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-      `}
-    >
-      Gmail
-    </button>
+            {/* Interactive Tabs */}
+            <div className="flex gap-2 mt-3">
+              <button
+                onClick={() => {
+                  setActiveTab('gmail')
+                  fetchInbox()
+                }}
+                className={`text-sm font-semibold px-4 py-1.5 rounded shadow transition
+                  ${activeTab === 'gmail'
+                    ? 'bg-[#D93025] text-white'
+                    : 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                `}
+              >
+                Gmail
+              </button>
 
-    <button
-      onClick={() => {
-        setActiveTab('whatsapp')
-        alert('WhatsApp integration coming soon 📱')
-      }}
-      className={`text-sm font-semibold px-4 py-1.5 rounded shadow transition
-        ${activeTab === 'whatsapp'
-          ? 'bg-[#25D366] text-white'
-          : 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-      `}
-    >
-      WhatsApp
-    </button>
+              <button
+                onClick={() => {
+                  setActiveTab('whatsapp')
+                  alert('WhatsApp integration coming soon 📱')
+                }}
+                className={`text-sm font-semibold px-4 py-1.5 rounded shadow transition
+                  ${activeTab === 'whatsapp'
+                    ? 'bg-[#25D366] text-white'
+                    : 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                `}
+              >
+                WhatsApp
+              </button>
 
-    <button
-      onClick={() => {
-        setActiveTab('telegram')
-        alert('Telegram integration coming soon 💬')
-      }}
-      className={`text-sm font-semibold px-4 py-1.5 rounded shadow transition
-        ${activeTab === 'telegram'
-          ? 'bg-[#0088CC] text-white'
-          : 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-      `}
-    >
-      Telegram
-    </button>
-  </div>
-</div>
+              <button
+                onClick={() => {
+                  setActiveTab('telegram')
+                  alert('Telegram integration coming soon 💬')
+                }}
+                className={`text-sm font-semibold px-4 py-1.5 rounded shadow transition
+                  ${activeTab === 'telegram'
+                    ? 'bg-[#0088CC] text-white'
+                    : 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                `}
+              >
+                Telegram
+              </button>
+            </div>
+          </div>
 
-          <EmailFilters />
-          <EmailTable emails={emails} status={emailStatus} />
+          {/* Filters */}
+          <EmailFilters source="Gmail" />
+
+          {/* 📦 Table inside clean, framed box */}
+          <div className="bg-[#1a1a1a] rounded-xl shadow-lg p-4 sm:p-6 lg:p-8 mt-4">
+            <EmailTable emails={emails} status={emailStatus} />
+          </div>
         </div>
       </section>
     </main>

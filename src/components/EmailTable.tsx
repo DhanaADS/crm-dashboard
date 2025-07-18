@@ -1,84 +1,171 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+
 type EmailItem = {
   id: string
   subject: string
   snippet: string
   from: string
+  date: string | null
+  body: string | null
 }
 
 type EmailTableProps = {
   emails?: EmailItem[]
   status: 'idle' | 'loading' | 'success' | 'error'
+  onRefresh?: () => void // ⏳ Hook for manual refresh
 }
 
-export default function EmailTable({ emails = [], status }: EmailTableProps) {
+export default function EmailTable({ emails = [], status, onRefresh }: EmailTableProps) {
+  const [view, setView] = useState<'summary' | 'message'>('summary')
+  const [summaries, setSummaries] = useState<Record<string, string>>({})
+
+  // Manual + Auto refresh
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log('[Auto Refresh] Fetching inbox...')
+      onRefresh?.()
+    }, 30 * 60 * 1000) // Every 30 min
+
+    return () => clearInterval(interval)
+  }, [onRefresh])
+
+  useEffect(() => {
+    const fetchSummaries = async () => {
+      if (view !== 'summary') return
+
+      for (const email of emails) {
+        if (!summaries[email.id] && email.body) {
+          try {
+            console.log('Sending for summary:', { emailId: email.id, message: email.body })
+
+            const res = await fetch('/api/summary', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ emailId: email.id, message: email.body })
+            })
+
+            const data = await res.json()
+
+            if (data.summary) {
+              setSummaries(prev => ({ ...prev, [email.id]: data.summary }))
+            } else {
+              setSummaries(prev => ({ ...prev, [email.id]: '⚠️ No summary returned' }))
+            }
+          } catch (err) {
+            console.error('Error summarizing:', err)
+            setSummaries(prev => ({ ...prev, [email.id]: '⚠️ Error summarizing' }))
+          }
+        }
+      }
+    }
+
+    fetchSummaries()
+  }, [view, emails])
+
+  const formatIST = (dateStr: string | null) => {
+    if (!dateStr) return '-'
+    const date = new Date(dateStr)
+    return date.toLocaleString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    })
+  }
+
   return (
-    <div className="overflow-auto rounded shadow border border-gray-800 mx-auto bg-[#121212] w-full max-w-7xl px-4">
-      <table className="w-full text-sm table-fixed">
-        <thead className="bg-gray-800 text-gray-200">
-          <tr>
-            <th className="p-3 text-left font-semibold w-[120px]">Folders</th>
-            <th className="p-3 text-left font-semibold">Select</th>
-            <th className="p-3 text-left font-semibold">Name</th>
-            <th className="p-3 text-left font-semibold">ID</th>
-            <th className="p-3 text-left font-semibold w-[200px]">Subject</th>
-            <th className="p-3 text-left font-semibold w-[300px]">Body</th>
-            <th className="p-3 text-left font-semibold">Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {status === 'loading' && (
-            <tr>
-              <td colSpan={7} className="text-center p-4 text-yellow-400">🔄 Loading emails...</td>
-            </tr>
-          )}
-          {status === 'error' && (
-            <tr>
-              <td colSpan={7} className="text-center p-4 text-red-500">❌ Error loading inbox</td>
-            </tr>
-          )}
-          {status === 'success' && emails.length === 0 && (
-            <tr>
-              <td colSpan={7} className="text-center p-4 text-gray-400">📭 No emails found</td>
-            </tr>
-          )}
+    <div className="w-full flex flex-col items-center py-10 gap-4">
+      <div className="flex justify-between w-full max-w-6xl px-4">
+        <div />
+        <button
+          onClick={onRefresh}
+          className="bg-blue-600 text-white text-sm px-4 py-2 rounded hover:bg-blue-700"
+        >
+          🔄 Refresh
+        </button>
+      </div>
 
-          {/* Render folders once, on the first row */}
-          {status === 'success' && emails.map((email, idx) => (
-            <tr key={email.id} className="border-t border-gray-700 hover:bg-gray-800 transition">
-              {/* Folders column only on first row with rowSpan */}
-              {idx === 0 && (
-                <td rowSpan={emails.length} className="align-top p-3 text-sm text-white bg-black border-r border-gray-700">
-                  <div className="space-y-2">
-                    <div className="font-semibold mb-2">📁 Folders</div>
-                    <ul className="space-y-1">
-                      <li className="hover:font-semibold cursor-pointer">📥 Inbox</li>
-                      <li className="hover:font-semibold cursor-pointer">📤 Sent</li>
-                      <li className="hover:font-semibold cursor-pointer">📝 Drafts</li>
-                      <li className="hover:font-semibold cursor-pointer">⚠️ Spam</li>
-                      <li className="hover:font-semibold cursor-pointer">🗑️ Trash</li>
-                    </ul>
+      <div className="w-full max-w-6xl px-4">
+        <div className="rounded shadow border border-gray-800 bg-[#121212] overflow-x-auto">
+          <table className="w-full min-w-[900px] table-fixed text-sm">
+            <thead className="bg-gray-800 text-gray-200">
+              <tr>
+                <th className="p-2 text-left font-semibold w-[110px]">Folders</th>
+                <th className="p-2 text-left font-semibold w-[50px]">✔</th>
+                <th className="p-2 text-left font-semibold w-[160px]">Name</th>
+                <th className="p-2 text-left font-semibold w-[240px]">Subject</th>
+                <th className="p-2 text-left font-semibold w-[340px]">
+                  <div className="flex items-center gap-2">
+                    <span>Switch</span>
+                    <select
+                      className="bg-gray-700 text-white rounded px-2 py-1 text-sm"
+                      value={view}
+                      onChange={(e) => setView(e.target.value as 'summary' | 'message')}
+                    >
+                      <option value="summary">AI Summary</option>
+                      <option value="message">Message</option>
+                    </select>
                   </div>
-                </td>
+                </th>
+                <th className="p-2 text-left font-semibold w-[160px]">Date & Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {status === 'loading' && (
+                <tr>
+                  <td colSpan={6} className="text-center p-4 text-yellow-400">🔄 Loading emails...</td>
+                </tr>
               )}
-
-              <td className="p-3">
-                <input type="checkbox" className="form-checkbox text-blue-500" />
-              </td>
-              <td className="p-3 whitespace-nowrap">{email.from?.split('<')[0].trim() || 'Unknown'}</td>
-              <td className="p-3 text-xs text-gray-400">{email.id?.slice(0, 8)}</td>
-              <td className="p-3 font-medium truncate">{email.subject || '(No Subject)'}</td>
-              <td className="p-3 text-gray-300 whitespace-nowrap overflow-hidden text-ellipsis">
-                {email.snippet || '(No body)'}
-              </td>
-              <td className="p-3 text-xs text-gray-400 whitespace-nowrap">
-                {new Date().toLocaleDateString()}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              {status === 'error' && (
+                <tr>
+                  <td colSpan={6} className="text-center p-4 text-red-500">❌ Error loading inbox</td>
+                </tr>
+              )}
+              {status === 'success' && emails.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="text-center p-4 text-gray-400">📭 No emails found</td>
+                </tr>
+              )}
+              {status === 'success' && emails.map((email, idx) => (
+                <tr key={email.id} className="border-t border-gray-700 hover:bg-gray-800 transition">
+                  {idx === 0 && (
+                    <td rowSpan={emails.length} className="align-top p-3 text-sm text-white bg-black border-r border-gray-700 w-[110px]">
+                      <div className="space-y-2">
+                        <div className="font-semibold mb-2">📁 Folders</div>
+                        <ul className="space-y-1">
+                          <li className="hover:font-semibold cursor-pointer">📥 Inbox</li>
+                          <li className="hover:font-semibold cursor-pointer">📤 Sent</li>
+                          <li className="hover:font-semibold cursor-pointer">📝 Drafts</li>
+                          <li className="hover:font-semibold cursor-pointer">⚠️ Spam</li>
+                          <li className="hover:font-semibold cursor-pointer">🗑️ Trash</li>
+                        </ul>
+                      </div>
+                    </td>
+                  )}
+                  <td className="p-2">
+                    <input type="checkbox" className="form-checkbox text-blue-500" />
+                  </td>
+                  <td className="p-2 truncate">{email.from?.split('<')[0].trim() || 'Unknown'}</td>
+                  <td className="p-2 font-medium truncate">{email.subject || '(No Subject)'}</td>
+                  <td className="p-2 text-gray-300 truncate">
+                    {view === 'summary'
+                      ? summaries[email.id] || '⏳ Summarizing...'
+                      : email.body || '(No body)'}
+                  </td>
+                  <td className="p-2 text-xs text-gray-400 whitespace-nowrap">
+                    {formatIST(email.date)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   )
 }
