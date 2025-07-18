@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
+import { EmailItem } from '@/types/email'
 
 type EmailItem = {
   id: string

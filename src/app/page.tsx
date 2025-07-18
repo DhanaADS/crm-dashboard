@@ -6,6 +6,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import Image from 'next/image'
 import EmailFilters from '@/components/EmailFilters'
 import EmailTable from '@/components/EmailTable'
+import { EmailItem } from '@/types/email' // ✅ Use this
 
 const allowedEmails = [
   'dhana@aggrandizedigital.com',
@@ -13,12 +14,7 @@ const allowedEmails = [
   'veera@aggrandizedigital.com',
 ]
 
-type EmailItem = {
-  id: string
-  subject: string
-  snippet: string
-  from: string
-}
+// ❌ Removed local type EmailItem
 
 export default function HomePage() {
   const [authChecked, setAuthChecked] = useState(false)
@@ -159,7 +155,7 @@ export default function HomePage() {
 
           {/* 📦 Table inside clean, framed box */}
           <div className="bg-[#1a1a1a] rounded-xl shadow-lg p-4 sm:p-6 lg:p-8 mt-4">
-            <EmailTable emails={emails} status={emailStatus} />
+            <EmailTable emails={emails} status={emailStatus} onRefresh={fetchInbox} />
           </div>
         </div>
       </section>
