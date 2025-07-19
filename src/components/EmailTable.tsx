@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
-import { EmailItem } from '@/types/email' // ✅ Use only imported type
+import { EmailItem } from '@/types/email'
 
 type EmailTableProps = {
   emails?: EmailItem[]
@@ -76,28 +76,25 @@ export default function EmailTable({ emails = [], status, onRefresh }: EmailTabl
     <div className="w-full flex flex-col items-center py-10 gap-4">
       <div className="flex justify-between w-full max-w-6xl px-4">
         <div />
-        <button
-          onClick={onRefresh}
-          className="bg-blue-600 text-white text-sm px-4 py-2 rounded hover:bg-blue-700"
-        >
+        <button onClick={onRefresh} className="btn btn-outline">
           🔄 Refresh
         </button>
       </div>
 
       <div className="w-full max-w-6xl px-4">
-        <div className="rounded shadow border border-gray-800 bg-[#121212] overflow-x-auto">
+        <div className="card overflow-x-auto bg-transparent text-white">
           <table className="w-full min-w-[900px] table-fixed text-sm">
-            <thead className="bg-gray-800 text-gray-200">
+            <thead className="bg-black/30 text-white">
               <tr>
-                <th className="p-2 text-left font-semibold w-[110px]">Folders</th>
-                <th className="p-2 text-left font-semibold w-[50px]">✔</th>
-                <th className="p-2 text-left font-semibold w-[160px]">Name</th>
-                <th className="p-2 text-left font-semibold w-[240px]">Subject</th>
-                <th className="p-2 text-left font-semibold w-[340px]">
+                <th className="table-cell w-[110px]">Folders</th>
+                <th className="table-cell w-[50px]">✔</th>
+                <th className="table-cell w-[160px]">Name</th>
+                <th className="table-cell w-[240px]">Subject</th>
+                <th className="table-cell w-[340px]">
                   <div className="flex items-center gap-2">
                     <span>Switch</span>
                     <select
-                      className="bg-gray-700 text-white rounded px-2 py-1 text-sm"
+                      className="select"
                       value={view}
                       onChange={(e) => setView(e.target.value as 'summary' | 'message')}
                     >
@@ -106,7 +103,7 @@ export default function EmailTable({ emails = [], status, onRefresh }: EmailTabl
                     </select>
                   </div>
                 </th>
-                <th className="p-2 text-left font-semibold w-[160px]">Date & Time</th>
+                <th className="table-cell w-[160px]">Date & Time</th>
               </tr>
             </thead>
             <tbody>
@@ -117,18 +114,26 @@ export default function EmailTable({ emails = [], status, onRefresh }: EmailTabl
               )}
               {status === 'error' && (
                 <tr>
-                  <td colSpan={6} className="text-center p-4 text-red-500">❌ Error loading inbox</td>
+                  <td colSpan={6} className="text-center p-4 text-red-400">❌ Error loading inbox</td>
                 </tr>
               )}
               {status === 'success' && emails.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="text-center p-4 text-gray-400">📭 No emails found</td>
+                  <td colSpan={6} className="text-center p-4 text-white/70">📭 No emails found</td>
                 </tr>
               )}
               {status === 'success' && emails.map((email, idx) => (
-                <tr key={email.id} className="border-t border-gray-700 hover:bg-gray-800 transition">
+                <tr
+                  key={email.id}
+                  className={`border-t border-white/10 transition-colors ${
+                    idx % 2 === 0 ? 'bg-white/5' : 'bg-white/10'
+                  } hover:bg-white/20`}
+                >
                   {idx === 0 && (
-                    <td rowSpan={emails.length} className="align-top p-3 text-sm text-white bg-black border-r border-gray-700 w-[110px]">
+                    <td
+                      rowSpan={emails.length}
+                      className="align-top p-3 bg-white/90 text-black border-r border-white/20 w-[110px] text-sm"
+                    >
                       <div className="space-y-2">
                         <div className="font-semibold mb-2">📁 Folders</div>
                         <ul className="space-y-1">
@@ -141,17 +146,17 @@ export default function EmailTable({ emails = [], status, onRefresh }: EmailTabl
                       </div>
                     </td>
                   )}
-                  <td className="p-2">
-                    <input type="checkbox" className="form-checkbox text-blue-500" />
+                  <td className="table-cell text-white">
+                    <input type="checkbox" className="form-checkbox text-primary" />
                   </td>
-                  <td className="p-2 truncate">{email.from?.split('<')[0].trim() || 'Unknown'}</td>
-                  <td className="p-2 font-medium truncate">{email.subject || '(No Subject)'}</td>
-                  <td className="p-2 text-gray-300 truncate">
+                  <td className="table-cell truncate text-white">{email.from?.split('<')[0].trim() || 'Unknown'}</td>
+                  <td className="table-cell font-medium truncate text-white">{email.subject || '(No Subject)'}</td>
+                  <td className="table-cell truncate text-white">
                     {view === 'summary'
                       ? summaries[email.id] || '⏳ Summarizing...'
                       : email.body || '(No body)'}
                   </td>
-                  <td className="p-2 text-xs text-gray-400 whitespace-nowrap">
+                  <td className="table-cell text-xs text-white whitespace-nowrap">
                     {formatIST(email.date)}
                   </td>
                 </tr>

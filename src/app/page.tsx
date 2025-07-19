@@ -6,7 +6,9 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import Image from 'next/image'
 import EmailFilters from '@/components/EmailFilters'
 import EmailTable from '@/components/EmailTable'
-import { EmailItem } from '@/types/email' // ✅ Use this
+import InventoryTable from '@/components/InventoryTable'
+import { EmailItem } from '@/types/email'
+import { InventoryItem } from '@/types/inventory'
 
 const allowedEmails = [
   'dhana@aggrandizedigital.com',
@@ -14,13 +16,13 @@ const allowedEmails = [
   'veera@aggrandizedigital.com',
 ]
 
-// ❌ Removed local type EmailItem
-
 export default function HomePage() {
   const [authChecked, setAuthChecked] = useState(false)
   const [emails, setEmails] = useState<EmailItem[]>([])
   const [emailStatus, setEmailStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
-  const [activeTab, setActiveTab] = useState<'gmail' | 'whatsapp' | 'telegram' | null>(null)
+  const [inventory, setInventory] = useState<InventoryItem[]>([])
+  const [inventoryStatus, setInventoryStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [activeTab, setActiveTab] = useState<'gmail' | 'whatsapp' | 'telegram' | 'inventory' | null>(null)
 
   const supabase = createClientComponentClient()
   const router = useRouter()
@@ -52,7 +54,6 @@ export default function HomePage() {
       setEmailStatus('loading')
       const res = await fetch('/api/emails')
       const data: { inbox?: EmailItem[] } = await res.json()
-
       if (Array.isArray(data.inbox)) {
         setEmails(data.inbox)
         setEmailStatus('success')
@@ -66,6 +67,19 @@ export default function HomePage() {
     }
   }
 
+  const fetchInventory = async () => {
+    try {
+      setInventoryStatus('loading')
+      const { data, error } = await supabase.from('web_inventory').select('*')
+      if (error) throw error
+      setInventory(data || [])
+      setInventoryStatus('success')
+    } catch (err) {
+      console.error('Inventory fetch error:', err)
+      setInventoryStatus('error')
+    }
+  }
+
   const handleLogout = async () => {
     await supabase.auth.signOut()
     router.push('/login')
@@ -73,92 +87,91 @@ export default function HomePage() {
 
   if (!authChecked) {
     return (
-      <main className="relative min-h-screen p-6 bg-gray-900 text-white">
+      <main className="relative min-h-screen p-6 bg-transparent text-white">
         <p className="text-sm text-center">Checking authentication...</p>
       </main>
     )
   }
 
   return (
-    <main className="relative min-h-screen bg-gray-100 text-gray-900">
-      {/* Logout Button */}
+    <main className="min-h-screen bg-transparent text-white p-4 sm:p-6">
       <div className="absolute top-4 left-4 z-50">
-        <button
-          onClick={handleLogout}
-          className="px-3 py-2 text-sm bg-red-600 hover:bg-red-700 text-white rounded shadow"
-        >
+        <button onClick={handleLogout} className="btn btn-outline">
           🔓 Logout
         </button>
       </div>
 
-      <section className="min-h-screen px-4 sm:px-6 lg:px-8 py-6">
-        <div className="max-w-6xl mx-auto">
-          {/* Header */}
-          <div className="flex flex-col items-center justify-center mb-8">
-            <Image
-              src="/assets/ads-logo.png"
-              alt="ADS Logo"
-              width={60}
-              height={60}
-              className="object-contain"
-            />
-            <h1 className="text-2xl font-bold mt-2">ADS Dashboard</h1>
+      <div className="card max-w-5xl mx-auto p-6 sm:p-8 mt-10 bg-white/5 text-white shadow-lg">
+        <div className="flex flex-col items-center justify-center mb-6">
+          <Image
+            src="/assets/ads-logo.png"
+            alt="ADS Logo"
+            width={60}
+            height={60}
+            className="object-contain"
+          />
+         <h1 className="text-2xl font-bold mt-2 text-white">ADS Dashboard</h1>
 
-            {/* Interactive Tabs */}
-            <div className="flex gap-2 mt-3">
-              <button
-                onClick={() => {
-                  setActiveTab('gmail')
-                  fetchInbox()
-                }}
-                className={`text-sm font-semibold px-4 py-1.5 rounded shadow transition
-                  ${activeTab === 'gmail'
-                    ? 'bg-[#D93025] text-white'
-                    : 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-                `}
-              >
-                Gmail
-              </button>
+          <div className="flex gap-3 mt-4 flex-wrap justify-center">
+            <button
+              onClick={() => {
+                setActiveTab('gmail')
+                fetchInbox()
+              }}
+              className="btn btn-primary"
+            >
+              Gmail
+            </button>
 
-              <button
-                onClick={() => {
-                  setActiveTab('whatsapp')
-                  alert('WhatsApp integration coming soon 📱')
-                }}
-                className={`text-sm font-semibold px-4 py-1.5 rounded shadow transition
-                  ${activeTab === 'whatsapp'
-                    ? 'bg-[#25D366] text-white'
-                    : 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-                `}
-              >
-                WhatsApp
-              </button>
+            <button
+              onClick={() => {
+                setActiveTab('whatsapp')
+                alert('WhatsApp integration coming soon 📱')
+              }}
+              className="btn btn-secondary"
+            >
+              WhatsApp
+            </button>
 
-              <button
-                onClick={() => {
-                  setActiveTab('telegram')
-                  alert('Telegram integration coming soon 💬')
-                }}
-                className={`text-sm font-semibold px-4 py-1.5 rounded shadow transition
-                  ${activeTab === 'telegram'
-                    ? 'bg-[#0088CC] text-white'
-                    : 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-                `}
-              >
-                Telegram
-              </button>
-            </div>
-          </div>
+            <button
+              onClick={() => {
+                setActiveTab('telegram')
+                alert('Telegram integration coming soon 💬')
+              }}
+              className="btn btn-secondary"
+            >
+              Telegram
+            </button>
 
-          {/* Filters */}
-          <EmailFilters source="Gmail" />
-
-          {/* 📦 Table inside clean, framed box */}
-          <div className="bg-[#1a1a1a] rounded-xl shadow-lg p-4 sm:p-6 lg:p-8 mt-4">
-            <EmailTable emails={emails} status={emailStatus} onRefresh={fetchInbox} />
+            <button
+              onClick={() => {
+                setActiveTab('inventory')
+                fetchInventory()
+              }}
+              className="btn btn-primary"
+            >
+              📦 Inventory
+            </button>
           </div>
         </div>
-      </section>
+
+        {/* Gmail Tab */}
+        {activeTab === 'gmail' && (
+          <>
+            <EmailFilters source="Gmail" />
+            <div className="card mt-4 p-4 sm:p-6 bg-white/5 text-white">
+              <EmailTable emails={emails} status={emailStatus} onRefresh={fetchInbox} />
+            </div>
+          </>
+        )}
+
+        {/* Inventory Tab */}
+        {activeTab === 'inventory' && (
+          <div className="mt-6">
+            <InventoryTable items={inventory} status={inventoryStatus} />
+          </div>
+        )}
+      </div>
     </main>
   )
 }
