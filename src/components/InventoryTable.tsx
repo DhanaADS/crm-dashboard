@@ -68,6 +68,13 @@ interface SortableHeaderProps {
   direction: 'asc' | 'desc'
 }
 
+interface SortableHeaderProps {
+  col: string
+  onClick: () => void
+  sorted: boolean
+  direction: 'asc' | 'desc'
+}
+
 function SortableHeader({ col, onClick, sorted, direction }: SortableHeaderProps) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: col })
   const style = {
