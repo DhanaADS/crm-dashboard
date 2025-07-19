@@ -3,7 +3,13 @@
 import { useState } from "react"
 import { InventoryItem } from "@/types/inventory"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogFooter } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogFooter
+} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
@@ -44,7 +50,7 @@ export default function AddInventoryItem({
 
   const handleSubmit = () => {
     const newItem: InventoryItem = {
-      ID: Date.now(), // simple unique ID
+      ID: Date.now(),
       ...formData
     }
     onAdd(newItem)
@@ -62,32 +68,38 @@ export default function AddInventoryItem({
           <h2 className="text-lg font-semibold">Add New Inventory Item</h2>
         </DialogHeader>
         <div className="grid grid-cols-2 gap-4">
-          {Object.entries(initialFormState).map(([key, _]) => (
-            <div key={key}>
-              <Label className="capitalize">{key.replace(/_/g, ' ')}</Label>
-              {yesNoFields.includes(key) ? (
-                <select
-                  className="select w-full"
-                  value={formData[key as keyof typeof formData]}
-                  onChange={(e) => handleChange(key as keyof typeof formData, e.target.value)}
-                >
-                  <option value="">Select</option>
-                  <option value="Yes">Yes</option>
-                  <option value="No">No</option>
-                </select>
-              ) : (
-                <Input
-                  value={formData[key as keyof typeof formData]}
-                  onChange={e =>
-                    handleChange(
-                      key as keyof typeof formData,
-                      ["da", "price", "traffic"].includes(key) ? Number(e.target.value) : e.target.value
-                    )
-                  }
-                />
-              )}
-            </div>
-          ))}
+          {Object.entries(initialFormState).map(([key]) => {
+            return (
+              <div key={key}>
+                <Label className="capitalize">{key.replace(/_/g, ' ')}</Label>
+                {yesNoFields.includes(key) ? (
+                  <select
+                    className="select w-full"
+                    value={formData[key as keyof typeof formData]}
+                    onChange={(e) =>
+                      handleChange(key as keyof typeof formData, e.target.value)
+                    }
+                  >
+                    <option value="">Select</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                  </select>
+                ) : (
+                  <Input
+                    value={formData[key as keyof typeof formData]}
+                    onChange={e =>
+                      handleChange(
+                        key as keyof typeof formData,
+                        ["da", "price", "traffic"].includes(key)
+                          ? Number(e.target.value)
+                          : e.target.value
+                      )
+                    }
+                  />
+                )}
+              </div>
+            )
+          })}
         </div>
         <DialogFooter className="mt-4">
           <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>

@@ -61,7 +61,14 @@ const columnKeyMap: Record<string, keyof InventoryItem> = {
   "Active": "last_active_state",
 }
 
-function SortableHeader({ col, onClick, sorted, direction }: any) {
+interface SortableHeaderProps {
+  col: string
+  onClick: () => void
+  sorted: boolean
+  direction: 'asc' | 'desc'
+}
+
+function SortableHeader({ col, onClick, sorted, direction }: SortableHeaderProps) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: col })
   const style = {
     transform: CSS.Transform.toString(transform),
