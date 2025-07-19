@@ -112,7 +112,7 @@ export default function InventoryTable({ items, status }: InventoryTableProps) {
   const handleClearFilters = () => setFilters({ minDA: '', category: '', sponsored: '', dofollow: '' })
   const toggleColumn = (col: string) => setVisibleColumns(prev => prev.includes(col) ? prev.filter(c => c !== col) : [...prev, col])
 
-  const handleSort = (key: keyof InventoryItem) => {
+  const handleSort = (key: keyof InventoryItem) => { ... }
     if (sortConfig?.key === key) {
       setSortConfig({ key, direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' })
     } else {
