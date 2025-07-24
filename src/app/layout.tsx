@@ -1,16 +1,19 @@
-'use client'
+// src/app/layout.tsx
+import './globals.css'
+import { Inter } from 'next/font/google'
+import type { Metadata } from 'next'
 
-import '../styles/globals.css'
-import { SessionProvider } from 'next-auth/react'
+const inter = Inter({ subsets: ['latin'] })
+
+export const metadata: Metadata = {
+  title: 'ADS Dashboard',
+  description: 'Admin dashboard for managing inventory and email data.',
+}
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">
-      <body className="min-h-screen bg-[url('/assets/bg.jpg')] bg-cover bg-center bg-no-repeat bg-fixed text-foreground antialiased">
-        <SessionProvider>
-          {children}
-        </SessionProvider>
-      </body>
+      <body className={inter.className}>{children}</body>
     </html>
   )
 }

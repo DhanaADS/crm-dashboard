@@ -20,10 +20,6 @@ const buttonVariants = cva(
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
-        
-        // ✅ New glass variant
-        glass:
-          "bg-white/5 text-white hover:bg-white/10 rounded-lg px-3 py-1.5 border border-white/10 shadow-sm transition",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

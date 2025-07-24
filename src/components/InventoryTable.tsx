@@ -1,306 +1,657 @@
-'use client'
+import React, { useState, useMemo } from 'react';
+import { 
+  Search, Filter, ArrowUpDown, ArrowUp, ArrowDown, MoreHorizontal, 
+  Edit, Trash2, ExternalLink, TrendingUp, TrendingDown, Eye, Download,
+  ShoppingCart, DollarSign, Target, CheckCircle, AlertCircle, X,
+  Calculator, Globe, Package
+} from 'lucide-react';
+import './InventoryTable.css'; // Import the CSS file
 
-import { useState } from "react"
-import { InventoryItem } from "@/types/inventory"
-import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from "@/components/ui/table"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
-import { Download, XCircle, Eye, ArrowDown, ArrowUp, GripVertical } from "lucide-react"
-import { saveAs } from "file-saver"
-import * as XLSX from "xlsx"
-import { Parser } from "json2csv"
-import {
-  DndContext,
-  closestCenter,
-  MouseSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from '@dnd-kit/core'
-import {
-  arrayMove,
-  SortableContext,
-  useSortable,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
-import AddInventoryItem from "@/components/AddInventoryItem"
+const InventoryManagement = () => {
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedItems, setSelectedItems] = useState(new Set());
+  const [activeOrder, setActiveOrder] = useState(null);
+  const [showOrderSelection, setShowOrderSelection] = useState(false);
 
-interface InventoryTableProps {
-  items: InventoryItem[]
-  status: "idle" | "loading" | "success" | "error"
-}
+  // Sample active orders for integration
+  const activeOrders = [
+    {
+      id: 'ORD-001',
+      clientName: 'TechCorp Solutions',
+      sitesNeeded: 3,
+      maxBudget: 240,
+      requirements: {
+        categories: ['Technology', 'Business'],
+        minDA: 80,
+        linkType: 'Editorial'
+      }
+    },
+    {
+      id: 'ORD-002',
+      clientName: 'HealthPro Inc',
+      sitesNeeded: 5,
+      maxBudget: 400,
+      requirements: {
+        categories: ['Health', 'Medical'],
+        minDA: 75,
+        linkType: 'Guest Post'
+      }
+    }
+  ];
 
-const allColumns = [
-  "ID", "Magazine", "DA", "Price", "Traffic", "Indexed", "DoFollow", "Category",
-  "Google News", "Sponsored", "CBD", "Casino", "Dating", "Crypto",
-  "Contact", "Created", "Active"
-]
+  // Enhanced inventory data with pricing and availability
+  const inventoryData = [
+    {
+      id: 1,
+      domain: 'techcrunch.com',
+      category: 'Technology',
+      domainAuthority: 92,
+      monthlyTraffic: '45.2M',
+      trafficTrend: 'up',
+      linkType: 'Editorial',
+      status: 'Available',
+      lastUpdated: '2025-01-20',
+      pricing: {
+        editorial: 120,
+        guestPost: 80,
+        sponsored: 150
+      },
+      articleFee: 20,
+      turnaroundDays: 5,
+      notes: 'High-quality tech publication'
+    },
+    {
+      id: 2,
+      domain: 'forbes.com',
+      category: 'Business',
+      domainAuthority: 94,
+      monthlyTraffic: '88.1M',
+      trafficTrend: 'up',
+      linkType: 'Sponsored',
+      status: 'Available',
+      lastUpdated: '2025-01-19',
+      pricing: {
+        editorial: 200,
+        guestPost: 120,
+        sponsored: 180
+      },
+      articleFee: 30,
+      turnaroundDays: 7,
+      notes: 'Premium business content'
+    },
+    {
+      id: 3,
+      domain: 'healthline.com',
+      category: 'Health',
+      domainAuthority: 89,
+      monthlyTraffic: '67.5M',
+      trafficTrend: 'down',
+      linkType: 'Guest Post',
+      status: 'Available',
+      lastUpdated: '2025-01-18',
+      pricing: {
+        editorial: 100,
+        guestPost: 70,
+        sponsored: 110
+      },
+      articleFee: 15,
+      turnaroundDays: 4,
+      notes: 'Medical authority site'
+    },
+    {
+      id: 4,
+      domain: 'investopedia.com',
+      category: 'Finance',
+      domainAuthority: 87,
+      monthlyTraffic: '34.7M',
+      trafficTrend: 'up',
+      linkType: 'Resource',
+      status: 'Available',
+      lastUpdated: '2025-01-17',
+      pricing: {
+        editorial: 90,
+        guestPost: 60,
+        sponsored: 100
+      },
+      articleFee: 20,
+      turnaroundDays: 6,
+      notes: 'Financial education leader'
+    },
+    {
+      id: 5,
+      domain: 'coursera.org',
+      category: 'Education',
+      domainAuthority: 85,
+      monthlyTraffic: '89.3M',
+      trafficTrend: 'up',
+      linkType: 'Partnership',
+      status: 'Available',
+      lastUpdated: '2025-01-16',
+      pricing: {
+        editorial: 80,
+        guestPost: 50,
+        sponsored: 90
+      },
+      articleFee: 15,
+      turnaroundDays: 3,
+      notes: 'Online learning platform'
+    },
+    {
+      id: 6,
+      domain: 'wired.com',
+      category: 'Technology',
+      domainAuthority: 91,
+      monthlyTraffic: '28.4M',
+      trafficTrend: 'down',
+      linkType: 'Editorial',
+      status: 'Limited',
+      lastUpdated: '2025-01-15',
+      pricing: {
+        editorial: 110,
+        guestPost: 75,
+        sponsored: 130
+      },
+      articleFee: 25,
+      turnaroundDays: 5,
+      notes: 'Tech culture and news'
+    },
+    {
+      id: 7,
+      domain: 'entrepreneur.com',
+      category: 'Business',
+      domainAuthority: 83,
+      monthlyTraffic: '15.6M',
+      trafficTrend: 'up',
+      linkType: 'Guest Post',
+      status: 'Available',
+      lastUpdated: '2025-01-14',
+      pricing: {
+        editorial: 70,
+        guestPost: 45,
+        sponsored: 80
+      },
+      articleFee: 12,
+      turnaroundDays: 4,
+      notes: 'Entrepreneurship focused'
+    },
+    {
+      id: 8,
+      domain: 'webmd.com',
+      category: 'Health',
+      domainAuthority: 88,
+      monthlyTraffic: '52.1M',
+      trafficTrend: 'up',
+      linkType: 'Resource',
+      status: 'Available',
+      lastUpdated: '2025-01-13',
+      pricing: {
+        editorial: 95,
+        guestPost: 65,
+        sponsored: 105
+      },
+      articleFee: 18,
+      turnaroundDays: 5,
+      notes: 'Medical information portal'
+    }
+  ];
 
-const columnKeyMap: Record<string, keyof InventoryItem> = {
-  "ID": "ID",
-  "Magazine": "magazine",
-  "DA": "da",
-  "Price": "price",
-  "Traffic": "traffic",
-  "Indexed": "indexed",
-  "DoFollow": "dofollow",
-  "Category": "category",
-  "Google News": "google_news",
-  "Sponsored": "sponsored",
-  "CBD": "cbd",
-  "Casino": "casino",
-  "Dating": "dating",
-  "Crypto": "crypto",
-  "Contact": "contact",
-  "Created": "created_at",
-  "Active": "last_active_state",
-}
+  const filteredData = useMemo(() => {
+    let filtered = inventoryData.filter(item =>
+      item.domain.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.linkType.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
-interface SortableHeaderProps {
-  col: string
-  onClick: () => void
-  sorted: boolean
-  direction: 'asc' | 'desc'
-}
+    // Apply order-based filtering if an order is selected
+    if (activeOrder) {
+      filtered = filtered.filter(item => {
+        const meetsDA = item.domainAuthority >= activeOrder.requirements.minDA;
+        const meetsCategory = activeOrder.requirements.categories.includes(item.category);
+        return meetsDA && meetsCategory;
+      });
+    }
 
-interface SortableHeaderProps {
-  col: string
-  onClick: () => void
-  sorted: boolean
-  direction: 'asc' | 'desc'
-}
+    return filtered;
+  }, [searchTerm, activeOrder]);
 
-function SortableHeader({ col, onClick, sorted, direction }: SortableHeaderProps) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: col })
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    cursor: 'move'
-  }
-  return (
-    <TableHead
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      onClick={onClick}
-      className="text-center bg-muted whitespace-nowrap select-none"
-    >
-      <div className="flex items-center justify-center gap-1">
-        <GripVertical className="w-3 h-3 opacity-50" />
-        {col}
-        {sorted && (direction === 'asc' ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />)}
-      </div>
-    </TableHead>
-  )
-}
+  const sortedData = useMemo(() => {
+    if (!sortConfig.key) return filteredData;
 
-export default function InventoryTable({ items, status }: InventoryTableProps) {
-  const [filters, setFilters] = useState({ minDA: '', category: '', sponsored: '', dofollow: '' })
-  const [searchTerm, setSearchTerm] = useState('')
-  const [visibleColumns, setVisibleColumns] = useState<string[]>([...allColumns])
-  const [columnOrder, setColumnOrder] = useState<string[]>([...allColumns])
-  const [sortConfig, setSortConfig] = useState<{ key: keyof InventoryItem, direction: 'asc' | 'desc' } | null>(null)
-  const [localItems, setLocalItems] = useState<InventoryItem[]>([])
+    return [...filteredData].sort((a, b) => {
+      const aValue = a[sortConfig.key];
+      const bValue = b[sortConfig.key];
 
-  const handleChange = (field: string, value: string) => setFilters(prev => ({ ...prev, [field]: value }))
-  const handleClearFilters = () => setFilters({ minDA: '', category: '', sponsored: '', dofollow: '' })
-  const toggleColumn = (col: string) => setVisibleColumns(prev => prev.includes(col) ? prev.filter(c => c !== col) : [...prev, col])
+      if (sortConfig.key === 'domainAuthority') {
+        return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
+      }
 
-  const handleSort = (key: keyof InventoryItem) => { ... }
-    if (sortConfig?.key === key) {
-      setSortConfig({ key, direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' })
+      if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [filteredData, sortConfig]);
+
+  const selectedItemsData = useMemo(() => {
+    return inventoryData.filter(item => selectedItems.has(item.id));
+  }, [selectedItems]);
+
+  const budgetCalculation = useMemo(() => {
+    if (!activeOrder || selectedItemsData.length === 0) {
+      return { total: 0, articleFees: 0, grandTotal: 0, isWithinBudget: true };
+    }
+
+    const linkTypeKey = activeOrder.requirements.linkType.toLowerCase().replace(' ', '');
+    const linkTypePricing = {
+      'editorial': 'editorial',
+      'guestpost': 'guestPost',
+      'sponsored': 'sponsored',
+      'resourcepage': 'guestPost',
+      'partnership': 'guestPost'
+    };
+
+    const pricingKey = linkTypePricing[linkTypeKey] || 'guestPost';
+
+    const total = selectedItemsData.reduce((sum, item) => {
+      return sum + (item.pricing[pricingKey] || item.pricing.guestPost);
+    }, 0);
+
+    const articleFees = selectedItemsData.reduce((sum, item) => sum + item.articleFee, 0);
+    const grandTotal = total + articleFees;
+    const isWithinBudget = grandTotal <= activeOrder.maxBudget;
+
+    return { total, articleFees, grandTotal, isWithinBudget };
+  }, [selectedItemsData, activeOrder]);
+
+  const handleSort = (key) => {
+    setSortConfig(current => ({
+      key,
+      direction: current.key === key && current.direction === 'asc' ? 'desc' : 'asc'
+    }));
+  };
+
+  const getSortIcon = (key) => {
+    if (sortConfig.key !== key) return <ArrowUpDown className="sort-icon" />;
+    return sortConfig.direction === 'asc' ? 
+      <ArrowUp className="sort-icon active" /> : 
+      <ArrowDown className="sort-icon active" />;
+  };
+
+  const getStatusBadge = (status) => {
+    const statusClass = status.toLowerCase().replace(' ', '-');
+    return (
+      <span className={`status-badge status-${statusClass}`}>
+        {status}
+      </span>
+    );
+  };
+
+  const getTrendIcon = (trend) => {
+    return trend === 'up' ? 
+      <TrendingUp className="trend-icon trend-up" /> : 
+      <TrendingDown className="trend-icon trend-down" />;
+  };
+
+  const handleSelectItem = (id) => {
+    const newSelected = new Set(selectedItems);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
     } else {
-      setSortConfig({ key, direction: 'asc' })
+      // Check if we can add more items based on order requirements
+      if (activeOrder && selectedItems.size >= activeOrder.sitesNeeded && !newSelected.has(id)) {
+        return; // Don't allow selecting more than needed
+      }
+      newSelected.add(id);
     }
-  }
+    setSelectedItems(newSelected);
+  };
 
-  const combinedItems = [...items, ...localItems]
+  const getPriceForLinkType = (item, linkType) => {
+    const linkTypeKey = linkType?.toLowerCase().replace(' ', '');
+    const linkTypePricing = {
+      'editorial': 'editorial',
+      'guestpost': 'guestPost',
+      'sponsored': 'sponsored',
+      'resourcepage': 'guestPost',
+      'partnership': 'guestPost'
+    };
+    
+    const pricingKey = linkTypePricing[linkTypeKey] || 'guestPost';
+    return item.pricing[pricingKey] || item.pricing.guestPost;
+  };
 
-  const filteredItems = combinedItems.filter(item => {
-    const daPass = filters.minDA ? item.da >= parseInt(filters.minDA) : true
-    const categoryPass = filters.category ? item.category?.toLowerCase().includes(filters.category.toLowerCase()) : true
-    const sponsoredPass = filters.sponsored ? item.sponsored === filters.sponsored : true
-    const dofollowPass = filters.dofollow ? item.dofollow === filters.dofollow : true
-    const searchPass = searchTerm
-      ? Object.values(item).some(val =>
-          typeof val === 'string' && val.toLowerCase().includes(searchTerm)
-        )
-      : true
-
-    return daPass && categoryPass && sponsoredPass && dofollowPass && searchPass
-  })
-
-  const sortedItems = sortConfig ? [...filteredItems].sort((a, b) => {
-    const valA = a[sortConfig.key]
-    const valB = b[sortConfig.key]
-    if (valA === valB) return 0
-    const dir = sortConfig.direction === 'asc' ? 1 : -1
-    return valA > valB ? dir : -dir
-  }) : filteredItems
-
-  const getExportData = () => {
-    return sortedItems.map(item => {
-      const row: Record<string, any> = {}
-      columnOrder.forEach(col => {
-        if (visibleColumns.includes(col)) {
-          const key = columnKeyMap[col]
-          row[col] = item[key]
-        }
-      })
-      return row
-    })
-  }
-
-  const exportExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(getExportData())
-    const workbook = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Inventory")
-    const buffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" })
-    saveAs(new Blob([buffer], { type: "application/octet-stream" }), "inventory_export.xlsx")
-  }
-
-  const exportCSV = () => {
-    const exportFields = columnOrder.filter(col => visibleColumns.includes(col))
-    const parser = new Parser({ fields: exportFields })
-    const csv = parser.parse(getExportData())
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
-    saveAs(blob, "inventory_export.csv")
-  }
-
-  const sensors = useSensors(useSensor(MouseSensor))
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event
-    if (active.id !== over?.id) {
-      setColumnOrder((prev) => {
-        const oldIndex = prev.indexOf(active.id as string)
-        const newIndex = prev.indexOf(over?.id as string)
-        return arrayMove(prev, oldIndex, newIndex)
-      })
-    }
-  }
-
-  if (status === "loading") return <p>Loading inventory...</p>
-  if (status === "error") return <p className="text-red-500">Failed to load inventory</p>
-  if (status === "success" && items.length === 0) return <p>No inventory items found</p>
-
-  return (
-    <div className="w-full">
-      <Card className="w-full overflow-x-auto p-0 border border-border bg-card text-card-foreground shadow">
-
-        {/* Filters + Actions */}
-        <div className="flex flex-wrap items-end justify-between gap-6 p-4 border-b border-border bg-muted text-sm">
-          <div className="flex gap-6 flex-wrap items-end">
-            <div>
-              <label className="block font-medium mb-1">Min DA</label>
-              <input type="number" className="input" placeholder="e.g. 50" value={filters.minDA} onChange={(e) => handleChange('minDA', e.target.value)} />
-            </div>
-            <div>
-              <label className="block font-medium mb-1">Category</label>
-              <input type="text" className="input" placeholder="e.g. Tech" value={filters.category} onChange={(e) => handleChange('category', e.target.value)} />
-            </div>
-            <div>
-              <label className="block font-medium mb-1">Sponsored</label>
-              <select className="select" value={filters.sponsored} onChange={(e) => handleChange('sponsored', e.target.value)}>
-                <option value="">All</option><option value="Yes">Yes</option><option value="No">No</option>
-              </select>
-            </div>
-            <div>
-              <label className="block font-medium mb-1">DoFollow</label>
-              <select className="select" value={filters.dofollow} onChange={(e) => handleChange('dofollow', e.target.value)}>
-                <option value="">All</option><option value="Yes">Yes</option><option value="No">No</option>
-              </select>
-            </div>
-            <div className="w-full flex justify-end sm:w-auto sm:ml-auto">
-              <div>
-                <label className="block font-medium mb-1 text-center">Search</label>
-                <input
-                  type="text"
-                  className="input w-[250px]"
-                  placeholder="Search..."
-                  onChange={(e) => setSearchTerm(e.target.value.toLowerCase())}
-                />
+  const OrderSelectionPanel = () => (
+    <div className="order-panel">
+      <div className="order-panel-header">
+        <h3 className="order-panel-title">
+          <Target className="w-5 h-5 text-blue-400" />
+          Order-Based Filtering
+        </h3>
+        {activeOrder && (
+          <button 
+            onClick={() => {
+              setActiveOrder(null);
+              setSelectedItems(new Set());
+            }}
+            className="btn btn-danger"
+          >
+            <X className="w-4 h-4" />
+            Clear Order
+          </button>
+        )}
+      </div>
+      
+      {!activeOrder ? (
+        <div className="order-grid">
+          {activeOrders.map(order => (
+            <div 
+              key={order.id} 
+              className="order-card"
+              onClick={() => setActiveOrder(order)}
+            >
+              <div className="order-card-header">
+                <span className="order-id">{order.id}</span>
+                <span className="order-sites">{order.sitesNeeded} sites</span>
+              </div>
+              <div className="order-client">{order.clientName}</div>
+              <div className="order-details">
+                <div>Budget: ${order.maxBudget}</div>
+                <div>Min DA: {order.requirements.minDA}</div>
+                <div>Categories: {order.requirements.categories.join(', ')}</div>
               </div>
             </div>
+          ))}
+        </div>
+      ) : (
+        <div className="active-order-summary">
+          <div className="order-info">
+            <h4>Active Order: {activeOrder.id}</h4>
+            <div className="info-item">
+              <span className="info-label">Client:</span>
+              <span className="info-value">{activeOrder.clientName}</span>
+            </div>
+            <div className="info-item">
+              <span className="info-label">Sites Needed:</span>
+              <span className="info-value">{activeOrder.sitesNeeded}</span>
+            </div>
+            <div className="info-item">
+              <span className="info-label">Budget:</span>
+              <span className="info-value success">${activeOrder.maxBudget}</span>
+            </div>
+            <div className="info-item">
+              <span className="info-label">Link Type:</span>
+              <span className="info-value">{activeOrder.requirements.linkType}</span>
+            </div>
           </div>
-          <div className="flex gap-2 flex-wrap items-center">
-            <AddInventoryItem onAdd={(item) => setLocalItems(prev => [...prev, item])} />
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline"><Eye className="w-4 h-4 mr-1" /> View Columns</Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-60">
-                <p className="text-sm font-semibold mb-2">Toggle Columns</p>
-                <div className="space-y-2 max-h-64 overflow-auto">
-                  {allColumns.map(col => (
-                    <div key={col} className="flex items-center gap-2">
-                      <Checkbox checked={visibleColumns.includes(col)} onCheckedChange={() => toggleColumn(col)} id={`col-${col}`} />
-                      <label htmlFor={`col-${col}`} className="text-sm">{col}</label>
-                    </div>
-                  ))}
-                </div>
-              </PopoverContent>
-            </Popover>
-            <Button variant="outline" onClick={handleClearFilters}><XCircle className="w-4 h-4 mr-1" /> Clear Filters</Button>
-            <Button onClick={exportExcel}><Download className="w-4 h-4 mr-1" /> Excel</Button>
-            <Button onClick={exportCSV}><Download className="w-4 h-4 mr-1" /> CSV</Button>
+          <div className="selection-status">
+            <h4>Selection Status</h4>
+            <div className="info-item">
+              <span className="info-label">Selected:</span>
+              <span className="info-value">{selectedItems.size}/{activeOrder.sitesNeeded}</span>
+            </div>
+            <div className="info-item">
+              <span className="info-label">Budget Used:</span>
+              <span className={`info-value ${budgetCalculation.isWithinBudget ? 'success' : 'danger'}`}>
+                ${budgetCalculation.grandTotal}/${activeOrder.maxBudget}
+              </span>
+            </div>
+            <div className="info-item">
+              <span className="info-label">Remaining:</span>
+              <span className="info-value info">
+                ${activeOrder.maxBudget - budgetCalculation.grandTotal}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  const BudgetSummary = () => {
+    if (!activeOrder || selectedItems.size === 0) return null;
+
+    const summaryClass = budgetCalculation.isWithinBudget && selectedItems.size === activeOrder.sitesNeeded
+      ? 'budget-summary success' 
+      : selectedItems.size > activeOrder.sitesNeeded || !budgetCalculation.isWithinBudget
+      ? 'budget-summary danger'
+      : 'budget-summary warning';
+
+    return (
+      <div className={summaryClass}>
+        <div className="budget-header">
+          <div className="budget-title">
+            {budgetCalculation.isWithinBudget && selectedItems.size === activeOrder.sitesNeeded ? (
+              <CheckCircle className="w-5 h-5" />
+            ) : (
+              <AlertCircle className="w-5 h-5" />
+            )}
+            Budget Summary - {activeOrder.id}
+          </div>
+          <div className="budget-breakdown">
+            <div>Sites: ${budgetCalculation.total} | Articles: ${budgetCalculation.articleFees}</div>
+            <div className="budget-total">Total: ${budgetCalculation.grandTotal}</div>
+          </div>
+        </div>
+        
+        {selectedItems.size === activeOrder.sitesNeeded && budgetCalculation.isWithinBudget && (
+          <div className="budget-actions">
+            <button className="btn btn-success">
+              Finalize Selection for {activeOrder.id}
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className="inventory-container">
+      <div className="inventory-wrapper">
+        {/* Header */}
+        <div className="inventory-header">
+          <div>
+            <h2 className="inventory-title">Domain Inventory</h2>
+            <p className="inventory-subtitle">
+              {filteredData.length} domains available
+              {activeOrder && ` • Filtered for ${activeOrder.id}`}
+            </p>
+          </div>
+          <div className="header-actions">
+            <button 
+              onClick={() => setShowOrderSelection(!showOrderSelection)}
+              className="btn btn-primary"
+            >
+              <Target className="w-4 h-4" />
+              {activeOrder ? 'Change Order' : 'Select Order'}
+            </button>
+            <button className="btn btn-secondary">
+              <Download className="w-4 h-4" />
+              Export
+            </button>
           </div>
         </div>
 
-        {/* Show Result Count */}
-        <div className="px-4 py-2 text-sm border-b border-border bg-muted">
-          Showing {sortedItems.length} result{sortedItems.length !== 1 && 's'}
+        {/* Order Selection Panel */}
+        <OrderSelectionPanel />
+
+        {/* Budget Summary */}
+        <BudgetSummary />
+
+        {/* Search and Filters */}
+        <div className="search-section">
+          <div className="search-controls">
+            <div className="search-input-wrapper">
+              <Search className="search-icon" />
+              <input
+                type="text"
+                placeholder="Search inventory..."
+                className="search-input"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <button className="btn btn-secondary">
+              <Filter className="w-4 h-4" />
+              Advanced Filters
+            </button>
+          </div>
         </div>
 
         {/* Table */}
-        <div className="overflow-auto max-h-[70vh]">
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext items={columnOrder} strategy={verticalListSortingStrategy}>
-              <Table className="bg-card">
-                <TableHeader className="sticky top-0 z-10 bg-muted">
-                  <TableRow>
-                    {columnOrder.map(col => visibleColumns.includes(col) && (
-                      <SortableHeader
-                        key={col}
-                        col={col}
-                        onClick={() => handleSort(columnKeyMap[col])}
-                        sorted={sortConfig?.key === columnKeyMap[col]}
-                        direction={sortConfig?.direction}
+        <div className="inventory-table-container">
+          <table className="inventory-table">
+            <thead className="table-header">
+              <tr>
+                <th className="table-cell">
+                  <span>Select</span>
+                </th>
+                <th 
+                  className="table-cell sortable-header"
+                  onClick={() => handleSort('domain')}
+                >
+                  <button className="sort-button">
+                    Domain
+                    {getSortIcon('domain')}
+                  </button>
+                </th>
+                <th 
+                  className="table-cell sortable-header"
+                  onClick={() => handleSort('category')}
+                >
+                  <button className="sort-button">
+                    Category
+                    {getSortIcon('category')}
+                  </button>
+                </th>
+                <th 
+                  className="table-cell sortable-header"
+                  onClick={() => handleSort('domainAuthority')}
+                >
+                  <button className="sort-button">
+                    DA Score
+                    {getSortIcon('domainAuthority')}
+                  </button>
+                </th>
+                <th className="table-cell">Traffic</th>
+                <th className="table-cell">Pricing</th>
+                <th className="table-cell">Article Fee</th>
+                <th className="table-cell">Status</th>
+                <th className="table-cell">Turnaround</th>
+                <th className="table-cell" style={{textAlign: 'center'}}>Actions</th>
+              </tr>
+            </thead>
+            <tbody className="table-body">
+              {sortedData.map((item) => {
+                const isSelected = selectedItems.has(item.id);
+                const currentPrice = activeOrder ? 
+                  getPriceForLinkType(item, activeOrder.requirements.linkType) : 
+                  item.pricing.guestPost;
+                
+                return (
+                  <tr 
+                    key={item.id} 
+                    className={`table-row ${isSelected ? 'selected' : ''}`}
+                  >
+                    <td className="table-cell">
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => handleSelectItem(item.id)}
+                        disabled={activeOrder && selectedItems.size >= activeOrder.sitesNeeded && !isSelected}
+                        className="checkbox"
                       />
-                    ))}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {sortedItems.map((item, index) => (
-                    <TableRow
-                      key={item.ID || `inv-${index}`}
-                      className="even:bg-muted/50 text-sm"
-                    >
-                      {columnOrder.map(col => visibleColumns.includes(col) && (
-                        <TableCell key={col} className="text-center">
-                          {col === 'Magazine' ? (
-                            <a href={item.magazine} className="underline text-primary" target="_blank">
-                              {item.magazine}
-                            </a>
-                          ) : (
-                            String(item[columnKeyMap[col]] ?? '')
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </SortableContext>
-          </DndContext>
+                    </td>
+                    <td className="table-cell domain-cell">
+                      <div>
+                        <a href={`https://${item.domain}`} className="domain-link" target="_blank" rel="noopener noreferrer">
+                          {item.domain}
+                          <ExternalLink className="external-icon" />
+                        </a>
+                        {item.notes && (
+                          <div className="domain-notes">{item.notes}</div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="table-cell">
+                      <span className="category-badge">{item.category}</span>
+                    </td>
+                    <td className="table-cell">
+                      <div className="da-score">
+                        <div className="da-indicator"></div>
+                        <span className="da-value">{item.domainAuthority}</span>
+                      </div>
+                    </td>
+                    <td className="table-cell">
+                      <div className="traffic-cell">
+                        <span className="traffic-value">{item.monthlyTraffic}</span>
+                        {getTrendIcon(item.trafficTrend)}
+                      </div>
+                    </td>
+                    <td className="table-cell">
+                      <div className="pricing-display">
+                        {activeOrder ? (
+                          <span className="pricing-current">${currentPrice}</span>
+                        ) : (
+                          <div className="pricing-breakdown">
+                            <div className="pricing-item">E: ${item.pricing.editorial}</div>
+                            <div className="pricing-item">G: ${item.pricing.guestPost}</div>
+                            <div className="pricing-item">S: ${item.pricing.sponsored}</div>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="table-cell">
+                      <span className="article-fee">${item.articleFee}</span>
+                    </td>
+                    <td className="table-cell">
+                      {getStatusBadge(item.status)}
+                    </td>
+                    <td className="table-cell">
+                      <span className="turnaround">{item.turnaroundDays} days</span>
+                    </td>
+                    <td className="table-cell">
+                      <div className="action-buttons">
+                        <button className="action-btn" title="View">
+                          <Eye className="action-icon" />
+                        </button>
+                        <button className="action-btn" title="Edit">
+                          <Edit className="action-icon" />
+                        </button>
+                        <button className="action-btn" title="More">
+                          <MoreHorizontal className="action-icon" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+
+          {/* Table Footer */}
+          <div className="table-footer">
+            <div className="table-info">
+              Showing 1 to <strong>{sortedData.length}</strong> of <strong>{sortedData.length}</strong> results
+              {selectedItems.size > 0 && (
+                <span> • <strong>{selectedItems.size}</strong> selected</span>
+              )}
+            </div>
+            <div className="pagination">
+              <button className="pagination-btn">
+                Previous
+              </button>
+              <button className="pagination-btn active">
+                1
+              </button>
+              <button className="pagination-btn">
+                Next
+              </button>
+            </div>
+          </div>
         </div>
-      </Card>
+      </div>
     </div>
-  )
-}
+  );
+};
+
+export default InventoryManagement;
