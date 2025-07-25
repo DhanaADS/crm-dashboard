@@ -229,3 +229,150 @@ iframe {
 * {
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
+
+/* Navigation Tab Buttons - Add this to the end of your globals.css */
+
+/* Gmail Button - Red */
+.nav-button.gmail,
+button[class*="gmail"],
+[data-tab="gmail"],
+button:has(.mail-icon),
+button:has([data-icon="gmail"]) {
+  background: linear-gradient(135deg, #ea4335 0%, #d33b2c 100%) !important;
+  color: white !important;
+  border: 1px solid rgba(234, 67, 53, 0.3) !important;
+  box-shadow: 0 8px 25px -8px rgba(234, 67, 53, 0.4) !important;
+}
+
+/* WhatsApp Button - Green */
+.nav-button.whatsapp,
+button[class*="whatsapp"],
+[data-tab="whatsapp"],
+button:has(.message-icon),
+button:has([data-icon="whatsapp"]) {
+  background: linear-gradient(135deg, #25d366 0%, #20ba5a 100%) !important;
+  color: white !important;
+  border: 1px solid rgba(37, 211, 102, 0.3) !important;
+  box-shadow: 0 8px 25px -8px rgba(37, 211, 102, 0.4) !important;
+}
+
+/* Telegram Button - Blue */
+.nav-button.telegram,
+button[class*="telegram"],
+[data-tab="telegram"],
+button:has(.send-icon),
+button:has([data-icon="telegram"]) {
+  background: linear-gradient(135deg, #0088cc 0%, #006ba6 100%) !important;
+  color: white !important;
+  border: 1px solid rgba(0, 136, 204, 0.3) !important;
+  box-shadow: 0 8px 25px -8px rgba(0, 136, 204, 0.4) !important;
+}
+
+/* Orders Button - Orange */
+.nav-button.orders,
+button[class*="orders"],
+[data-tab="orders"],
+button:has(.clipboard-icon),
+button:has([data-icon="orders"]) {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+  color: white !important;
+  border: 1px solid rgba(245, 158, 11, 0.3) !important;
+  box-shadow: 0 8px 25px -8px rgba(245, 158, 11, 0.4) !important;
+}
+
+/* Inventory Button - Purple */
+.nav-button.inventory,
+button[class*="inventory"],
+[data-tab="inventory"],
+button:has(.package-icon),
+button:has([data-icon="inventory"]) {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+  color: white !important;
+  border: 1px solid rgba(139, 92, 246, 0.3) !important;
+  box-shadow: 0 8px 25px -8px rgba(139, 92, 246, 0.4) !important;
+}
+
+/* Active state for navigation buttons */
+.nav-button.active,
+button[data-active="true"],
+.active-tab {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 30px -8px rgba(59, 130, 246, 0.5) !important;
+}
+
+/* Hover effects for navigation buttons */
+.nav-button:hover,
+button[class*="nav"]:hover {
+  transform: translateY(-1px) !important;
+  filter: brightness(1.1) !important;
+}
+
+/* Specific targeting for dashboard navigation */
+.dashboard-nav button:nth-child(1),
+[role="tablist"] button:nth-child(1),
+.tab-container button:first-child {
+  background: linear-gradient(135deg, #ea4335 0%, #d33b2c 100%) !important;
+  color: white !important;
+  border: 1px solid rgba(234, 67, 53, 0.3) !important;
+}
+
+.dashboard-nav button:nth-child(2),
+[role="tablist"] button:nth-child(2),
+.tab-container button:nth-child(2) {
+  background: linear-gradient(135deg, #25d366 0%, #20ba5a 100%) !important;
+  color: white !important;
+  border: 1px solid rgba(37, 211, 102, 0.3) !important;
+}
+
+.dashboard-nav button:nth-child(3),
+[role="tablist"] button:nth-child(3),
+.tab-container button:nth-child(3) {
+  background: linear-gradient(135deg, #0088cc 0%, #006ba6 100%) !important;
+  color: white !important;
+  border: 1px solid rgba(0, 136, 204, 0.3) !important;
+}
+
+.dashboard-nav button:nth-child(4),
+[role="tablist"] button:nth-child(4),
+.tab-container button:nth-child(4) {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+  color: white !important;
+  border: 1px solid rgba(245, 158, 11, 0.3) !important;
+}
+
+.dashboard-nav button:nth-child(5),
+[role="tablist"] button:nth-child(5),
+.tab-container button:nth-child(5) {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+  color: white !important;
+  border: 1px solid rgba(139, 92, 246, 0.3) !important;
+}
+
+/* Override any conflicting button styles */
+button:has(svg + span):nth-child(1) {
+  background: linear-gradient(135deg, #ea4335 0%, #d33b2c 100%) !important;
+}
+
+button:has(svg + span):nth-child(2) {
+  background: linear-gradient(135deg, #25d366 0%, #20ba5a 100%) !important;
+}
+
+button:has(svg + span):nth-child(3) {
+  background: linear-gradient(135deg, #0088cc 0%, #006ba6 100%) !important;
+}
+
+button:has(svg + span):nth-child(4) {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+}
+
+button:has(svg + span):nth-child(5) {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+}
+
+/* Force override for buttons with icons and text */
+.flex.items-center.gap-3 button,
+.flex.items-center.gap-2 button {
+  color: white !important;
+  font-weight: 600 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}

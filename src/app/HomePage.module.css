@@ -1273,3 +1273,38 @@
     gap: 0.5rem;
   }
 }
+
+/* Gmail - Official Red (#EA4335) */
+.tabGmail {
+  background: linear-gradient(135deg, #EA4335, #D33B2C);
+  color: white;
+  border: 1px solid #EA4335;
+}
+
+/* WhatsApp - Official Green (#25D366) */
+.tabWhatsapp {
+  background: linear-gradient(135deg, #25D366, #1DA851);
+  color: white;
+  border: 1px solid #25D366;
+}
+
+/* Telegram - Official Blue (#0088CC) */
+.tabTelegram {
+  background: linear-gradient(135deg, #0088CC, #006699);
+  color: white;
+  border: 1px solid #0088CC;
+}
+
+/* Orders - Professional Purple (#7C3AED) */
+.tabOrders {
+  background: linear-gradient(135deg, #7C3AED, #6D28D9);
+  color: white;
+  border: 1px solid #7C3AED;
+}
+
+/* Inventory - Professional Orange (#F97316) */
+.tabInventory {
+  background: linear-gradient(135deg, #F97316, #EA580C);
+  color: white;
+  border: 1px solid #F97316;
+}
