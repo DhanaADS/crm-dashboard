@@ -1,36 +1,43 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { FaSun, FaMoon } from 'react-icons/fa'
+import { Moon, Sun } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 export default function DarkModeToggle() {
-  const [isDark, setIsDark] = useState(false)
+  const [theme, setTheme] = useState('dark')
 
   useEffect(() => {
-    const root = window.document.documentElement
-    if (isDark) {
-      root.classList.add('dark')
-    } else {
-      root.classList.remove('dark')
-    }
-  }, [isDark])
+    const savedTheme = localStorage.getItem('ads-theme') || 'dark'
+    setTheme(savedTheme)
+    document.documentElement.className = savedTheme
+  }, [])
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark'
+    setTheme(newTheme)
+    localStorage.setItem('ads-theme', newTheme)
+    document.documentElement.className = newTheme
+  }
 
   return (
-    <button
-      onClick={() => setIsDark(!isDark)}
-      className="flex items-center space-x-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 px-3 py-1 rounded-full transition duration-300 shadow-md"
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={toggleTheme}
+      className="gap-2"
     >
-      {isDark ? (
+      {theme === 'dark' ? (
         <>
-          <FaMoon className="text-blue-400" />
-          <span className="text-sm">Dark</span>
+          <Sun className="h-5 w-5" />
+          <span>Light</span>
         </>
       ) : (
         <>
-          <FaSun className="text-yellow-500" />
-          <span className="text-sm">Light</span>
+          <Moon className="h-5 w-5" />
+          <span>Dark</span>
         </>
       )}
-    </button>
+    </Button>
   )
 }

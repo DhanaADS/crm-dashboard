@@ -1,0 +1,246 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { useRouter } from 'next/navigation'
+import Image from 'next/image'
+import { Mail, Shield, Sparkles, Chrome } from 'lucide-react'
+import styles from './LoginPage.module.css'
+
+const allowedAdmins = [
+  'dhana@aggrandizedigital.com',
+  'saravana@aggrandizedigital.com',
+  'veera@aggrandizedigital.com',
+]
+
+export default function LoginPage() {
+  const [theme, setTheme] = useState('dark')
+  const [isLoading, setIsLoading] = useState(false)
+  const [message, setMessage] = useState('')
+  const [messageType, setMessageType] = useState<'success' | 'error' | ''>('')
+  
+  const supabase = createClientComponentClient()
+  const router = useRouter()
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('ads-theme') || 'dark'
+    setTheme(savedTheme)
+    document.documentElement.className = savedTheme
+  }, [])
+
+  useEffect(() => {
+    const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user?.email) {
+        setIsLoading(true)
+        const userEmail = session.user.email
+        
+        if (allowedAdmins.includes(userEmail)) {
+          setMessage('Access granted! Redirecting to dashboard...')
+          setMessageType('success')
+          setTimeout(() => {
+            router.push('/dashboard')
+          }, 1500)
+        } else {
+          setMessage('Access denied: You are not an authorized admin.')
+          setMessageType('error')
+          await supabase.auth.signOut()
+          setIsLoading(false)
+        }
+      }
+      
+      if (event === 'SIGNED_OUT') {
+        setIsLoading(false)
+        setMessage('')
+        setMessageType('')
+      }
+    })
+
+    return () => {
+      data.subscription.unsubscribe()
+    }
+  }, [supabase, router])
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark'
+    setTheme(newTheme)
+    localStorage.setItem('ads-theme', newTheme)
+    document.documentElement.className = newTheme
+  }
+
+  return (
+    <div className={`${styles.loginContainer} ${theme === 'dark' ? styles.loginContainerDark : styles.loginContainerLight}`}>
+      
+      {/* Animated Background */}
+      <div className={styles.backgroundElements}>
+        <div className={styles.gridOverlay}></div>
+        <div className={`${styles.floatingOrb} ${styles.orb1}`}></div>
+        <div className={`${styles.floatingOrb} ${styles.orb2}`}></div>
+        <div className={`${styles.floatingOrb} ${styles.orb3}`}></div>
+      </div>
+
+      {/* Theme Toggle */}
+      <button
+        onClick={toggleTheme}
+        className="absolute top-6 right-6 z-20 p-3 rounded-full backdrop-blur-sm border border-white/20 hover:bg-white/10 transition-all duration-300"
+        style={{
+          background: theme === 'dark' 
+            ? 'rgba(255, 255, 255, 0.1)' 
+            : 'rgba(0, 0, 0, 0.1)',
+          color: theme === 'dark' ? '#ffffff' : '#000000'
+        }}
+      >
+        {theme === 'dark' ? (
+          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
+          </svg>
+        ) : (
+          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+          </svg>
+        )}
+      </button>
+
+      {/* Main Login Card */}
+      <div className={`${styles.loginCard} ${theme === 'dark' ? styles.loginCardDark : styles.loginCardLight}`}>
+        
+        {/* Logo Section */}
+        <div className={styles.logoSection}>
+          <div className={styles.logoContainer}>
+            <div className={styles.logoWrapper}>
+              <Image
+                src="/assets/ads-logo.png"
+                alt="ADS Logo"
+                width={40}
+                height={40}
+                className={styles.logoImage}
+              />
+            </div>
+          </div>
+          
+          <h1 className={styles.logoTitle}>ADS Dashboard</h1>
+          <p className={`${styles.logoSubtitle} ${theme === 'dark' ? styles.logoSubtitleDark : styles.logoSubtitleLight}`}>
+            Advanced Management System
+          </p>
+        </div>
+
+        {/* Header Section */}
+        <div className={styles.headerSection}>
+          <h2 className={`${styles.welcomeText} ${theme === 'dark' ? styles.welcomeTextDark : styles.welcomeTextLight}`}>
+            Welcome Back
+          </h2>
+          <p className={`${styles.descriptionText} ${theme === 'dark' ? styles.descriptionTextDark : styles.descriptionTextLight}`}>
+            Sign in to access your premium dashboard with advanced analytics and management tools.
+          </p>
+        </div>
+
+        {/* Message Display */}
+        {message && (
+          <div className={`${styles.messageContainer} ${messageType === 'success' ? styles.successMessage : styles.errorMessage}`}>
+            <div className="flex items-center gap-2">
+              {messageType === 'success' ? (
+                <Shield className="w-4 h-4" />
+              ) : (
+                <Mail className="w-4 h-4" />
+              )}
+              <span className="text-sm font-medium">{message}</span>
+            </div>
+          </div>
+        )}
+
+        {/* Auth Container */}
+        <div className={styles.authContainer}>
+          
+          {/* Custom Magic Link Form */}
+          <div className={styles.authForm}>
+            <div className={styles.inputGroup}>
+              <label className={`${styles.inputLabel} ${theme === 'dark' ? styles.inputLabelDark : styles.inputLabelLight}`}>
+                <Mail className="w-4 h-4 inline mr-2" />
+                Email Address
+              </label>
+              <div className="relative">
+                <input
+                  type="email"
+                  placeholder="Enter your authorized email"
+                  className={`${styles.inputField} ${theme === 'dark' ? styles.inputFieldDark : styles.inputFieldLight}`}
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+
+            <button
+              className={styles.submitButton}
+              disabled={isLoading}
+              type="submit"
+            >
+              <div className="flex items-center justify-center gap-2">
+                {isLoading && <div className={styles.loadingSpinner}></div>}
+                <Sparkles className="w-4 h-4" />
+                <span>{isLoading ? 'Sending...' : 'Send Magic Link'}</span>
+              </div>
+            </button>
+          </div>
+
+          {/* OAuth Divider */}
+          <div className={styles.oauthDivider}>
+            <div className={`${styles.dividerLine} ${theme === 'dark' ? styles.dividerLineDark : styles.dividerLineLight}`}></div>
+            <span className={`${styles.dividerText} ${theme === 'dark' ? styles.dividerTextDark : styles.dividerTextLight}`}>
+              or continue with
+            </span>
+            <div className={`${styles.dividerLine} ${theme === 'dark' ? styles.dividerLineDark : styles.dividerLineLight}`}></div>
+          </div>
+
+          {/* Google OAuth Button */}
+          <button
+            className={`${styles.googleButton} ${theme === 'dark' ? styles.googleButtonDark : styles.googleButtonLight}`}
+            disabled={isLoading}
+          >
+            <Chrome className="w-5 h-5" />
+            <span>Continue with Google</span>
+          </button>
+        </div>
+
+        {/* Supabase Auth (Hidden but Functional) */}
+        <div style={{ display: 'none' }}>
+          <Auth
+            supabaseClient={supabase}
+            view="magic_link"
+            appearance={{
+              theme: ThemeSupa,
+              className: {
+                container: 'hidden',
+                button: 'hidden',
+                input: 'hidden',
+                label: 'hidden',
+              },
+            }}
+            theme={theme}
+            providers={['google']}
+            showLinks={false}
+            magicLink={true}
+            localization={{
+              variables: {
+                magic_link: {
+                  email_input_label: 'Email address',
+                  button_label: 'Send Magic Link',
+                  link_text: '',
+                  confirmation_text: 'Check your email for the login link!',
+                },
+              },
+            }}
+          />
+        </div>
+
+        {/* Footer */}
+        <div className={`${styles.footerSection} ${theme === 'dark' ? styles.footerSectionDark : styles.footerSectionLight}`}>
+          <p className={`${styles.footerText} ${theme === 'dark' ? styles.footerTextDark : styles.footerTextLight}`}>
+            Use your <span className={styles.footerHighlight}>authorized email</span> to receive a secure magic link.
+            <br />
+            Only approved administrators can access this dashboard.
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}

@@ -14,6 +14,24 @@ import { OrderItem } from '@/types/order'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent } from '@/components/ui/tabs'
 import { OrderProvider } from '@/contexts/OrderContext'
+import { 
+  Mail, 
+  MessageSquare, 
+  Send, 
+  ClipboardList, 
+  Package,
+  Sun,
+  Moon,
+  LogOut,
+  Users,
+  Activity,
+  TrendingUp,
+  Zap,
+  Bell,
+  ArrowRight,
+  Sparkles
+} from 'lucide-react'
+import styles from './HomePage.module.css'
 
 const allowedEmails = [
   'dhana@aggrandizedigital.com',
@@ -117,7 +135,7 @@ export default function HomePage() {
         clientBudget: order.total_budget,
         companyProfitTarget: order.profit_margin,
         requirements: {
-          categories: ['General'], // You can enhance this based on sites
+          categories: ['General'],
           minDA: 50,
           linkType: 'Guest Post',
           niche: 'General'
@@ -152,7 +170,6 @@ export default function HomePage() {
   }
 
   const handleOrderCreated = () => {
-    // Refresh orders when a new order is created
     fetchOrders()
   }
 
@@ -163,301 +180,460 @@ export default function HomePage() {
 
   if (!authChecked) {
     return (
-      <div style={{
-        minHeight: '100vh',
-        width: '100vw',
-        background: theme === 'dark' ? '#1a1a1a' : '#f5f5f5',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        zIndex: 9999
-      }}>
-        <div className="text-center">
-          <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <div className="text-primary-foreground text-2xl font-bold">A</div>
+      <div className={`${styles.loadingScreen} ${theme === 'dark' ? styles.loadingScreenDark : styles.loadingScreenLight}`}>
+        <div className={styles.loadingContent}>
+          <div className={styles.loadingIconContainer}>
+            <div className={styles.loadingIcon}>
+              <Sparkles className={styles.loadingIconSparkles} />
+            </div>
+            <div className={`${styles.loadingIconIndicator} ${theme === 'dark' ? styles.loadingIconIndicatorDark : styles.loadingIconIndicatorLight}`}></div>
           </div>
-          <p className="text-muted-foreground">Checking authentication...</p>
+          <h2 className={`${styles.loadingTitle} ${theme === 'dark' ? styles.loadingTitleDark : styles.loadingTitleLight}`}>
+            Initializing Dashboard
+          </h2>
+          <p className={`${styles.loadingSubtitle} ${theme === 'dark' ? styles.loadingSubtitleDark : styles.loadingSubtitleLight}`}>
+            Verifying your credentials...
+          </p>
+          <div className={styles.loadingDots}>
+            <div className={styles.loadingDotsContainer}>
+              <div className={`${styles.loadingDot} ${styles.loadingDotBlue}`}></div>
+              <div className={`${styles.loadingDot} ${styles.loadingDotPurple}`}></div>
+              <div className={`${styles.loadingDot} ${styles.loadingDotPink}`}></div>
+            </div>
+          </div>
         </div>
       </div>
     )
   }
 
+  const navigationTabs = [
+    {
+      key: 'gmail',
+      label: 'Gmail',
+      icon: Mail,
+      activeClass: styles.tabGmail,
+      inactiveClass: styles.tabGmailInactive,
+      action: () => {
+        setActiveTab('gmail')
+        fetchInbox()
+      }
+    },
+    {
+      key: 'whatsapp',
+      label: 'WhatsApp',
+      icon: MessageSquare,
+      activeClass: styles.tabWhatsapp,
+      inactiveClass: styles.tabWhatsappInactive,
+      action: () => setActiveTab('whatsapp')
+    },
+    {
+      key: 'telegram',
+      label: 'Telegram',
+      icon: Send,
+      activeClass: styles.tabTelegram,
+      inactiveClass: styles.tabTelegramInactive,
+      action: () => setActiveTab('telegram')
+    },
+    {
+      key: 'orders',
+      label: 'Orders',
+      icon: ClipboardList,
+      activeClass: styles.tabOrders,
+      inactiveClass: styles.tabOrdersInactive,
+      action: () => {
+        setActiveTab('orders')
+        fetchOrders()
+      }
+    },
+    {
+      key: 'inventory',
+      label: 'Inventory',
+      icon: Package,
+      activeClass: styles.tabInventory,
+      inactiveClass: styles.tabInventoryInactive,
+      action: () => {
+        setActiveTab('inventory')
+        fetchInventory()
+      }
+    }
+  ]
+
   return (
     <OrderProvider>
-      <div style={{
-        minHeight: '100vh',
-        width: '100vw',
-        background: theme === 'dark' ? '#1a1a1a' : '#f5f5f5',
-        overflowX: 'hidden'
-      }}>
-        {/* Header */}
-        <div style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 50,
-          width: '100%',
-          background: theme === 'dark' ? 'rgba(26, 26, 26, 0.95)' : 'rgba(245, 245, 245, 0.95)',
-          backdropFilter: 'blur(10px)',
-          borderBottom: theme === 'dark' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.1)',
-          padding: '12px 24px'
-        }}>
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center',
-            maxWidth: '1400px',
-            margin: '0 auto'
-          }}>
-
-<div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-  <Link href="/employees">
-    <Button
-      size="sm"
-      variant="outline"
-      className="h-8 px-3 text-sm bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
-    >
-      👨‍💼 Employees
-    </Button>
-  </Link>
-  <Button
-    onClick={toggleTheme}
-    size="sm"
-    variant="outline"
-    className="h-8 px-3 text-sm button-inactive"
-  >
-    {theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
-  </Button>
-</div>
-            <Button
-              onClick={handleLogout}
-              size="sm"
-              variant="outline"
-              className="h-8 px-4 text-sm button-inactive"
-            >
-              🔓 Logout
-            </Button>
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <div style={{ 
-          padding: '16px 24px 24px 24px',
-          width: '100%',
-          maxWidth: '1400px',
-          margin: '0 auto',
-          boxSizing: 'border-box'
-        }}>
-          <div style={{
-            width: '100%',
-            background: theme === 'dark' ? 'rgba(255, 255, 255, 0.02)' : 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(20px)',
-            border: theme === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(0, 0, 0, 0.1)',
-            borderRadius: '24px',
-            boxShadow: theme === 'dark' ? '0 25px 50px -12px rgba(0, 0, 0, 0.8)' : '0 20px 25px -5px rgba(0, 0, 0, 0.15)',
-            overflow: 'hidden'
-          }}>
-            {/* Dashboard Header */}
-            <div style={{
-              padding: '1.5rem 2rem',
-              background: theme === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.02)',
-              backdropFilter: 'blur(15px)',
-              borderBottom: theme === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(0, 0, 0, 0.1)',
-              textAlign: 'center'
-            }}>
-              <div className="flex justify-center items-center mb-4">
-                <div 
-                  className="rounded-xl flex items-center justify-center shadow-lg"
-                  style={{ 
-                    width: '50px', 
-                    height: '50px',
-                    backgroundColor: '#000000'
-                  }}
-                >
-                  <Image
-                    src="/assets/ads-logo.png"
-                    alt="ADS Logo"
-                    width={28}
-                    height={28}
-                    className="object-contain"
-                  />
+      <div className={`${styles.dashboardContainer} ${theme === 'dark' ? styles.darkTheme : styles.lightTheme}`}>
+        
+        {/* Modern Header */}
+        <header className={`${styles.header} ${theme === 'dark' ? styles.headerDark : styles.headerLight}`}>
+          <div className={styles.headerContent}>
+            {/* Logo Section */}
+            <div className={styles.logoSection}>
+              <div className={styles.logoContainer}>
+                <Image
+                  src="/assets/ads-logo.png"
+                  alt="ADS Logo"
+                  width={26}
+                  height={26}
+                  className="object-contain"
+                />
+                <div className={styles.statusIndicator}></div>
+              </div>
+              <div className={styles.logoText}>
+                <span className={styles.logoTitle}>
+                  ADS Dashboard
+                </span>
+                <div className={`${styles.logoSubtitle} ${theme === 'dark' ? styles.logoSubtitleDark : styles.logoSubtitleLight}`}>
+                  Advanced Management System
                 </div>
               </div>
-              <h1 className={`text-2xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                ADS Dashboard
-              </h1>
-              <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                Advanced Digital Solutions Management
-              </p>
+            </div>
+            
+            {/* Right Actions */}
+            <div className={styles.actionBar}>
+              {/* Quick Stats */}
+              <div className={`${styles.quickStats} ${theme === 'dark' ? styles.quickStatsDark : styles.quickStatsLight}`}>
+                <div className={styles.statItem}>
+                  <Activity className="h-4 w-4 text-green-500" />
+                  <span className={`${styles.statText} ${theme === 'dark' ? styles.statTextDark : styles.statTextLight}`}>
+                    Live
+                  </span>
+                </div>
+                <div className={`${styles.divider} ${theme === 'dark' ? styles.dividerDark : styles.dividerLight}`}></div>
+                <div className={styles.statItem}>
+                  <TrendingUp className="h-4 w-4 text-blue-500" />
+                  <span className={`${styles.statText} ${theme === 'dark' ? styles.statTextDark : styles.statTextLight}`}>
+                    {emails.length} Items
+                  </span>
+                </div>
+              </div>
+
+              {/* Notification Bell */}
+              <button className={`${styles.actionButton} ${theme === 'dark' ? styles.actionButtonDark : styles.actionButtonLight} relative`}>
+                <Bell className="h-4 w-4" />
+                <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></div>
+              </button>
+
+              {/* Employees Link */}
+              <Link href="/employees">
+                <button className={`${styles.actionButton} ${theme === 'dark' ? styles.actionButtonDark : styles.actionButtonLight}`}>
+                  <Users className="h-4 w-4" />
+                  <span className="hidden sm:inline font-medium">Team</span>
+                </button>
+              </Link>
+              
+              {/* Theme Toggle */}
+              <button
+                onClick={toggleTheme}
+                className={`${styles.actionButton} ${theme === 'dark' ? styles.actionButtonDark : styles.actionButtonLight}`}
+              >
+                {theme === 'dark' ? (
+                  <>
+                    <Sun className="h-4 w-4" />
+                    <span className="hidden sm:inline font-medium">Light</span>
+                  </>
+                ) : (
+                  <>
+                    <Moon className="h-4 w-4" />
+                    <span className="hidden sm:inline font-medium">Dark</span>
+                  </>
+                )}
+              </button>
+              
+              {/* Logout */}
+              <button
+                onClick={handleLogout}
+                className={`${styles.logoutButton} ${theme === 'dark' ? styles.logoutButtonDark : styles.logoutButtonLight}`}
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="hidden sm:inline font-medium">Logout</span>
+              </button>
+            </div>
+          </div>
+        </header>
+
+        {/* Main Content */}
+        <main className={styles.mainContent}>
+          <div className={`${styles.dashboardCard} ${theme === 'dark' ? styles.dashboardCardDark : styles.dashboardCardLight}`}>
+            
+            {/* Hero Dashboard Header */}
+            <div className={`${styles.heroSection} ${theme === 'dark' ? styles.heroSectionDark : styles.heroSectionLight}`}>
+              <div className={styles.gridPattern}></div>
+              <div className={styles.heroContent}>
+                <div className={styles.heroText}>
+                  <div className={styles.heroTitle}>
+                    <Zap className="h-8 w-8 text-yellow-500" />
+                    <h1 className={styles.heroMainTitle}>
+                      Dashboard Command
+                    </h1>
+                  </div>
+                  <p className={`${styles.heroDescription} ${theme === 'dark' ? styles.heroDescriptionDark : styles.heroDescriptionLight}`}>
+                    Your centralized mission control for managing communications, orders, and inventory with 
+                    <span className={`${styles.highlight} ${styles.highlightBlue}`}> intelligent automation</span> and 
+                    <span className={`${styles.highlight} ${styles.highlightPurple}`}> real-time insights</span>.
+                  </p>
+                </div>
+                
+                {/* Quick Action Cards */}
+                <div className={styles.quickStatsGrid}>
+                  <div className={`${styles.statCard} ${styles.statCardBlue} ${theme === 'dark' ? styles.statCardBlueDark : styles.statCardBlueLight}`}>
+                    <div className={styles.statCardContent}>
+                      <div className={`${styles.statValue} ${styles.statValueBlue}`}>{emails.length}</div>
+                      <div className={`${styles.statLabel} ${theme === 'dark' ? styles.statLabelDark : styles.statLabelLight}`}>Active Emails</div>
+                    </div>
+                  </div>
+                  <div className={`${styles.statCard} ${styles.statCardPurple} ${theme === 'dark' ? styles.statCardPurpleDark : styles.statCardPurpleLight}`}>
+                    <div className={styles.statCardContent}>
+                      <div className={`${styles.statValue} ${styles.statValuePurple}`}>{orders.length}</div>
+                      <div className={`${styles.statLabel} ${theme === 'dark' ? styles.statLabelDark : styles.statLabelLight}`}>Live Orders</div>
+                    </div>
+                  </div>
+                  <div className={`${styles.statCard} ${styles.statCardGreen} ${theme === 'dark' ? styles.statCardGreenDark : styles.statCardGreenLight}`}>
+                    <div className={styles.statCardContent}>
+                      <div className={`${styles.statValue} ${styles.statValueGreen}`}>{inventory.length}</div>
+                      <div className={`${styles.statLabel} ${theme === 'dark' ? styles.statLabelDark : styles.statLabelLight}`}>Inventory Items</div>
+                    </div>
+                  </div>
+                  <div className={`${styles.statCard} ${styles.statCardOrange} ${theme === 'dark' ? styles.statCardOrangeDark : styles.statCardOrangeLight}`}>
+                    <div className={styles.statCardContent}>
+                      <div className={`${styles.statValue} ${styles.statValueOrange}`}>98%</div>
+                      <div className={`${styles.statLabel} ${theme === 'dark' ? styles.statLabelDark : styles.statLabelLight}`}>Uptime</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* Navigation Tabs */}
-            <div className="px-6 py-4 border-b" style={{
-              borderBottom: theme === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(0, 0, 0, 0.1)'
-            }}>
-              <div className="flex justify-center items-center gap-2 flex-wrap">
-                <Button
-                  onClick={() => {
-                    setActiveTab('gmail')
-                    fetchInbox()
-                  }}
-                  size="sm"
-                  variant={activeTab === 'gmail' ? 'default' : 'outline'}
-                  className={`h-8 px-4 text-sm ${activeTab === 'gmail' ? 'bg-red-600 hover:bg-red-700 text-white' : 'button-inactive'}`}
-                >
-                  📧 Gmail
-                </Button>
-
-                <Button
-                  onClick={() => setActiveTab('whatsapp')}
-                  size="sm"
-                  variant={activeTab === 'whatsapp' ? 'default' : 'outline'}
-                  className={`h-8 px-4 text-sm ${activeTab === 'whatsapp' ? 'bg-green-500 hover:bg-green-600 text-white' : 'button-inactive'}`}
-                >
-                  📱 WhatsApp
-                </Button>
-
-                <Button
-                  onClick={() => setActiveTab('telegram')}
-                  size="sm"
-                  variant={activeTab === 'telegram' ? 'default' : 'outline'}
-                  className={`h-8 px-4 text-sm ${activeTab === 'telegram' ? 'bg-sky-500 hover:bg-sky-600 text-white' : 'button-inactive'}`}
-                >
-                  💬 Telegram
-                </Button>
-
-                <Button
-                  onClick={() => {
-                    setActiveTab('orders')
-                    fetchOrders()
-                  }}
-                  size="sm"
-                  variant={activeTab === 'orders' ? 'default' : 'outline'}
-                  className={`h-8 px-4 text-sm ${activeTab === 'orders' ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'button-inactive'}`}
-                >
-                  📋 Orders
-                </Button>
-
-                <Button
-                  onClick={() => {
-                    setActiveTab('inventory')
-                    fetchInventory()
-                  }}
-                  size="sm"
-                  variant={activeTab === 'inventory' ? 'default' : 'outline'}
-                  className={`h-8 px-4 text-sm ${activeTab === 'inventory' ? 'bg-zinc-600 hover:bg-zinc-700 text-white' : 'button-inactive'}`}
-                >
-                  📦 Inventory
-                </Button>
+            {/* Modern Navigation Tabs */}
+            <div className={`${styles.navigationSection} ${theme === 'dark' ? styles.navigationSectionDark : styles.navigationSectionLight}`}>
+              <div className={styles.tabsContainer}>
+                {navigationTabs.map((tab) => {
+                  const IconComponent = tab.icon
+                  const isActive = activeTab === tab.key
+                  
+                  return (
+                    <button
+                      key={tab.key}
+                      onClick={tab.action}
+                      className={`${styles.tabButton} ${
+                        isActive 
+                          ? `${styles.tabButtonActive} ${tab.activeClass}` 
+                          : `${styles.tabButtonInactive} ${tab.inactiveClass} ${theme === 'dark' ? styles.tabButtonInactiveDark : styles.tabButtonInactiveLight}`
+                      }`}
+                    >
+                      <IconComponent className={`${styles.tabIcon} ${isActive ? styles.tabIconActive : ''}`} />
+                      <span>{tab.label}</span>
+                      {isActive && (
+                        <div className={styles.activeIndicator}>
+                          <div className={styles.activeIndicatorDot}></div>
+                        </div>
+                      )}
+                      <ArrowRight className={styles.arrowIcon} />
+                    </button>
+                  )
+                })}
               </div>
             </div>
 
             {/* Tab Content */}
-            <div style={{ padding: '1rem' }}>
+            <div className={styles.tabContent}>
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 {activeTab === 'gmail' && (
-                  <TabsContent value="gmail" className="focus-visible:outline-none">
-                    <EmailTable emails={emails} status={emailStatus} onRefresh={fetchInbox} />
+                  <TabsContent value="gmail" className="mt-0 focus-visible:outline-none">
+                    <div className={styles.contentSection}>
+                      <EmailTable emails={emails} status={emailStatus} onRefresh={fetchInbox} />
+                    </div>
                   </TabsContent>
                 )}
                 {activeTab === 'whatsapp' && (
-                  <TabsContent value="whatsapp" className="focus-visible:outline-none">
-                    <div className="text-center py-12">
-                      <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <div className="text-4xl">📱</div>
+                  <TabsContent value="whatsapp" className="mt-0 focus-visible:outline-none">
+                    <div className={styles.comingSoonContainer}>
+                      <div className={styles.comingSoonIcon}>
+                        <div className={`${styles.comingSoonIconCard} ${styles.comingSoonIconCardGreen} ${theme === 'dark' ? styles.comingSoonIconCardGreenDark : styles.comingSoonIconCardGreenLight}`}>
+                          <MessageSquare className={`${styles.comingSoonMainIcon} ${theme === 'dark' ? styles.comingSoonMainIconGreenDark : styles.comingSoonMainIconGreen}`} />
+                        </div>
+                        <div className={`${styles.comingSoonFloatingIcon} ${styles.comingSoonFloatingIconGreen}`}></div>
                       </div>
-                      <h3 className={`text-xl font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        WhatsApp Integration
+                      <h3 className={`${styles.comingSoonTitle} ${styles.comingSoonTitleGreen}`}>
+                        WhatsApp Business Hub
                       </h3>
-                      <p className={`mb-4 max-w-md mx-auto text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                        Connect your WhatsApp Business account.
+                      <p className={`${styles.comingSoonDescription} ${theme === 'dark' ? styles.comingSoonDescriptionDark : styles.comingSoonDescriptionLight}`}>
+                        Seamlessly integrate your WhatsApp Business API to manage customer conversations, 
+                        automated responses, and broadcast campaigns from your unified dashboard.
                       </p>
-                      <Button className="bg-green-500 hover:bg-green-600 text-white h-9 px-5">
-                        🚀 Coming Soon
-                      </Button>
+                      <div className={styles.comingSoonActions}>
+                        <button className={`${styles.primaryButton} ${styles.primaryButtonGreen}`} disabled>
+                          <Sparkles className="h-4 w-4" />
+                          Coming Soon
+                        </button>
+                        <button className={`${styles.secondaryButton} ${theme === 'dark' ? styles.secondaryButtonGreenDark : styles.secondaryButtonGreen}`}>
+                          Learn More
+                        </button>
+                      </div>
                     </div>
                   </TabsContent>
                 )}
                 {activeTab === 'telegram' && (
-                  <TabsContent value="telegram" className="focus-visible:outline-none">
-                    <div className="text-center py-12">
-                      <div className="w-20 h-20 bg-sky-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <div className="text-4xl">💬</div>
+                  <TabsContent value="telegram" className="mt-0 focus-visible:outline-none">
+                    <div className={styles.comingSoonContainer}>
+                      <div className={styles.comingSoonIcon}>
+                        <div className={`${styles.comingSoonIconCard} ${styles.comingSoonIconCardBlue} ${theme === 'dark' ? styles.comingSoonIconCardBlueDark : styles.comingSoonIconCardBlueLight}`}>
+                          <Send className={`${styles.comingSoonMainIcon} ${theme === 'dark' ? styles.comingSoonMainIconBlueDark : styles.comingSoonMainIconBlue}`} />
+                        </div>
+                        <div className={`${styles.comingSoonFloatingIcon} ${styles.comingSoonFloatingIconBlue}`}></div>
                       </div>
-                      <h3 className={`text-xl font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        Telegram Integration
+                      <h3 className={`${styles.comingSoonTitle} ${styles.comingSoonTitleBlue}`}>
+                        Telegram Automation Center
                       </h3>
-                      <p className={`mb-4 max-w-md mx-auto text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                        Set up Telegram bots and channels.
+                      <p className={`${styles.comingSoonDescription} ${theme === 'dark' ? styles.comingSoonDescriptionDark : styles.comingSoonDescriptionLight}`}>
+                        Deploy intelligent Telegram bots, manage channels, and automate customer support 
+                        with advanced scripting and real-time analytics integration.
                       </p>
-                      <Button className="bg-sky-500 hover:bg-sky-600 text-white h-9 px-5">
-                        🚀 Coming Soon
-                      </Button>
+                      <div className={styles.comingSoonActions}>
+                        <button className={`${styles.primaryButton} ${styles.primaryButtonBlue}`} disabled>
+                          <Sparkles className="h-4 w-4" />
+                          Coming Soon
+                        </button>
+                        <button className={`${styles.secondaryButton} ${theme === 'dark' ? styles.secondaryButtonBlueDark : styles.secondaryButtonBlue}`}>
+                          Learn More
+                        </button>
+                      </div>
                     </div>
                   </TabsContent>
                 )}
                 {activeTab === 'orders' && (
-                  <TabsContent value="orders" className="focus-visible:outline-none">
+                  <TabsContent value="orders" className="mt-0 focus-visible:outline-none">
                     {ordersStatus === 'idle' ? (
-                      <div className="text-center py-12">
-                        <div className="w-20 h-20 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <div className="text-4xl">📋</div>
+                      <div className={styles.comingSoonContainer}>
+                        <div className={styles.comingSoonIcon}>
+                          <div className={`${styles.comingSoonIconCard} ${styles.comingSoonIconCardPurple} ${theme === 'dark' ? styles.comingSoonIconCardPurpleDark : styles.comingSoonIconCardPurpleLight}`}>
+                            <ClipboardList className={`${styles.comingSoonMainIcon} ${theme === 'dark' ? styles.comingSoonMainIconPurpleDark : styles.comingSoonMainIconPurple}`} />
+                          </div>
+                          <div className={`${styles.comingSoonFloatingIcon} ${styles.comingSoonFloatingIconPurple}`}></div>
                         </div>
-                        <h3 className={`text-xl font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                          Order Management
+                        <h3 className={`${styles.comingSoonTitle} ${styles.comingSoonTitlePurple}`}>
+                          Order Management System
                         </h3>
-                        <p className={`mb-4 max-w-md mx-auto text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                          Manage client orders and budget analysis.
+                        <p className={`${styles.comingSoonDescription} ${theme === 'dark' ? styles.comingSoonDescriptionDark : styles.comingSoonDescriptionLight}`}>
+                          Advanced order processing with intelligent budget analysis, client management, 
+                          and automated workflow optimization for maximum efficiency.
                         </p>
-                        <Button 
-                          onClick={fetchOrders} 
-                          className="bg-blue-600 hover:bg-blue-700 text-white h-9 px-5"
-                        >
-                          📊 Load Orders
-                        </Button>
+                        <div className={styles.comingSoonActions}>
+                          <button 
+                            onClick={fetchOrders} 
+                            className={`${styles.primaryButton} ${styles.primaryButtonPurple}`}
+                          >
+                            <Zap className="h-4 w-4" />
+                            Load Orders
+                          </button>
+                          <button className={`${styles.secondaryButton} ${theme === 'dark' ? styles.secondaryButtonPurpleDark : styles.secondaryButtonPurple}`}>
+                            View Analytics
+                          </button>
+                        </div>
                       </div>
                     ) : (
-                      <OrderManagement 
-                        orders={orders} 
-                        status={ordersStatus} 
-                        theme={theme}
-                        onSwitchToInventory={handleSwitchToInventory}
-                        onOrderCreated={handleOrderCreated}
-                      />
+                      <div className={styles.contentSection}>
+                        <OrderManagement 
+                          orders={orders} 
+                          status={ordersStatus} 
+                          theme={theme}
+                          onSwitchToInventory={handleSwitchToInventory}
+                          onOrderCreated={handleOrderCreated}
+                        />
+                      </div>
                     )}
                   </TabsContent>
                 )}
                 {activeTab === 'inventory' && (
-                  <TabsContent value="inventory" className="focus-visible:outline-none">
+                  <TabsContent value="inventory" className="mt-0 focus-visible:outline-none">
                     {inventoryStatus === 'idle' ? (
-                      <div className="text-center py-16">
-                        <div className="w-24 h-24 bg-zinc-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                          <div className="text-5xl">📦</div>
+                      <div className={styles.comingSoonContainer}>
+                        <div className={styles.comingSoonIcon}>
+                          <div className={`${styles.comingSoonIconCard} ${styles.comingSoonIconCardOrange} ${theme === 'dark' ? styles.comingSoonIconCardOrangeDark : styles.comingSoonIconCardOrangeLight}`}>
+                            <Package className={`${styles.comingSoonMainIcon} ${theme === 'dark' ? styles.comingSoonMainIconOrangeDark : styles.comingSoonMainIconOrange}`} />
+                          </div>
+                          <div className={`${styles.comingSoonFloatingIcon} ${styles.comingSoonFloatingIconOrange}`}></div>
                         </div>
-                        <h3 className={`text-2xl font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                          Inventory Management
+                        <h3 className={`${styles.comingSoonTitle} ${styles.comingSoonTitleOrange}`}>
+                          Smart Inventory Control
                         </h3>
-                        <p className={`mb-6 max-w-md mx-auto ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                          Track domains and manage selections.
+                        <p className={`${styles.comingSoonDescription} ${theme === 'dark' ? styles.comingSoonDescriptionDark : styles.comingSoonDescriptionLight}`}>
+                          Intelligent domain tracking with AI-powered categorization, automated alerts, 
+                          and predictive analytics for optimal resource management.
                         </p>
-                        <Button 
-                          onClick={fetchInventory} 
-                          className="bg-zinc-600 hover:bg-zinc-700 text-white h-10 px-6"
-                        >
-                          📊 Load Inventory
-                        </Button>
+                        <div className={styles.comingSoonActions}>
+                          <button 
+                            onClick={fetchInventory} 
+                            className={`${styles.primaryButton} ${styles.primaryButtonOrange}`}
+                          >
+                            <Package className="h-4 w-4" />
+                            Load Inventory
+                          </button>
+                          <button className={`${styles.secondaryButton} ${theme === 'dark' ? styles.secondaryButtonOrangeDark : styles.secondaryButtonOrange}`}>
+                            Quick Scan
+                          </button>
+                        </div>
                       </div>
                     ) : (
-                      <InventoryTable items={inventory} status={inventoryStatus} theme={theme} />
+                      <div className={styles.contentSection}>
+                        <InventoryTable items={inventory} status={inventoryStatus} theme={theme} />
+                      </div>
                     )}
                   </TabsContent>
                 )}
               </Tabs>
             </div>
           </div>
-        </div>
+
+          {/* Footer with Modern Stats */}
+          <div className={styles.footerStats}>
+            <div className={`${styles.footerStatCard} ${theme === 'dark' ? styles.footerStatCardDark : styles.footerStatCardLight}`}>
+              <div className={styles.footerStatContent}>
+                <div className={`${styles.footerStatIcon} ${styles.footerStatIconBluePurple}`}>
+                  <Activity className={styles.footerStatIconImage} />
+                </div>
+                <div className={styles.footerStatText}>
+                  <div className={`${styles.footerStatLabel} ${theme === 'dark' ? styles.footerStatLabelDark : styles.footerStatLabelLight}`}>
+                    System Status
+                  </div>
+                  <div className={`${styles.footerStatValue} ${styles.footerStatValueGreen}`}>
+                    All Systems Operational
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className={`${styles.footerStatCard} ${theme === 'dark' ? styles.footerStatCardDark : styles.footerStatCardLight}`}>
+              <div className={styles.footerStatContent}>
+                <div className={`${styles.footerStatIcon} ${styles.footerStatIconGreenEmerald}`}>
+                  <TrendingUp className={styles.footerStatIconImage} />
+                </div>
+                <div className={styles.footerStatText}>
+                  <div className={`${styles.footerStatLabel} ${theme === 'dark' ? styles.footerStatLabelDark : styles.footerStatLabelLight}`}>
+                    Performance
+                  </div>
+                  <div className={`${styles.footerStatValue} ${styles.footerStatValueBlue}`}>
+                    +23% This Week
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className={`${styles.footerStatCard} ${theme === 'dark' ? styles.footerStatCardDark : styles.footerStatCardLight}`}>
+              <div className={styles.footerStatContent}>
+                <div className={`${styles.footerStatIcon} ${styles.footerStatIconOrangeRed}`}>
+                  <Zap className={styles.footerStatIconImage} />
+                </div>
+                <div className={styles.footerStatText}>
+                  <div className={`${styles.footerStatLabel} ${theme === 'dark' ? styles.footerStatLabelDark : styles.footerStatLabelLight}`}>
+                    Response Time
+                  </div>
+                  <div className={`${styles.footerStatValue} ${styles.footerStatValuePurple}`}>
+                    2.3s Average
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
       </div>
     </OrderProvider>
   )

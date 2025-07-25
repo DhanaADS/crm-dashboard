@@ -1,8 +1,9 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { EmailItem } from '@/types/email'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import styles from './EmailTable.module.css'
 
 type EmailTableProps = {
   emails?: EmailItem[]
@@ -10,20 +11,31 @@ type EmailTableProps = {
   onRefresh?: () => void
 }
 
-export default function EmailTable({ emails = [], status, onRefresh }: EmailTableProps) {
-  console.log('🔥🔥🔥 ENHANCED THEMED EMAIL TABLE LOADED! 🔥🔥🔥');
-  const [selectedEmail, setSelectedEmail] = useState<EmailItem | null>(null)
+interface AISummary {
+  id: string
+  summary: string
+}
 
-  // Simple theme detection
-  const [isDark, setIsDark] = useState(true)
+export default function EmailTable({ emails = [], status, onRefresh }: EmailTableProps) {
+  const [selectedEmail, setSelectedEmail] = useState<EmailItem | null>(null)
+  const [activeFolder, setActiveFolder] = useState<string>('inbox')
+  const [aiSummaries, setAiSummaries] = useState<Record<string, string>>({})
+  const [loadingAI, setLoadingAI] = useState(false)
+  const [theme, setTheme] = useState('dark')
+  const summariesRef = useRef(aiSummaries)
+
+  // Theme detection
   useEffect(() => {
+    const savedTheme = localStorage.getItem('ads-theme') || 'dark'
+    setTheme(savedTheme)
+    document.documentElement.className = savedTheme
+    
     const checkTheme = () => {
       const htmlElement = document.documentElement
-      const isDarkTheme = htmlElement.classList.contains('dark') || htmlElement.className === 'dark'
-      setIsDark(isDarkTheme)
+      const currentTheme = htmlElement.className || 'dark'
+      setTheme(currentTheme)
     }
-    checkTheme()
-    // Watch for theme changes
+    
     const observer = new MutationObserver(checkTheme)
     observer.observe(document.documentElement, {
       attributes: true,
@@ -32,6 +44,21 @@ export default function EmailTable({ emails = [], status, onRefresh }: EmailTabl
     return () => observer.disconnect()
   }, [])
 
+  // Keep summariesRef in sync
+  useEffect(() => {
+    summariesRef.current = aiSummaries
+  }, [aiSummaries])
+
+  // Auto-refresh emails every 30 minutes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log('[Auto Refresh] Fetching inbox...')
+      onRefresh?.()
+    }, 30 * 60 * 1000)
+
+    return () => clearInterval(interval)
+  }, [onRefresh])
+
   // Auto-select first email when emails load
   useEffect(() => {
     if (emails.length > 0 && !selectedEmail) {
@@ -39,399 +66,346 @@ export default function EmailTable({ emails = [], status, onRefresh }: EmailTabl
     }
   }, [emails, selectedEmail])
 
-  // FORCE OVERRIDE STYLES TO PREVENT CONFLICTS
-  const containerStyle = {
-    width: '100%',
-    maxWidth: 'none',
-    backgroundColor: 'transparent',
-    padding: '0'
-  }
-  const gridStyle = {
-    display: 'grid',
-    gridTemplateColumns: '280px 1fr 380px',
-    gap: '16px',
-    height: '520px',
-    width: '100%'
+  // Generate AI Summary using your existing API
+  const generateAISummary = async (email: EmailItem): Promise<string> => {
+    try {
+      if (!email.body) {
+        console.log(`⚠️ No body content for email ${email.id}`)
+        return '📧 No content to summarize'
+      }
+
+      console.log(`🚀 Calling /api/summary for email ${email.id}`)
+      
+      const res = await fetch('/api/summary', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          emailId: email.id, 
+          message: email.body 
+        })
+      })
+
+      console.log(`📡 API response status:`, res.status)
+      
+      if (!res.ok) {
+        throw new Error(`API responded with status: ${res.status}`)
+      }
+
+      const data = await res.json()
+      console.log(`📊 API response data:`, data)
+
+      if (data.summary) {
+        console.log(`✅ Summary received for ${email.id}:`, data.summary)
+        return data.summary
+      } else {
+        console.log(`⚠️ No summary in response for ${email.id}`)
+        return '⚠️ No summary returned'
+      }
+    } catch (error) {
+      console.error('❌ Error generating AI summary:', error)
+      return '⚠️ Error summarizing - Check console for details'
+    }
   }
 
+  // Generate AI summaries for all emails using your API
+  const generateAllAISummaries = async () => {
+    if (emails.length === 0) return
+    
+    setLoadingAI(true)
+    console.log('🤖 Starting AI summary generation for', emails.length, 'emails')
+    
+    try {
+      const newSummaries = { ...summariesRef.current }
+      
+      for (const email of emails) {
+        // Skip if already have summary
+        if (newSummaries[email.id]) {
+          console.log(`✅ Skipping email ${email.id} - already has summary`)
+          continue
+        }
+        
+        console.log(`🔄 Generating summary for email: ${email.id}`)
+        console.log(`📧 Email content preview:`, email.body?.substring(0, 100))
+        
+        const summary = await generateAISummary(email)
+        newSummaries[email.id] = summary
+        
+        console.log(`✅ Generated summary for ${email.id}:`, summary)
+        
+        // Update state incrementally so user sees progress
+        setAiSummaries(prev => {
+          const updated = { ...prev, [email.id]: summary }
+          console.log('📊 Updated summaries state:', updated)
+          return updated
+        })
+        
+        // Small delay to prevent overwhelming the API
+        await new Promise(resolve => setTimeout(resolve, 500))
+      }
+      
+      console.log('🎉 All summaries generated successfully')
+      
+    } catch (error) {
+      console.error('❌ Error generating AI summaries:', error)
+    } finally {
+      setLoadingAI(false)
+    }
+  }
+
+  // Auto-generate summaries when AI Summary folder is active
+  useEffect(() => {
+    if (activeFolder === 'ai-summary' && emails.length > 0) {
+      const needsSummaries = emails.some(email => !summariesRef.current[email.id])
+      if (needsSummaries) {
+        generateAllAISummaries()
+      }
+    }
+  }, [activeFolder, emails])
+
+  // Handle folder click
+  const handleFolderClick = (folder: string) => {
+    setActiveFolder(folder)
+    if (folder === 'ai-summary') {
+      generateAllAISummaries()
+    }
+  }
+
+  // Get current content based on active folder
+  const getCurrentContent = () => {
+    if (activeFolder === 'ai-summary') {
+      return renderAISummary()
+    }
+    return renderEmailList()
+  }
+
+  const renderAISummary = () => (
+    <div className={styles.aiSummaryContainer}>
+      <div className={styles.aiHeader}>
+        <div className={styles.aiTitle}>
+          <span className={styles.aiIcon}>🤖</span>
+          AI Email Summary
+        </div>
+        <Button
+          onClick={generateAllAISummaries}
+          size="sm"
+          disabled={loadingAI}
+          className={styles.aiRefreshBtn}
+        >
+          {loadingAI ? '🔄 Analyzing...' : '✨ Regenerate'}
+        </Button>
+      </div>
+      
+      {loadingAI ? (
+        <div className={styles.aiLoading}>
+          <div className={styles.aiLoadingIcon}>🧠</div>
+          <div className={styles.aiLoadingText}>AI is analyzing your emails...</div>
+          <div className={styles.aiLoadingSubtext}>This may take a few moments</div>
+        </div>
+      ) : (
+        <div className={styles.aiSummaryList}>
+          {emails.length === 0 ? (
+            <div className={styles.aiEmpty}>
+              <div className={styles.aiEmptyIcon}>🤖</div>
+              <div className={styles.aiEmptyText}>No emails to summarize</div>
+              <div className={styles.aiEmptySubtext}>Load some emails first</div>
+            </div>
+          ) : (
+            emails.map((email) => {
+              const summary = aiSummaries[email.id]
+              
+              return (
+                <div
+                  key={email.id}
+                  className={styles.aiSummaryItem}
+                  onClick={() => {
+                    setSelectedEmail(email)
+                    setActiveFolder('inbox')
+                  }}
+                >
+                  <div className={styles.aiSummaryHeader}>
+                    <div className={styles.aiSummaryFrom}>
+                      {email.from?.split('<')[0].trim() || 'Unknown'}
+                    </div>
+                    <div className={styles.aiSummaryDate}>
+                      {email.date ? new Date(email.date).toLocaleDateString() : ''}
+                    </div>
+                  </div>
+                  <div className={styles.aiSummaryText}>
+                    {summary || '⏳ Generating summary...'}
+                  </div>
+                  <div className={styles.aiSummarySubject}>
+                    Subject: {email.subject || 'No subject'}
+                  </div>
+                </div>
+              )
+            })
+          )}
+        </div>
+      )}
+    </div>
+  )
+
+  const renderEmailList = () => (
+    <>
+      {status === 'loading' && (
+        <div className={styles.loadingState}>
+          <div className={styles.loadingIcon}>⏳</div>
+          <div className={styles.loadingText}>Loading emails...</div>
+        </div>
+      )}
+      {status === 'success' && emails.map((email) => (
+        <div
+          key={email.id}
+          onClick={() => setSelectedEmail(email)}
+          className={`${styles.emailItem} ${selectedEmail?.id === email.id ? styles.emailItemSelected : ''}`}
+        >
+          <div className={styles.emailAvatar}>
+            {email.from?.charAt(0)?.toUpperCase() || 'U'}
+          </div>
+          <div className={styles.emailContent}>
+            <div className={styles.emailHeader}>
+              <span className={styles.emailFrom}>
+                {email.from?.split('<')[0].trim() || 'Unknown'}
+              </span>
+              <span className={styles.emailDate}>
+                {email.date ? new Date(email.date).toLocaleDateString() : ''}
+              </span>
+            </div>
+            <div className={styles.emailSubject}>
+              {email.subject || '(No Subject)'}
+            </div>
+            <div className={styles.emailPreview}>
+              {email.body ? email.body.substring(0, 120) + '...' : '(No content)'}
+            </div>
+          </div>
+        </div>
+      ))}
+    </>
+  )
+
   return (
-    <div style={containerStyle}>
-      <div style={gridStyle}>
+    <div className={`${styles.container} ${theme === 'dark' ? styles.containerDark : styles.containerLight}`}>
+      {/* Animated Background */}
+      <div className={styles.backgroundPattern}></div>
+      <div className={styles.floatingElements}>
+        <div className={`${styles.floatingElement} ${styles.element1}`}></div>
+        <div className={`${styles.floatingElement} ${styles.element2}`}></div>
+        <div className={`${styles.floatingElement} ${styles.element3}`}></div>
+      </div>
+
+      <div className={styles.gridLayout}>
         {/* FOLDERS SIDEBAR */}
-        <Card style={{
-          backgroundColor: isDark
-            ? 'rgba(255, 255, 255, 0.015)'
-            : 'rgba(255, 255, 255, 0.9)',
-          backdropFilter: 'blur(15px)',
-          border: isDark
-            ? '1px solid rgba(255, 255, 255, 0.04)'
-            : '1px solid rgba(0, 0, 0, 0.1)',
-          borderRadius: '16px',
-          boxShadow: isDark
-            ? '0 8px 32px rgba(0, 0, 0, 0.4)'
-            : '0 8px 32px rgba(0, 0, 0, 0.1)'
-        }}>
-          <CardHeader style={{
-            paddingBottom: '12px',
-            borderBottom: isDark
-              ? '1px solid rgba(255, 255, 255, 0.05)'
-              : '1px solid rgba(0, 0, 0, 0.1)'
-          }}>
-            <h3 style={{
-              color: isDark ? '#ffffff' : '#1f2937',
-              fontWeight: '600',
-              fontSize: '16px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}>
+        <Card className={`${styles.card} ${styles.foldersCard}`}>
+          <CardHeader className={styles.cardHeader}>
+            <h3 className={styles.cardTitle}>
               📁 Folders
             </h3>
           </CardHeader>
-          <CardContent style={{ paddingTop: '12px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {/* AI Summary */}
-              <div style={{
-                padding: '12px',
-                color: isDark ? '#ffffff' : '#1f2937',
-                borderRadius: '8px',
-                cursor: 'default', // Make it non-interactive
-                transition: 'all 0.2s',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between'
-              }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  💡 AI Summary
-                </span>
+          <CardContent className={styles.cardContent}>
+            <div className={styles.foldersList}>
+              {/* AI Summary Folder */}
+              <div 
+                className={`${styles.folderItem} ${activeFolder === 'ai-summary' ? styles.folderActive : ''}`}
+                onClick={() => handleFolderClick('ai-summary')}
+              >
+                <span className={styles.folderIcon}>🤖</span>
+                <span className={styles.folderName}>AI Summary</span>
+                {loadingAI && <span className={styles.folderSpinner}>⏳</span>}
               </div>
 
-              {/* ACTIVE INBOX */}
-              <div style={{
-                padding: '12px',
-                background: 'hsl(var(--primary))',
-                color: 'hsl(var(--primary-foreground))',
-                borderRadius: '8px',
-                fontWeight: '500',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between'
-              }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  📥 Inbox
-                </span>
-                <span style={{
-                  fontSize: '12px',
-                  backgroundColor: 'rgba(255,255,255,0.2)',
-                  padding: '4px 8px',
-                  borderRadius: '12px'
-                }}>
-                  {emails.length}
-                </span>
+              {/* Inbox Folder */}
+              <div 
+                className={`${styles.folderItem} ${activeFolder === 'inbox' ? styles.folderActive : ''}`}
+                onClick={() => handleFolderClick('inbox')}
+              >
+                <span className={styles.folderIcon}>📥</span>
+                <span className={styles.folderName}>Inbox</span>
+                <span className={styles.folderCount}>{emails.length}</span>
               </div>
 
-              {/* OTHER FOLDERS - Filtered to remove Sent, Junk, Trash */}
-              {[
-                { icon: '📝', name: 'Drafts', count: 9 }
-                // { icon: '📤', name: 'Sent', count: 0 },  // Removed
-                // { icon: '🚫', name: 'Junk', count: 23 },  // Removed
-                // { icon: '🗑️', name: 'Trash', count: 0 }   // Removed
-              ].map((folder) => (
-                <div key={folder.name} style={{
-                  padding: '12px',
-                  color: isDark ? '#9ca3af' : '#6b7280',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between'
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.backgroundColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'
-                  e.currentTarget.style.color = isDark ? '#ffffff' : '#1f2937'
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent'
-                  e.currentTarget.style.color = isDark ? '#9ca3af' : '#6b7280'
-                }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    {folder.icon} {folder.name}
-                  </span>
-                  {folder.count > 0 && (
-                    <span style={{
-                      fontSize: '12px',
-                      backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-                      padding: '2px 6px',
-                      borderRadius: '12px'
-                    }}>
-                      {folder.count}
-                    </span>
-                  )}
-                </div>
-              ))}
+              {/* Other Folders */}
+              <div className={styles.folderItem}>
+                <span className={styles.folderIcon}>📝</span>
+                <span className={styles.folderName}>Drafts</span>
+                <span className={styles.folderCount}>9</span>
+              </div>
             </div>
           </CardContent>
         </Card>
 
         {/* EMAIL LIST */}
-        <Card style={{
-          backgroundColor: isDark
-            ? 'rgba(255, 255, 255, 0.015)'
-            : 'rgba(255, 255, 255, 0.9)',
-          backdropFilter: 'blur(15px)',
-          border: isDark
-            ? '1px solid rgba(255, 255, 255, 0.04)'
-            : '1px solid rgba(0, 0, 0, 0.1)',
-          borderRadius: '16px',
-          boxShadow: isDark
-            ? '0 8px 32px rgba(0, 0, 0, 0.4)'
-            : '0 8px 32px rgba(0, 0, 0, 0.1)'
-        }}>
-          <CardHeader style={{
-            paddingBottom: '12px',
-            borderBottom: isDark
-              ? '1px solid rgba(255, 255, 255, 0.05)'
-              : '1px solid rgba(0, 0, 0, 0.1)'
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{
-                color: isDark ? '#ffffff' : '#1f2937',
-                fontWeight: '600',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}>
-                📬 Email List
+        <Card className={`${styles.card} ${styles.emailListCard}`}>
+          <CardHeader className={styles.cardHeader}>
+            <div className={styles.emailListHeader}>
+              <h3 className={styles.cardTitle}>
+                {activeFolder === 'ai-summary' ? '🤖 AI Summary' : '📬 Email List'}
               </h3>
-              <div style={{ display: 'flex', gap: '8px' }}>
+              <div className={styles.emailListActions}>
                 <Button
                   onClick={onRefresh}
                   size="sm"
                   variant="outline"
-                  className="h-8 px-4 text-sm button-inactive"
+                  className={styles.actionButton}
                 >
                   🔄 Refresh
                 </Button>
                 <Button
                   size="sm"
                   variant="outline"
-                  className="h-8 px-4 text-sm button-inactive"
+                  className={styles.actionButton}
                 >
                   All mail
                 </Button>
                 <Button
                   size="sm"
                   variant="outline"
-                  className="h-8 px-4 text-sm button-inactive"
+                  className={styles.actionButton}
                 >
                   Unread
                 </Button>
               </div>
             </div>
           </CardHeader>
-          <CardContent style={{ paddingTop: '12px', height: '420px', overflowY: 'auto' }}>
-            {status === 'loading' && (
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                height: '128px',
-                color: isDark ? '#9ca3af' : '#6b7280'
-              }}>
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '24px', marginBottom: '8px' }}>⏳</div>
-                  <div style={{ fontSize: '14px' }}>Loading emails...</div>
-                </div>
-              </div>
-            )}
-            {status === 'success' && emails.map((email) => (
-              <div
-                key={email.id}
-                onClick={() => setSelectedEmail(email)}
-                style={{
-                  padding: '12px',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  border: selectedEmail?.id === email.id
-                    ? '1px solid hsl(var(--primary))'
-                    : '1px solid transparent',
-                  backgroundColor: selectedEmail?.id === email.id
-                    ? isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)'
-                    : 'transparent',
-                  marginBottom: '8px'
-                }}
-                onMouseOver={(e) => {
-                  if (selectedEmail?.id !== email.id) {
-                    e.currentTarget.style.backgroundColor = isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.02)'
-                  }
-                }}
-                onMouseOut={(e) => {
-                  if (selectedEmail?.id !== email.id) {
-                    e.currentTarget.style.backgroundColor = 'transparent'
-                  }
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                  <div style={{
-                    width: '36px',
-                    height: '36px',
-                    backgroundColor: 'hsl(var(--primary))',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'hsl(var(--primary-foreground))',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    flexShrink: 0
-                  }}>
-                    {email.from?.charAt(0)?.toUpperCase() || 'U'}
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                      <span style={{
-                        color: isDark ? '#ffffff' : '#1f2937',
-                        fontSize: '14px',
-                        fontWeight: '500',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap'
-                      }}>
-                        {email.from?.split('<')[0].trim() || 'Unknown'}
-                      </span>
-                      <span style={{
-                        color: isDark ? '#9ca3af' : '#6b7280',
-                        fontSize: '12px',
-                        flexShrink: 0,
-                        marginLeft: '8px'
-                      }}>
-                        {email.date ? new Date(email.date).toLocaleDateString() : ''}
-                      </span>
-                    </div>
-                    <div style={{
-                      color: isDark ? '#ffffff' : '#1f2937',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      marginBottom: '4px',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap'
-                    }}>
-                      {email.subject || '(No Subject)'}
-                    </div>
-                    <div style={{
-                      color: isDark ? '#9ca3af' : '#6b7280',
-                      fontSize: '12px',
-                      lineHeight: '1.4',
-                      display: '-webkit-box',
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden'
-                    }}>
-                      {email.body ? email.body.substring(0, 120) + '...' : '(No content)'}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <CardContent className={`${styles.cardContent} ${styles.emailListContent}`}>
+            {getCurrentContent()}
           </CardContent>
         </Card>
 
         {/* EMAIL DETAIL */}
-        <Card style={{
-          backgroundColor: isDark
-            ? 'rgba(255, 255, 255, 0.015)'
-            : 'rgba(255, 255, 255, 0.9)',
-          backdropFilter: 'blur(15px)',
-          border: isDark
-            ? '1px solid rgba(255, 255, 255, 0.04)'
-            : '1px solid rgba(0, 0, 0, 0.1)',
-          borderRadius: '16px',
-          boxShadow: isDark
-            ? '0 8px 32px rgba(0, 0, 0, 0.4)'
-            : '0 8px 32px rgba(0, 0, 0, 0.1)'
-        }}>
-          <CardHeader style={{
-            paddingBottom: '12px',
-            borderBottom: isDark
-              ? '1px solid rgba(255, 255, 255, 0.05)'
-              : '1px solid rgba(0, 0, 0, 0.1)'
-          }}>
-            <h3 style={{
-              color: isDark ? '#ffffff' : '#1f2937',
-              fontWeight: '600',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}>
+        <Card className={`${styles.card} ${styles.emailDetailCard}`}>
+          <CardHeader className={styles.cardHeader}>
+            <h3 className={styles.cardTitle}>
               📖 Email Detail
             </h3>
           </CardHeader>
-          <CardContent style={{ paddingTop: '12px', height: '420px', overflowY: 'auto' }}>
+          <CardContent className={`${styles.cardContent} ${styles.emailDetailContent}`}>
             {selectedEmail ? (
-              <div>
-                <div style={{
-                  borderBottom: isDark
-                    ? '1px solid rgba(255, 255, 255, 0.05)'
-                    : '1px solid rgba(0, 0, 0, 0.1)',
-                  paddingBottom: '16px',
-                  marginBottom: '16px'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                    <div style={{
-                      width: '48px',
-                      height: '48px',
-                      backgroundColor: 'hsl(var(--primary))',
-                      borderRadius: '50%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'hsl(var(--primary-foreground))',
-                      fontWeight: '600',
-                      fontSize: '18px'
-                    }}>
-                      {selectedEmail.from?.charAt(0)?.toUpperCase() || 'U'}
+              <div className={styles.emailDetail}>
+                <div className={styles.emailDetailHeader}>
+                  <div className={styles.emailDetailAvatar}>
+                    {selectedEmail.from?.charAt(0)?.toUpperCase() || 'U'}
+                  </div>
+                  <div className={styles.emailDetailInfo}>
+                    <div className={styles.emailDetailFrom}>
+                      {selectedEmail.from?.split('<')[0].trim() || 'Unknown'}
                     </div>
-                    <div>
-                      <div style={{ color: isDark ? '#ffffff' : '#1f2937', fontWeight: '600' }}>
-                        {selectedEmail.from?.split('<')[0].trim() || 'Unknown'}
-                      </div>
-                      <div style={{ color: isDark ? '#9ca3af' : '#6b7280', fontSize: '14px' }}>
-                        {selectedEmail.date ? new Date(selectedEmail.date).toLocaleString() : ''}
-                      </div>
+                    <div className={styles.emailDetailDate}>
+                      {selectedEmail.date ? new Date(selectedEmail.date).toLocaleString() : ''}
                     </div>
                   </div>
-                  <h2 style={{
-                    color: isDark ? '#ffffff' : '#1f2937',
-                    fontWeight: '600',
-                    fontSize: '18px',
-                    marginBottom: '8px'
-                  }}>
-                    {selectedEmail.subject || '(No Subject)'}
-                  </h2>
                 </div>
-                <div style={{
-                  color: isDark ? '#ffffff' : '#1f2937',
-                  lineHeight: '1.6',
-                  fontSize: '14px'
-                }}>
+                <h2 className={styles.emailDetailSubject}>
+                  {selectedEmail.subject || '(No Subject)'}
+                </h2>
+                <div className={styles.emailDetailBody}>
                   {selectedEmail.body || '(No content available)'}
                 </div>
               </div>
             ) : (
-              <div style={{
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: isDark ? '#9ca3af' : '#6b7280'
-              }}>
-                <div style={{ fontSize: '80px', marginBottom: '16px' }}>✉️</div>
-                <div style={{ fontSize: '18px', fontWeight: '500' }}>Select an email to read</div>
-                <div style={{ fontSize: '14px', marginTop: '8px' }}>Click on any email in the list</div>
+              <div className={styles.emailDetailEmpty}>
+                <div className={styles.emailDetailEmptyIcon}>✉️</div>
+                <div className={styles.emailDetailEmptyTitle}>Select an email to read</div>
+                <div className={styles.emailDetailEmptyText}>Click on any email in the list</div>
               </div>
             )}
           </CardContent>

@@ -1,8 +1,5 @@
-'use client'
-
-import { ChakraProvider } from '@chakra-ui/react'
-import { ReactNode } from 'react'
-
-export function Providers({ children }: { children: ReactNode }) {
-  return <ChakraProvider>{children}</ChakraProvider>
+// src/app/providers.tsx
+// This file is not needed with our current approach
+export function Providers({ children }: { children: React.ReactNode }) {
+  return <>{children}</>
 }

@@ -1,13 +1,34 @@
 'use client'
+
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import Image from 'next/image'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Plus, Edit, Trash2, User, Mail, Phone, MapPin, Star, Briefcase, Upload, Search, Grid, List, ArrowLeft, Check as CheckIcon, Users, Award, Building, Calendar, Zap } from 'lucide-react'
-import './employee-portfolio.css'
+import { 
+  Plus, 
+  Edit, 
+  Trash2, 
+  User, 
+  Mail, 
+  Phone, 
+  MapPin, 
+  Star, 
+  Briefcase, 
+  Upload, 
+  Search, 
+  ArrowLeft,
+  Sun,
+  Moon,
+  LogOut,
+  Users,
+  Activity,
+  Clock,
+  TrendingUp,
+  Shield,
+  X,
+  Camera
+} from 'lucide-react'
+import styles from './TeamManagement.module.css'
 
 interface Employee {
   id: string
@@ -50,8 +71,9 @@ const departments = [
 ]
 
 const positions = [
-  'Frontend Developer', 'Backend Developer', 'Full Stack Developer', 'UI/UX Designer',
-  'Product Manager', 'Marketing Manager', 'Sales Executive', 'HR Manager', 'Finance Manager'
+  'Frontend Developer', 'Backend Developer', 'Full Stack Developer', 'UI/UX Designer', 
+  'Product Manager', 'Marketing Manager', 'Sales Executive', 'HR Manager', 'Finance Manager',
+  'DevOps Engineer', 'Data Analyst', 'Quality Assurance', 'Project Manager', 'Team Lead'
 ]
 
 const allowedEmails = [
@@ -60,7 +82,7 @@ const allowedEmails = [
   'veera@aggrandizedigital.com',
 ]
 
-export default function EmployeesPage() {
+export default function TeamManagementPage() {
   const [authChecked, setAuthChecked] = useState(false)
   const [employees, setEmployees] = useState<Employee[]>([])
   const [loading, setLoading] = useState(true)
@@ -68,7 +90,8 @@ export default function EmployeesPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null)
   const [uploadingPhoto, setUploadingPhoto] = useState<string | null>(null)
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [theme, setTheme] = useState('dark')
+  
   const [formData, setFormData] = useState<EmployeeFormData>({
     name: '',
     email: '',
@@ -89,9 +112,23 @@ export default function EmployeesPage() {
   const router = useRouter()
 
   useEffect(() => {
+    const savedTheme = localStorage.getItem('ads-theme') || 'dark'
+    setTheme(savedTheme)
+    document.documentElement.className = savedTheme
+  }, [])
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark'
+    setTheme(newTheme)
+    localStorage.setItem('ads-theme', newTheme)
+    document.documentElement.className = newTheme
+  }
+
+  useEffect(() => {
     const checkAuth = async () => {
       const response = await supabase.auth.getSession()
       const session = response?.data?.session
+      
       if (!session?.user?.email || !allowedEmails.includes(session.user.email)) {
         await supabase.auth.signOut()
         router.push('/login')
@@ -120,115 +157,61 @@ export default function EmployeesPage() {
       setEmployees(data || [])
     } catch (error) {
       console.error('Error fetching employees:', error)
-      // Demo data as fallback
+      // Premium demo data as fallback
       setEmployees([
         {
-          id: '0',
-          name: 'DHANAPAL E',
-          email: 'dhana@aggrandizedigital.com',
-          phone: '+91 9876543210',
-          position: 'Frontend Developer',
-          department: 'Engineering',
-          location: 'Coimbatore',
-          hire_date: '2025-07-01',
-          salary: 850000,
-          status: 'active',
-          bio: 'Senior frontend developer with expertise in React and modern web technologies.',
-          skills: ['React', 'TypeScript', 'Next.js', 'Tailwind CSS', 'Node.js'],
-          projects: ['Employee Portfolio', 'Dashboard System', 'E-commerce Platform'],
-          performance_rating: 5.0,
-          created_at: '2025-07-01T00:00:00Z',
-          updated_at: '2025-07-01T00:00:00Z'
-        },
-        {
           id: '1',
-          name: 'John Doe',
-          email: 'john@company.com',
-          phone: '+1 234 567 8900',
-          position: 'Frontend Developer',
+          name: 'Sarah Chen',
+          email: 'sarah.chen@company.com',
+          phone: '+1 (555) 123-4567',
+          position: 'Senior Frontend Developer',
           department: 'Engineering',
-          location: 'New York',
+          location: 'San Francisco, CA',
           hire_date: '2023-01-15',
-          salary: 85000,
+          salary: 120000,
           status: 'active',
-          bio: 'Passionate frontend developer with 5+ years of experience in building scalable web applications.',
-          skills: ['React', 'TypeScript', 'Next.js', 'Tailwind CSS'],
-          projects: ['E-commerce Platform', 'Admin Dashboard', 'Mobile App'],
-          performance_rating: 4.8,
+          bio: 'Passionate frontend architect with expertise in React, TypeScript, and modern web technologies. Leading the development of our next-generation user interfaces.',
+          skills: ['React', 'TypeScript', 'Next.js', 'Tailwind CSS', 'GraphQL', 'Figma'],
+          projects: ['Dashboard Redesign', 'Mobile App UI', 'Design System'],
+          performance_rating: 4.9,
           created_at: '2023-01-15T00:00:00Z',
           updated_at: '2023-01-15T00:00:00Z'
         },
         {
           id: '2',
-          name: 'Sarah Wilson',
-          email: 'sarah@company.com',
-          phone: '+1 234 567 8901',
-          position: 'UI/UX Designer',
-          department: 'Design',
-          location: 'San Francisco',
+          name: 'Marcus Rodriguez',
+          email: 'marcus.r@company.com',
+          phone: '+1 (555) 987-6543',
+          position: 'Product Manager',
+          department: 'Product',
+          location: 'Austin, TX',
           hire_date: '2022-08-20',
-          salary: 75000,
+          salary: 135000,
           status: 'active',
-          bio: 'Creative designer focused on user-centered design and innovative solutions.',
-          skills: ['Figma', 'Adobe Creative Suite', 'Prototyping', 'User Research'],
-          projects: ['Mobile Banking App', 'SaaS Dashboard', 'Brand Identity'],
-          performance_rating: 4.9,
+          bio: 'Strategic product leader focused on user experience and market growth. Driving product vision and cross-functional collaboration.',
+          skills: ['Product Strategy', 'User Research', 'Analytics', 'Agile', 'Roadmapping', 'Stakeholder Management'],
+          projects: ['Product Roadmap Q4', 'User Research Initiative', 'Feature Prioritization'],
+          performance_rating: 4.8,
           created_at: '2022-08-20T00:00:00Z',
           updated_at: '2022-08-20T00:00:00Z'
         },
         {
           id: '3',
-          name: 'Mike Johnson',
-          email: 'mike@company.com',
-          phone: '+1 234 567 8902',
-          position: 'Backend Developer',
-          department: 'Engineering',
-          location: 'Austin',
+          name: 'Elena Kowalski',
+          email: 'elena.k@company.com',
+          phone: '+1 (555) 456-7890',
+          position: 'UI/UX Designer',
+          department: 'Design',
+          location: 'New York, NY',
           hire_date: '2023-03-10',
-          salary: 90000,
-          status: 'on_leave',
-          bio: 'Backend engineer specializing in scalable systems and cloud architecture.',
-          skills: ['Node.js', 'Python', 'PostgreSQL', 'AWS', 'Docker'],
-          projects: ['Microservices Architecture', 'Payment Gateway', 'Analytics Platform'],
+          salary: 95000,
+          status: 'active',
+          bio: 'Creative designer passionate about creating intuitive and beautiful user experiences. Specializing in interaction design and user research.',
+          skills: ['Figma', 'Adobe Creative Suite', 'Prototyping', 'User Research', 'Design Systems', 'Accessibility'],
+          projects: ['Mobile Banking App', 'Accessibility Audit', 'Brand Guidelines'],
           performance_rating: 4.7,
           created_at: '2023-03-10T00:00:00Z',
           updated_at: '2023-03-10T00:00:00Z'
-        },
-        {
-          id: '4',
-          name: 'Emily Chen',
-          email: 'emily@company.com',
-          phone: '+1 234 567 8903',
-          position: 'Product Manager',
-          department: 'Product',
-          location: 'Seattle',
-          hire_date: '2022-11-05',
-          salary: 95000,
-          status: 'active',
-          bio: 'Strategic product manager with expertise in user research and data-driven decisions.',
-          skills: ['Product Strategy', 'User Research', 'Analytics', 'Agile'],
-          projects: ['Product Roadmap', 'User Experience Optimization', 'Market Analysis'],
-          performance_rating: 4.6,
-          created_at: '2022-11-05T00:00:00Z',
-          updated_at: '2022-11-05T00:00:00Z'
-        },
-        {
-          id: '5',
-          name: 'David Rodriguez',
-          email: 'david@company.com',
-          phone: '+1 234 567 8904',
-          position: 'DevOps Engineer',
-          department: 'Engineering',
-          location: 'Denver',
-          hire_date: '2023-02-14',
-          salary: 88000,
-          status: 'active',
-          bio: 'DevOps specialist focused on automation, monitoring, and cloud infrastructure.',
-          skills: ['AWS', 'Docker', 'Kubernetes', 'CI/CD', 'Terraform'],
-          projects: ['Infrastructure Automation', 'Monitoring System', 'Cloud Migration'],
-          performance_rating: 4.7,
-          created_at: '2023-02-14T00:00:00Z',
-          updated_at: '2023-02-14T00:00:00Z'
         }
       ])
     } finally {
@@ -236,35 +219,85 @@ export default function EmployeesPage() {
     }
   }
 
+  // Complete photo upload function that saves to Supabase Storage and Database
   const handlePhotoUpload = async (employeeId: string, file: File) => {
     try {
       setUploadingPhoto(employeeId)
+      
+      // Validate file
+      if (!file) {
+        throw new Error('No file selected')
+      }
+
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error('File size must be less than 5MB')
+      }
+
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        throw new Error('File must be an image')
+      }
+
+      // Upload to Supabase Storage
       const fileExt = file.name.split('.').pop()
       const fileName = `${employeeId}-${Date.now()}.${fileExt}`
-      const { error: uploadError } = await supabase.storage
+      const filePath = `employee-photos/${fileName}`
+
+      // Delete old photo if exists
+      const employee = employees.find(emp => emp.id === employeeId)
+      if (employee?.photo_url) {
+        const oldPath = employee.photo_url.split('/').pop()
+        if (oldPath) {
+          await supabase.storage
+            .from('employee-photos')
+            .remove([`employee-photos/${oldPath}`])
+        }
+      }
+
+      // Upload new photo
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from('employee-photos')
-        .upload(fileName, file)
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: true
+        })
 
-      if (uploadError) throw uploadError
+      if (uploadError) {
+        throw uploadError
+      }
 
-      const { data: { publicUrl } } = supabase.storage
+      // Get the public URL
+      const { data: publicUrlData } = supabase.storage
         .from('employee-photos')
-        .getPublicUrl(fileName)
+        .getPublicUrl(filePath)
 
+      if (!publicUrlData?.publicUrl) {
+        throw new Error('Failed to get public URL')
+      }
+
+      // Update the employee in the database
       const { error: updateError } = await supabase
         .from('employees')
-        .update({ photo_url: publicUrl })
+        .update({ photo_url: publicUrlData.publicUrl })
         .eq('id', employeeId)
 
-      if (updateError) throw updateError
+      if (updateError) {
+        throw updateError
+      }
 
-      setEmployees(prev => prev.map(emp =>
-        emp.id === employeeId ? { ...emp, photo_url: publicUrl } : emp
+      // Update local state
+      setEmployees(prev => prev.map(emp => 
+        emp.id === employeeId ? { ...emp, photo_url: publicUrlData.publicUrl } : emp
       ))
-    } catch (error) {
+
+      console.log('Photo uploaded and saved successfully:', publicUrlData.publicUrl)
+
+    } catch (error: any) {
       console.error('Error uploading photo:', error)
+      alert(`Upload Error: ${error?.message || 'Failed to upload photo'}`)
     } finally {
-      setUploadingPhoto(null)
+      setTimeout(() => setUploadingPhoto(null), 1000)
     }
   }
 
@@ -286,7 +319,7 @@ export default function EmployeesPage() {
 
         if (error) throw error
 
-        setEmployees(prev => prev.map(emp =>
+        setEmployees(prev => prev.map(emp => 
           emp.id === editingEmployee.id ? { ...emp, ...employeeData } : emp
         ))
       } else {
@@ -311,7 +344,7 @@ export default function EmployeesPage() {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this employee?')) return
+    if (!confirm('Are you sure you want to delete this team member?')) return
 
     try {
       const { error } = await supabase
@@ -365,617 +398,481 @@ export default function EmployeesPage() {
     setIsAddModalOpen(true)
   }
 
-  const filteredEmployees = employees.filter(employee =>
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    router.push('/login')
+  }
+
+  const filteredEmployees = employees.filter(employee => 
     employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
     employee.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
     employee.department.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const getPerformanceColor = (rating: number) => {
-    if (rating >= 4.5) return 'rating-excellent'
-    if (rating >= 4.0) return 'rating-good'
-    if (rating >= 3.5) return 'rating-average'
-    return 'rating-poor'
-  }
-
   if (!authChecked) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 animate-pulse">
-            <Users className="text-white text-3xl" />
-          </div>
-          <div className="space-y-2">
-            <div className="h-4 bg-gray-700 rounded w-48 mx-auto animate-pulse"></div>
-            <div className="h-3 bg-gray-800 rounded w-32 mx-auto animate-pulse"></div>
-          </div>
+      <div className={`${styles.teamContainer} ${theme === 'dark' ? styles.teamContainerDark : styles.teamContainerLight}`}>
+        <div className={styles.loadingContainer}>
+          <div className={styles.loadingSpinner}></div>
         </div>
       </div>
     )
   }
 
-  const EmployeeCard = ({ employee }: { employee: Employee }) => (
-    <Card className="employee-card">
-      <CardHeader className="card-header">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="employee-photo-container">
+  // Fixed TeamMemberCard component
+  function TeamMemberCard({ employee }: { employee: Employee }) {
+    return (
+      <div className={`${styles.memberCard} ${theme === 'dark' ? styles.memberCardDark : styles.memberCardLight}`}>
+        {/* Card Header */}
+        <div className={`${styles.cardHeader} ${theme === 'dark' ? styles.cardHeaderDark : styles.cardHeaderLight}`}>
+          <div className={styles.memberInfo}>
+            <div className={styles.avatarContainer}>
               {employee.photo_url ? (
                 <Image
                   src={employee.photo_url}
                   alt={employee.name}
-                  width={60}
-                  height={60}
-                  className="employee-photo"
+                  width={64}
+                  height={64}
+                  className={styles.avatar}
                 />
               ) : (
-                <div className="employee-photo-placeholder">
-                  <User className="w-8 h-8 text-white" />
+                <div className={styles.avatarPlaceholder}>
+                  <User className="w-8 h-8" />
                 </div>
               )}
-              <label className="photo-upload-overlay">
+              
+              {/* Fixed upload button - completely hidden input */}
+              <label className={styles.uploadButton}>
                 <input
                   type="file"
                   accept="image/*"
-                  className="hidden"
+                  style={{ 
+                    display: 'none',
+                    position: 'absolute',
+                    left: '-9999px',
+                    opacity: 0,
+                    visibility: 'hidden'
+                  }}
                   onChange={(e) => {
                     const file = e.target.files?.[0]
-                    if (file) handlePhotoUpload(employee.id, file)
+                    if (file) {
+                      handlePhotoUpload(employee.id, file)
+                      // Clear the input value to allow re-uploading the same file
+                      e.target.value = ''
+                    }
                   }}
                 />
                 {uploadingPhoto === employee.id ? (
-                  <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
+                  <div className={styles.uploadSpinner}></div>
                 ) : (
-                  <Upload className="w-3 h-3 text-white" />
+                  <Camera className="w-3 h-3 text-white" />
                 )}
               </label>
             </div>
-            <div className="flex-1">
-              <CardTitle className="card-title">
-                {employee.name}
-              </CardTitle>
-              <p className="card-subtitle">
-                {employee.position}
-              </p>
-              <div className="flex items-center space-x-2 mt-1">
-                <Building className="w-3 h-3 text-slate-500" />
-                <span className="text-xs text-slate-500">{employee.department}</span>
+            
+            <div className={styles.memberDetails}>
+              <h3 className={styles.memberName}>{employee.name}</h3>
+              <p className={styles.memberPosition}>{employee.position}</p>
+              <div className={`${styles.statusBadge} ${
+                employee.status === 'active' ? styles.statusActive :
+                employee.status === 'inactive' ? styles.statusInactive : styles.statusOnLeave
+              }`}>
+                <div className="w-2 h-2 rounded-full bg-current"></div>
+                {employee.status.replace('_', ' ').toUpperCase()}
               </div>
             </div>
           </div>
-          <div className="flex flex-col items-end space-y-2">
-            <span className={`${
-              employee.status === 'active' ? 'status-active' :
-              employee.status === 'inactive' ? 'status-inactive' :
-              'status-on-leave'
-            }`}>
-              {employee.status.replace('_', ' ').toUpperCase()}
-            </span>
-            <div className="flex items-center space-x-1">
-              <Star className={`w-4 h-4 ${getPerformanceColor(employee.performance_rating)} fill-current`} />
-              <span className={`text-sm font-semibold ${getPerformanceColor(employee.performance_rating)}`}>
-                {employee.performance_rating.toFixed(1)}
-              </span>
-            </div>
-          </div>
         </div>
-      </CardHeader>
-      <CardContent className="card-content">
-        <div className="space-y-4">
-          {employee.bio && (
-            <p className="text-sm text-slate-300 line-clamp-2 leading-relaxed">
-              {employee.bio}
-            </p>
-          )}
-          
-          <div className="grid grid-cols-1 gap-3">
-            <div className="flex items-center space-x-2 text-sm">
-              <Mail className="w-4 h-4 text-slate-500 flex-shrink-0" />
-              <span className="text-slate-300 truncate">
-                {employee.email}
-              </span>
+
+        {/* Card Body */}
+        <div className={styles.cardBody}>
+          <div className={styles.contactInfo}>
+            <div className={styles.contactItem}>
+              <Mail className={styles.contactIcon} />
+              <span>{employee.email}</span>
             </div>
-            <div className="flex items-center space-x-2 text-sm">
-              <MapPin className="w-4 h-4 text-slate-500 flex-shrink-0" />
-              <span className="text-slate-300">
-                {employee.location}
-              </span>
+            <div className={styles.contactItem}>
+              <Phone className={styles.contactIcon} />
+              <span>{employee.phone}</span>
             </div>
-            <div className="flex items-center space-x-2 text-sm">
-              <Calendar className="w-4 h-4 text-slate-500 flex-shrink-0" />
-              <span className="text-slate-300">
-                Joined {new Date(employee.hire_date).toLocaleDateString('en-US', { 
-                  month: 'short', 
-                  year: 'numeric' 
-                })}
-              </span>
+            <div className={styles.contactItem}>
+              <Briefcase className={styles.contactIcon} />
+              <span>{employee.department}</span>
+            </div>
+            <div className={styles.contactItem}>
+              <MapPin className={styles.contactIcon} />
+              <span>{employee.location}</span>
+            </div>
+            <div className={styles.contactItem}>
+              <Star className={styles.contactIcon} />
+              <span>{employee.performance_rating}/5.0 Rating</span>
             </div>
           </div>
 
-          <div>
-            <div className="flex items-center space-x-2 mb-2">
-              <Zap className="w-4 h-4 text-blue-400" />
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
-                Skills
-              </span>
+          {employee.bio && (
+            <div className="mb-4">
+              <p className="text-sm opacity-80">{employee.bio}</p>
             </div>
-            <div className="flex flex-wrap gap-1.5">
+          )}
+          
+          <div className={styles.skillsSection}>
+            <div className={styles.skillsLabel}>Core Skills</div>
+            <div className={styles.skillsContainer}>
               {employee.skills.slice(0, 4).map((skill, index) => (
-                <span key={index} className="skill-tag">
+                <span key={index} className={styles.skillBadge}>
                   {skill}
                 </span>
               ))}
               {employee.skills.length > 4 && (
-                <span className="bg-slate-700/50 text-slate-400 text-xs px-2.5 py-1 rounded-lg border border-slate-600/50">
+                <span className={styles.skillBadge}>
                   +{employee.skills.length - 4} more
                 </span>
               )}
             </div>
           </div>
 
-          <div className="flex space-x-2 pt-2">
-            <Button
-              size="sm"
+          <div className={styles.cardActions}>
+            <button
               onClick={() => openEditModal(employee)}
-              className="btn-primary flex-1"
+              className={`${styles.actionBtn} ${styles.editBtn}`}
             >
-              <Edit className="w-4 h-4 mr-2" />
+              <Edit className="w-4 h-4" />
               Edit
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
+            </button>
+            <button
               onClick={() => handleDelete(employee.id)}
-              className="btn-secondary"
+              className={`${styles.actionBtn} ${styles.deleteBtn}`}
             >
               <Trash2 className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  )
-
-  return (
-    <div className="employee-portfolio-container">
-      {/* Header */}
-      <div className="employee-header">
-        <div className="max-w-7xl mx-auto px-6 py-6">
-          <div className="flex flex-col space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="employee-title">
-                  Employee Portfolio
-                </h1>
-                <p className="employee-subtitle">
-                  Manage your team members and their information
-                </p>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="flex items-center bg-slate-700 rounded-lg border border-slate-600">
-                  <Button
-                    variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                    size="sm"
-                    onClick={() => setViewMode('grid')}
-                    className={viewMode === 'grid' 
-                      ? 'btn-primary' 
-                      : 'text-slate-400 hover:text-white hover:bg-slate-600'
-                    }
-                  >
-                    <Grid className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant={viewMode === 'list' ? 'default' : 'ghost'}
-                    size="sm"
-                    onClick={() => setViewMode('list')}
-                    className={viewMode === 'list' 
-                      ? 'btn-primary' 
-                      : 'text-slate-400 hover:text-white hover:bg-slate-600'
-                    }
-                  >
-                    <List className="w-4 h-4" />
-                  </Button>
-                </div>
-                <Button 
-                  onClick={() => setIsAddModalOpen(true)} 
-                  className="btn-primary px-6 py-2"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Employee
-                </Button>
-              </div>
-            </div>
-            
-            <div className="search-container">
-              <Search className="search-icon w-5 h-5" />
-              <Input
-                placeholder="Search employees, roles, departments..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="search-input"
-              />
-            </div>
+              Delete
+            </button>
           </div>
         </div>
       </div>
+    )
+  }
+
+  return (
+    <div className={`${styles.teamContainer} ${theme === 'dark' ? styles.teamContainerDark : styles.teamContainerLight}`}>
+      
+      {/* Animated Background */}
+      <div className={styles.backgroundPattern}></div>
+      <div className={styles.floatingElements}>
+        <div className={`${styles.floatingElement} ${styles.element1}`}></div>
+        <div className={`${styles.floatingElement} ${styles.element2}`}></div>
+        <div className={`${styles.floatingElement} ${styles.element3}`}></div>
+      </div>
+
+      {/* Header */}
+      <header className={`${styles.teamHeader} ${theme === 'dark' ? styles.teamHeaderDark : styles.teamHeaderLight}`}>
+        <div className={styles.headerContent}>
+          <div className={styles.headerActions}>
+            <button
+              onClick={() => router.push('/')}
+              className={`${styles.actionButton} ${theme === 'dark' ? styles.actionButtonDark : styles.actionButtonLight}`}
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Dashboard
+            </button>
+            <button
+              onClick={toggleTheme}
+              className={`${styles.actionButton} ${theme === 'dark' ? styles.actionButtonDark : styles.actionButtonLight}`}
+            >
+              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {theme === 'dark' ? 'Light' : 'Dark'}
+            </button>
+          </div>
+          <button
+            onClick={handleLogout}
+            className={`${styles.actionButton} ${styles.logoutButton}`}
+          >
+            <LogOut className="w-4 h-4" />
+            Logout
+          </button>
+        </div>
+      </header>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Stats Cards */}
-        <div className="stats-grid">
-          <Card className="stats-card">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-slate-400 text-sm font-medium mb-2 uppercase tracking-wide">
-                    Total Employees
-                  </p>
-                  <p className="text-3xl font-bold text-white">
-                    {employees.length}
-                  </p>
-                </div>
-                <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center">
-                  <Users className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="stats-card">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-slate-400 text-sm font-medium mb-2 uppercase tracking-wide">
-                    Active
-                  </p>
-                  <p className="text-3xl font-bold text-white">
-                    {employees.filter(e => e.status === 'active').length}
-                  </p>
-                </div>
-                <div className="w-12 h-12 rounded-2xl bg-green-600 flex items-center justify-center">
-                  <CheckIcon className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="stats-card">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-slate-400 text-sm font-medium mb-2 uppercase tracking-wide">
-                    On Leave
-                  </p>
-                  <p className="text-3xl font-bold text-white">
-                    {employees.filter(e => e.status === 'on_leave').length}
-                  </p>
-                </div>
-                <div className="w-12 h-12 rounded-2xl bg-yellow-600 flex items-center justify-center">
-                  <Calendar className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="stats-card">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-slate-400 text-sm font-medium mb-2 uppercase tracking-wide">
-                    Departments
-                  </p>
-                  <p className="text-3xl font-bold text-white">
-                    {new Set(employees.map(e => e.department)).size}
-                  </p>
-                </div>
-                <div className="w-12 h-12 rounded-2xl bg-purple-600 flex items-center justify-center">
-                  <Building className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+      <div className={styles.mainContent}>
+        
+        {/* Page Header */}
+        <div className={styles.pageHeader}>
+          <div className={styles.pageHeaderFlex}>
+            <div>
+              <h1 className={styles.headerTitle}>Team Management</h1>
+              <p className={`${styles.headerSubtitle} ${theme === 'dark' ? styles.headerSubtitleDark : styles.headerSubtitleLight}`}>
+                Manage your team members, track performance, and build amazing products together
+              </p>
+            </div>
+            <button onClick={() => setIsAddModalOpen(true)} className={styles.addButton}>
+              <Plus className="w-5 h-5" />
+              Add Team Member
+            </button>
+          </div>
         </div>
 
-        {/* Employee Grid/List */}
-        {loading ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-              <p className="text-slate-400">Loading employees...</p>
+        {/* Search */}
+        <div className={styles.searchSection}>
+          <div className={styles.searchWrapper}>
+            <Search className={styles.searchIcon} />
+            <input
+              type="text"
+              placeholder="Search team members..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className={`${styles.searchInput} ${theme === 'dark' ? styles.searchInputDark : styles.searchInputLight}`}
+            />
+          </div>
+        </div>
+
+        {/* Stats Grid */}
+        <div className={styles.statsGrid}>
+          <div className={`${styles.statCard} ${theme === 'dark' ? styles.statCardDark : styles.statCardLight}`}>
+            <div className={styles.statCardContent}>
+              <div className={styles.statInfo}>
+                <div className={styles.statLabel}>Total Team Members</div>
+                <div className={styles.statValue}>{employees.length}</div>
+              </div>
+              <div className={styles.statIcon}>
+                <Users className="w-6 h-6" />
+              </div>
             </div>
           </div>
-        ) : filteredEmployees.length === 0 ? (
-          <div className="text-center py-16">
-            <Users className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-slate-300 mb-2">No employees found</h3>
-            <p className="text-slate-500 mb-6">
-              {searchTerm ? 'Try adjusting your search terms' : 'Get started by adding your first employee'}
-            </p>
-            {!searchTerm && (
-              <Button 
-                onClick={() => setIsAddModalOpen(true)} 
-                className="btn-primary"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Add First Employee
-              </Button>
-            )}
+          
+          <div className={`${styles.statCard} ${theme === 'dark' ? styles.statCardDark : styles.statCardLight}`}>
+            <div className={styles.statCardContent}>
+              <div className={styles.statInfo}>
+                <div className={styles.statLabel}>Active Members</div>
+                <div className={styles.statValue}>{employees.filter(e => e.status === 'active').length}</div>
+              </div>
+              <div className={styles.statIcon}>
+                <Activity className="w-6 h-6" />
+              </div>
+            </div>
+          </div>
+          
+          <div className={`${styles.statCard} ${theme === 'dark' ? styles.statCardDark : styles.statCardLight}`}>
+            <div className={styles.statCardContent}>
+              <div className={styles.statInfo}>
+                <div className={styles.statLabel}>On Leave</div>
+                <div className={styles.statValue}>{employees.filter(e => e.status === 'on_leave').length}</div>
+              </div>
+              <div className={styles.statIcon}>
+                <Clock className="w-6 h-6" />
+              </div>
+            </div>
+          </div>
+          
+          <div className={`${styles.statCard} ${theme === 'dark' ? styles.statCardDark : styles.statCardLight}`}>
+            <div className={styles.statCardContent}>
+              <div className={styles.statInfo}>
+                <div className={styles.statLabel}>Departments</div>
+                <div className={styles.statValue}>{new Set(employees.map(e => e.department)).size}</div>
+              </div>
+              <div className={styles.statIcon}>
+                <Briefcase className="w-6 h-6" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Team Grid */}
+        {loading ? (
+          <div className={styles.loadingContainer}>
+            <div className={styles.loadingSpinner}></div>
           </div>
         ) : (
-          <div className={viewMode === 'grid' ? "employees-grid" : "space-y-4"}>
+          <div className={styles.teamGrid}>
             {filteredEmployees.map(employee => (
-              <EmployeeCard key={employee.id} employee={employee} />
+              <TeamMemberCard key={employee.id} employee={employee} />
             ))}
           </div>
         )}
 
-        {/* Modal */}
+        {/* Add/Edit Modal */}
         {isAddModalOpen && (
-          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="employee-modal w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl">
-              <div className="modal-header sticky top-0 p-6 rounded-t-2xl">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-2xl font-bold text-white mb-1">
-                      {editingEmployee ? 'Edit Employee' : 'Add New Employee'}
-                    </h2>
-                    <p className="text-slate-400">
-                      {editingEmployee ? 'Update employee information' : 'Fill in the details to add a new team member'}
-                    </p>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setIsAddModalOpen(false)
-                      setEditingEmployee(null)
-                      resetForm()
-                    }}
-                    className="bg-slate-700 border-slate-600 text-slate-300 hover:bg-slate-600"
-                  >
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Close
-                  </Button>
-                </div>
+          <div className={styles.modalOverlay}>
+            <div className={`${styles.modalContent} ${theme === 'dark' ? styles.modalContentDark : styles.modalContentLight}`}>
+              <div className={`${styles.modalHeader} ${theme === 'dark' ? styles.modalHeaderDark : styles.modalHeaderLight}`}>
+                <h2 className={styles.modalTitle}>
+                  {editingEmployee ? 'Edit Team Member' : 'Add New Team Member'}
+                </h2>
+                <button
+                  onClick={() => {
+                    setIsAddModalOpen(false)
+                    setEditingEmployee(null)
+                    resetForm()
+                  }}
+                  className={`${styles.actionButton} ${theme === 'dark' ? styles.actionButtonDark : styles.actionButtonLight}`}
+                >
+                  <X className="w-4 h-4" />
+                </button>
               </div>
               
-              <div className="p-6">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Personal Information Section */}
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-2 mb-4">
-                      <User className="w-5 h-5 text-purple-400" />
-                      <h3 className="text-lg font-semibold text-white">Personal Information</h3>
+              <div className={styles.modalBody}>
+                <form onSubmit={handleSubmit}>
+                  <div className={styles.formGrid}>
+                    <div className={styles.formField}>
+                      <label className={styles.formLabel}>Full Name</label>
+                      <input
+                        type="text"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        required
+                        className={`${styles.formInput} ${theme === 'dark' ? styles.formInputDark : styles.formInputLight}`}
+                        placeholder="John Doe"
+                      />
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
-                          Full Name *
-                        </label>
-                        <Input
-                          value={formData.name}
-                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                          required
-                          placeholder="John Doe"
-                          className="form-input"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
-                          Email Address *
-                        </label>
-                        <Input
-                          type="email"
-                          value={formData.email}
-                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                          required
-                          placeholder="john.doe@company.com"
-                          className="form-input"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
-                          Phone Number
-                        </label>
-                        <Input
-                          value={formData.phone}
-                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                          placeholder="+1 (555) 123-4567"
-                          className="form-input"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
-                          Location
-                        </label>
-                        <Input
-                          value={formData.location}
-                          onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                          placeholder="New York, NY"
-                          className="form-input"
-                        />
-                      </div>
+                    
+                    <div className={styles.formField}>
+                      <label className={styles.formLabel}>Email Address</label>
+                      <input
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        required
+                        className={`${styles.formInput} ${theme === 'dark' ? styles.formInputDark : styles.formInputLight}`}
+                        placeholder="john@company.com"
+                      />
                     </div>
-                  </div>
-
-                  {/* Professional Information Section */}
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-2 mb-4">
-                      <Briefcase className="w-5 h-5 text-blue-400" />
-                      <h3 className="text-lg font-semibold text-white">Professional Information</h3>
+                    
+                    <div className={styles.formField}>
+                      <label className={styles.formLabel}>Phone Number</label>
+                      <input
+                        type="tel"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        className={`${styles.formInput} ${theme === 'dark' ? styles.formInputDark : styles.formInputLight}`}
+                        placeholder="+1 (555) 123-4567"
+                      />
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
-                          Position *
-                        </label>
-                        <select
-                          value={formData.position}
-                          onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-                          required
-                          className="form-select w-full"
-                        >
-                          <option value="" className="bg-slate-700">Select position</option>
-                          {positions.map(position => (
-                            <option key={position} value={position} className="bg-slate-700">{position}</option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
-                          Department *
-                        </label>
-                        <select
-                          value={formData.department}
-                          onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                          required
-                          className="form-select w-full"
-                        >
-                          <option value="" className="bg-slate-700">Select department</option>
-                          {departments.map(dept => (
-                            <option key={dept} value={dept} className="bg-slate-700">{dept}</option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
-                          Hire Date *
-                        </label>
-                        <Input
-                          type="date"
-                          value={formData.hire_date}
-                          onChange={(e) => setFormData({ ...formData, hire_date: e.target.value })}
-                          required
-                          className="date-input"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
-                          Annual Salary
-                        </label>
-                        <Input
-                          type="number"
-                          value={formData.salary}
-                          onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
-                          placeholder="75000"
-                          className="form-input"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
-                          Employment Status
-                        </label>
-                        <select
-                          value={formData.status}
-                          onChange={(e) => setFormData({ ...formData, status: e.target.value as 'active' | 'inactive' | 'on_leave' })}
-                          className="form-select w-full"
-                        >
-                          <option value="active" className="bg-slate-700">Active</option>
-                          <option value="inactive" className="bg-slate-700">Inactive</option>
-                          <option value="on_leave" className="bg-slate-700">On Leave</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
-                          Performance Rating
-                        </label>
-                        <div className="space-y-2">
-                          <input
-                            type="range"
-                            min="1"
-                            max="5"
-                            step="0.1"
-                            value={formData.performance_rating}
-                            onChange={(e) => setFormData({ ...formData, performance_rating: parseFloat(e.target.value) })}
-                            className="rating-slider"
-                          />
-                          <div className="flex justify-between text-xs text-slate-400">
-                            <span>1.0</span>
-                            <span className="text-purple-400 font-semibold">{formData.performance_rating.toFixed(1)}</span>
-                            <span>5.0</span>
-                          </div>
-                        </div>
-                      </div>
+                    
+                    <div className={styles.formField}>
+                      <label className={styles.formLabel}>Position</label>
+                      <select
+                        value={formData.position}
+                        onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+                        className={`${styles.formSelect} ${theme === 'dark' ? styles.formSelectDark : styles.formSelectLight}`}
+                        required
+                      >
+                        <option value="">Select position</option>
+                        {positions.map(position => (
+                          <option key={position} value={position}>{position}</option>
+                        ))}
+                      </select>
+                    </div>
+                    
+                    <div className={styles.formField}>
+                      <label className={styles.formLabel}>Department</label>
+                      <select
+                        value={formData.department}
+                        onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                        className={`${styles.formSelect} ${theme === 'dark' ? styles.formSelectDark : styles.formSelectLight}`}
+                        required
+                      >
+                        <option value="">Select department</option>
+                        {departments.map(dept => (
+                          <option key={dept} value={dept}>{dept}</option>
+                        ))}
+                      </select>
+                    </div>
+                    
+                    <div className={styles.formField}>
+                      <label className={styles.formLabel}>Location</label>
+                      <input
+                        type="text"
+                        value={formData.location}
+                        onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                        className={`${styles.formInput} ${theme === 'dark' ? styles.formInputDark : styles.formInputLight}`}
+                        placeholder="San Francisco, CA"
+                      />
+                    </div>
+                    
+                    <div className={styles.formField}>
+                      <label className={styles.formLabel}>Hire Date</label>
+                      <input
+                        type="date"
+                        value={formData.hire_date}
+                        onChange={(e) => setFormData({ ...formData, hire_date: e.target.value })}
+                        required
+                        className={`${styles.formInput} ${theme === 'dark' ? styles.formInputDark : styles.formInputLight}`}
+                      />
+                    </div>
+                    
+                    <div className={styles.formField}>
+                      <label className={styles.formLabel}>Annual Salary</label>
+                      <input
+                        type="number"
+                        value={formData.salary}
+                        onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
+                        className={`${styles.formInput} ${theme === 'dark' ? styles.formInputDark : styles.formInputLight}`}
+                        placeholder="75000"
+                      />
                     </div>
                   </div>
-
-                  {/* Additional Information Section */}
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-2 mb-4">
-                      <Award className="w-5 h-5 text-green-400" />
-                      <h3 className="text-lg font-semibold text-white">Additional Information</h3>
-                    </div>
-                    <div className="space-y-6">
-                      <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
-                          Bio
-                        </label>
-                        <textarea
-                          value={formData.bio}
-                          onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                          placeholder="Brief description about the employee's background, experience, and role..."
-                          rows={4}
-                          className="form-textarea w-full"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
-                          Skills & Technologies
-                        </label>
-                        <Input
-                          value={formData.skills}
-                          onChange={(e) => setFormData({ ...formData, skills: e.target.value })}
-                          placeholder="React, TypeScript, Node.js, Python, AWS, Docker"
-                          className="form-input"
-                        />
-                        <p className="text-xs text-slate-500 mt-1">Separate skills with commas</p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
-                          Current Projects
-                        </label>
-                        <Input
-                          value={formData.projects}
-                          onChange={(e) => setFormData({ ...formData, projects: e.target.value })}
-                          placeholder="E-commerce Platform, Mobile App, Dashboard Redesign"
-                          className="form-input"
-                        />
-                        <p className="text-xs text-slate-500 mt-1">Separate projects with commas</p>
-                      </div>
-                    </div>
+                  
+                  <div className={styles.formField}>
+                    <label className={styles.formLabel}>Status</label>
+                    <select
+                      value={formData.status}
+                      onChange={(e) => setFormData({ ...formData, status: e.target.value as 'active' | 'inactive' | 'on_leave' })}
+                      className={`${styles.formSelect} ${theme === 'dark' ? styles.formSelectDark : styles.formSelectLight}`}
+                    >
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                      <option value="on_leave">On Leave</option>
+                    </select>
+                  </div>
+                  
+                  <div className={styles.formField}>
+                    <label className={styles.formLabel}>Bio</label>
+                    <textarea
+                      value={formData.bio}
+                      onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                      placeholder="Brief description about the team member..."
+                      rows={3}
+                      className={`${styles.formTextarea} ${theme === 'dark' ? styles.formTextareaDark : styles.formTextareaLight}`}
+                    />
+                  </div>
+                  
+                  <div className={styles.formField}>
+                    <label className={styles.formLabel}>Skills (comma-separated)</label>
+                    <input
+                      type="text"
+                      value={formData.skills}
+                      onChange={(e) => setFormData({ ...formData, skills: e.target.value })}
+                      placeholder="React, TypeScript, Node.js, Python"
+                      className={`${styles.formInput} ${theme === 'dark' ? styles.formInputDark : styles.formInputLight}`}
+                    />
+                  </div>
+                  
+                  <div className={styles.formField}>
+                    <label className={styles.formLabel}>Current Projects (comma-separated)</label>
+                    <input
+                      type="text"
+                      value={formData.projects}
+                      onChange={(e) => setFormData({ ...formData, projects: e.target.value })}
+                      placeholder="E-commerce Platform, Mobile App, Dashboard"
+                      className={`${styles.formInput} ${theme === 'dark' ? styles.formInputDark : styles.formInputLight}`}
+                    />
                   </div>
 
-                  {/* Form Actions */}
-                  <div className="flex items-center justify-end space-x-4 pt-6 border-t border-slate-700">
-                    <Button
+                  <div className={`${styles.formActions} ${theme === 'dark' ? styles.formActionsDark : styles.formActionsLight}`}>
+                    <button
                       type="button"
-                      variant="outline"
                       onClick={() => {
                         setIsAddModalOpen(false)
                         setEditingEmployee(null)
                         resetForm()
                       }}
-                      className="bg-slate-700 border-slate-600 text-slate-300 hover:bg-slate-600 px-8"
+                      className={`${styles.cancelBtn} ${theme === 'dark' ? styles.cancelBtnDark : styles.cancelBtnLight}`}
                     >
                       Cancel
-                    </Button>
-                    <Button 
-                      type="submit" 
-                      className="btn-primary px-8"
-                    >
-                      {editingEmployee ? (
-                        <>
-                          <CheckIcon className="w-4 h-4 mr-2" />
-                          Update Employee
-                        </>
-                      ) : (
-                        <>
-                          <Plus className="w-4 h-4 mr-2" />
-                          Add Employee
-                        </>
-                      )}
-                    </Button>
+                    </button>
+                    <button type="submit" className={styles.submitBtn}>
+                      {editingEmployee ? 'Update Member' : 'Add Member'}
+                    </button>
                   </div>
                 </form>
               </div>

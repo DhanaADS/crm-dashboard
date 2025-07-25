@@ -1,8 +1,22 @@
-export default function Card() {
+import { ReactNode } from 'react'
+
+interface CardProps {
+  title?: string
+  description?: string
+  children: ReactNode
+  className?: string
+}
+
+export default function Card({ title, description, children, className = '' }: CardProps) {
   return (
-    <div className="bg-white dark:bg-gray-800 dark:text-white p-4 rounded shadow">
-      <h2 className="text-lg font-semibold mb-2">Card Title</h2>
-      <p>Card content goes here.</p>
+    <div className={`rounded-xl border bg-card p-6 text-card-foreground shadow-sm ${className}`}>
+      {title && (
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold">{title}</h3>
+          {description && <p className="text-sm text-muted-foreground">{description}</p>}
+        </div>
+      )}
+      {children}
     </div>
-  );
+  )
 }
