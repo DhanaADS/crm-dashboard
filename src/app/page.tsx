@@ -53,6 +53,117 @@ export default function HomePage() {
   const supabase = createClientComponentClient()
   const router = useRouter()
 
+  // FORCE BUTTON COLORS WITH JAVASCRIPT
+  useEffect(() => {
+    const forceButtonColors = () => {
+      const colors = {
+        gmail: { bg: 'linear-gradient(135deg, #EA4335 0%, #D33B2C 100%)', border: '#EA4335' },
+        whatsapp: { bg: 'linear-gradient(135deg, #25D366 0%, #1DA851 100%)', border: '#25D366' },
+        telegram: { bg: 'linear-gradient(135deg, #0088CC 0%, #006699 100%)', border: '#0088CC' },
+        orders: { bg: 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)', border: '#7C3AED' },
+        inventory: { bg: 'linear-gradient(135deg, #F97316 0%, #EA580C 100%)', border: '#F97316' }
+      }
+
+      // Target by CSS class
+      Object.keys(colors).forEach(key => {
+        const elements = document.querySelectorAll(`[class*="tab${key.charAt(0).toUpperCase()}${key.slice(1)}"]`)
+        elements.forEach(el => {
+          if (!el.className.includes('Inactive')) {
+            const element = el as HTMLElement
+            element.style.setProperty('background', colors[key as keyof typeof colors].bg, 'important')
+            element.style.setProperty('color', 'white', 'important')
+            element.style.setProperty('border', `1px solid ${colors[key as keyof typeof colors].border}`, 'important')
+            
+            // Force white text on all children
+            const children = element.querySelectorAll('*')
+            children.forEach(child => {
+              const childElement = child as HTMLElement
+              childElement.style.setProperty('color', 'white', 'important')
+              childElement.style.setProperty('fill', 'white', 'important')
+            })
+          }
+        })
+      })
+
+      // Target by position in tabsContainer
+      const tabsContainer = document.querySelector(`.${styles.tabsContainer}`)
+      if (tabsContainer) {
+        const buttons = tabsContainer.querySelectorAll('button')
+        const colorKeys = Object.keys(colors)
+        buttons.forEach((button, index) => {
+          if (colorKeys[index] && button.className.includes('tabButtonActive')) {
+            const element = button as HTMLElement
+            const colorKey = colorKeys[index] as keyof typeof colors
+            element.style.setProperty('background', colors[colorKey].bg, 'important')
+            element.style.setProperty('color', 'white', 'important')
+            element.style.setProperty('border', `1px solid ${colors[colorKey].border}`, 'important')
+            
+            // Force white text on all children
+            const children = element.querySelectorAll('*')
+            children.forEach(child => {
+              const childElement = child as HTMLElement
+              childElement.style.setProperty('color', 'white', 'important')
+              childElement.style.setProperty('fill', 'white', 'important')
+            })
+          }
+        })
+      }
+    }
+
+    // Run immediately
+    forceButtonColors()
+    // Run after a delay to catch dynamic updates
+    setTimeout(forceButtonColors, 100)
+    setTimeout(forceButtonColors, 500)
+    
+    // Set up mutation observer to watch for changes
+    const observer = new MutationObserver(forceButtonColors)
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class', 'style']
+    })
+
+    return () => observer.disconnect()
+  }, [])
+
+  // Force colors when active tab changes
+  useEffect(() => {
+    const forceActiveTabColor = () => {
+      const colors = {
+        gmail: { bg: 'linear-gradient(135deg, #EA4335 0%, #D33B2C 100%)', border: '#EA4335' },
+        whatsapp: { bg: 'linear-gradient(135deg, #25D366 0%, #1DA851 100%)', border: '#25D366' },
+        telegram: { bg: 'linear-gradient(135deg, #0088CC 0%, #006699 100%)', border: '#0088CC' },
+        orders: { bg: 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)', border: '#7C3AED' },
+        inventory: { bg: 'linear-gradient(135deg, #F97316 0%, #EA580C 100%)', border: '#F97316' }
+      }
+
+      if (colors[activeTab as keyof typeof colors]) {
+        const color = colors[activeTab as keyof typeof colors]
+        const activeElements = document.querySelectorAll(`[class*="tab${activeTab.charAt(0).toUpperCase()}${activeTab.slice(1)}"]`)
+        
+        activeElements.forEach(el => {
+          if (!el.className.includes('Inactive')) {
+            const element = el as HTMLElement
+            element.style.setProperty('background', color.bg, 'important')
+            element.style.setProperty('color', 'white', 'important')
+            element.style.setProperty('border', `1px solid ${color.border}`, 'important')
+            
+            const children = element.querySelectorAll('*')
+            children.forEach(child => {
+              const childElement = child as HTMLElement
+              childElement.style.setProperty('color', 'white', 'important')
+              childElement.style.setProperty('fill', 'white', 'important')
+            })
+          }
+        })
+      }
+    }
+
+    setTimeout(forceActiveTabColor, 50)
+  }, [activeTab])
+
   useEffect(() => {
     const savedTheme = localStorage.getItem('ads-theme') || 'dark'
     setTheme(savedTheme)
@@ -402,31 +513,58 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Modern Navigation Tabs */}
+            {/* Modern Navigation Tabs with Forced Inline Styles */}
             <div className={`${styles.navigationSection} ${theme === 'dark' ? styles.navigationSectionDark : styles.navigationSectionLight}`}>
               <div className={styles.tabsContainer}>
                 {navigationTabs.map((tab) => {
                   const IconComponent = tab.icon
                   const isActive = activeTab === tab.key
                   
+                  // Define inline styles for guaranteed color application
+                  const getButtonStyle = () => {
+                    if (!isActive) return {}
+                    
+                    const colors = {
+                      gmail: { background: 'linear-gradient(135deg, #EA4335 0%, #D33B2C 100%)', border: '1px solid #EA4335' },
+                      whatsapp: { background: 'linear-gradient(135deg, #25D366 0%, #1DA851 100%)', border: '1px solid #25D366' },
+                      telegram: { background: 'linear-gradient(135deg, #0088CC 0%, #006699 100%)', border: '1px solid #0088CC' },
+                      orders: { background: 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)', border: '1px solid #7C3AED' },
+                      inventory: { background: 'linear-gradient(135deg, #F97316 0%, #EA580C 100%)', border: '1px solid #F97316' }
+                    }
+                    
+                    return {
+                      background: colors[tab.key as keyof typeof colors]?.background,
+                      border: colors[tab.key as keyof typeof colors]?.border,
+                      color: 'white',
+                      boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
+                    }
+                  }
+                  
                   return (
                     <button
                       key={tab.key}
                       onClick={tab.action}
+                      style={getButtonStyle()}
                       className={`${styles.tabButton} ${
                         isActive 
                           ? `${styles.tabButtonActive} ${tab.activeClass}` 
                           : `${styles.tabButtonInactive} ${tab.inactiveClass} ${theme === 'dark' ? styles.tabButtonInactiveDark : styles.tabButtonInactiveLight}`
                       }`}
                     >
-                      <IconComponent className={`${styles.tabIcon} ${isActive ? styles.tabIconActive : ''}`} />
-                      <span>{tab.label}</span>
+                      <IconComponent 
+                        className={`${styles.tabIcon} ${isActive ? styles.tabIconActive : ''}`}
+                        style={isActive ? { color: 'white' } : {}}
+                      />
+                      <span style={isActive ? { color: 'white' } : {}}>{tab.label}</span>
                       {isActive && (
                         <div className={styles.activeIndicator}>
                           <div className={styles.activeIndicatorDot}></div>
                         </div>
                       )}
-                      <ArrowRight className={styles.arrowIcon} />
+                      <ArrowRight 
+                        className={styles.arrowIcon}
+                        style={isActive ? { color: 'white' } : {}}
+                      />
                     </button>
                   )
                 })}
@@ -447,12 +585,12 @@ export default function HomePage() {
                   <TabsContent value="whatsapp" className="mt-0 focus-visible:outline-none">
                     <div className={styles.comingSoonContainer}>
                       <div className={styles.comingSoonIcon}>
-                        <div className={`${styles.comingSoonIconCard} ${styles.comingSoonIconCardGreen} ${theme === 'dark' ? styles.comingSoonIconCardGreenDark : styles.comingSoonIconCardGreenLight}`}>
-                          <MessageSquare className={`${styles.comingSoonMainIcon} ${theme === 'dark' ? styles.comingSoonMainIconGreenDark : styles.comingSoonMainIconGreen}`} />
+                        <div className={`${styles.comingSoonIconCard} ${styles.comingSoonIconCardWhatsapp} ${theme === 'dark' ? styles.comingSoonIconCardWhatsappDark : styles.comingSoonIconCardWhatsappLight}`}>
+                          <MessageSquare className={`${styles.comingSoonMainIcon} ${theme === 'dark' ? styles.comingSoonMainIconWhatsappDark : styles.comingSoonMainIconWhatsapp}`} />
                         </div>
-                        <div className={`${styles.comingSoonFloatingIcon} ${styles.comingSoonFloatingIconGreen}`}></div>
+                        <div className={`${styles.comingSoonFloatingIcon} ${styles.comingSoonFloatingIconWhatsapp}`}></div>
                       </div>
-                      <h3 className={`${styles.comingSoonTitle} ${styles.comingSoonTitleGreen}`}>
+                      <h3 className={`${styles.comingSoonTitle} ${styles.comingSoonTitleWhatsapp}`}>
                         WhatsApp Business Hub
                       </h3>
                       <p className={`${styles.comingSoonDescription} ${theme === 'dark' ? styles.comingSoonDescriptionDark : styles.comingSoonDescriptionLight}`}>
@@ -460,11 +598,11 @@ export default function HomePage() {
                         automated responses, and broadcast campaigns from your unified dashboard.
                       </p>
                       <div className={styles.comingSoonActions}>
-                        <button className={`${styles.primaryButton} ${styles.primaryButtonGreen}`} disabled>
+                        <button className={`${styles.primaryButton} ${styles.primaryButtonWhatsapp}`} disabled>
                           <Sparkles className="h-4 w-4" />
                           Coming Soon
                         </button>
-                        <button className={`${styles.secondaryButton} ${theme === 'dark' ? styles.secondaryButtonGreenDark : styles.secondaryButtonGreen}`}>
+                        <button className={`${styles.secondaryButton} ${theme === 'dark' ? styles.secondaryButtonWhatsappDark : styles.secondaryButtonWhatsapp}`}>
                           Learn More
                         </button>
                       </div>
@@ -475,12 +613,12 @@ export default function HomePage() {
                   <TabsContent value="telegram" className="mt-0 focus-visible:outline-none">
                     <div className={styles.comingSoonContainer}>
                       <div className={styles.comingSoonIcon}>
-                        <div className={`${styles.comingSoonIconCard} ${styles.comingSoonIconCardBlue} ${theme === 'dark' ? styles.comingSoonIconCardBlueDark : styles.comingSoonIconCardBlueLight}`}>
-                          <Send className={`${styles.comingSoonMainIcon} ${theme === 'dark' ? styles.comingSoonMainIconBlueDark : styles.comingSoonMainIconBlue}`} />
+                        <div className={`${styles.comingSoonIconCard} ${styles.comingSoonIconCardTelegram} ${theme === 'dark' ? styles.comingSoonIconCardTelegramDark : styles.comingSoonIconCardTelegramLight}`}>
+                          <Send className={`${styles.comingSoonMainIcon} ${theme === 'dark' ? styles.comingSoonMainIconTelegramDark : styles.comingSoonMainIconTelegram}`} />
                         </div>
-                        <div className={`${styles.comingSoonFloatingIcon} ${styles.comingSoonFloatingIconBlue}`}></div>
+                        <div className={`${styles.comingSoonFloatingIcon} ${styles.comingSoonFloatingIconTelegram}`}></div>
                       </div>
-                      <h3 className={`${styles.comingSoonTitle} ${styles.comingSoonTitleBlue}`}>
+                      <h3 className={`${styles.comingSoonTitle} ${styles.comingSoonTitleTelegram}`}>
                         Telegram Automation Center
                       </h3>
                       <p className={`${styles.comingSoonDescription} ${theme === 'dark' ? styles.comingSoonDescriptionDark : styles.comingSoonDescriptionLight}`}>
@@ -488,11 +626,11 @@ export default function HomePage() {
                         with advanced scripting and real-time analytics integration.
                       </p>
                       <div className={styles.comingSoonActions}>
-                        <button className={`${styles.primaryButton} ${styles.primaryButtonBlue}`} disabled>
+                        <button className={`${styles.primaryButton} ${styles.primaryButtonTelegram}`} disabled>
                           <Sparkles className="h-4 w-4" />
                           Coming Soon
                         </button>
-                        <button className={`${styles.secondaryButton} ${theme === 'dark' ? styles.secondaryButtonBlueDark : styles.secondaryButtonBlue}`}>
+                        <button className={`${styles.secondaryButton} ${theme === 'dark' ? styles.secondaryButtonTelegramDark : styles.secondaryButtonTelegram}`}>
                           Learn More
                         </button>
                       </div>
@@ -504,12 +642,12 @@ export default function HomePage() {
                     {ordersStatus === 'idle' ? (
                       <div className={styles.comingSoonContainer}>
                         <div className={styles.comingSoonIcon}>
-                          <div className={`${styles.comingSoonIconCard} ${styles.comingSoonIconCardPurple} ${theme === 'dark' ? styles.comingSoonIconCardPurpleDark : styles.comingSoonIconCardPurpleLight}`}>
-                            <ClipboardList className={`${styles.comingSoonMainIcon} ${theme === 'dark' ? styles.comingSoonMainIconPurpleDark : styles.comingSoonMainIconPurple}`} />
+                          <div className={`${styles.comingSoonIconCard} ${styles.comingSoonIconCardOrders} ${theme === 'dark' ? styles.comingSoonIconCardOrdersDark : styles.comingSoonIconCardOrdersLight}`}>
+                            <ClipboardList className={`${styles.comingSoonMainIcon} ${theme === 'dark' ? styles.comingSoonMainIconOrdersDark : styles.comingSoonMainIconOrders}`} />
                           </div>
-                          <div className={`${styles.comingSoonFloatingIcon} ${styles.comingSoonFloatingIconPurple}`}></div>
+                          <div className={`${styles.comingSoonFloatingIcon} ${styles.comingSoonFloatingIconOrders}`}></div>
                         </div>
-                        <h3 className={`${styles.comingSoonTitle} ${styles.comingSoonTitlePurple}`}>
+                        <h3 className={`${styles.comingSoonTitle} ${styles.comingSoonTitleOrders}`}>
                           Order Management System
                         </h3>
                         <p className={`${styles.comingSoonDescription} ${theme === 'dark' ? styles.comingSoonDescriptionDark : styles.comingSoonDescriptionLight}`}>
@@ -519,12 +657,12 @@ export default function HomePage() {
                         <div className={styles.comingSoonActions}>
                           <button 
                             onClick={fetchOrders} 
-                            className={`${styles.primaryButton} ${styles.primaryButtonPurple}`}
+                            className={`${styles.primaryButton} ${styles.primaryButtonOrders}`}
                           >
                             <Zap className="h-4 w-4" />
                             Load Orders
                           </button>
-                          <button className={`${styles.secondaryButton} ${theme === 'dark' ? styles.secondaryButtonPurpleDark : styles.secondaryButtonPurple}`}>
+                          <button className={`${styles.secondaryButton} ${theme === 'dark' ? styles.secondaryButtonOrdersDark : styles.secondaryButtonOrders}`}>
                             View Analytics
                           </button>
                         </div>
@@ -547,12 +685,12 @@ export default function HomePage() {
                     {inventoryStatus === 'idle' ? (
                       <div className={styles.comingSoonContainer}>
                         <div className={styles.comingSoonIcon}>
-                          <div className={`${styles.comingSoonIconCard} ${styles.comingSoonIconCardOrange} ${theme === 'dark' ? styles.comingSoonIconCardOrangeDark : styles.comingSoonIconCardOrangeLight}`}>
-                            <Package className={`${styles.comingSoonMainIcon} ${theme === 'dark' ? styles.comingSoonMainIconOrangeDark : styles.comingSoonMainIconOrange}`} />
+                          <div className={`${styles.comingSoonIconCard} ${styles.comingSoonIconCardInventory} ${theme === 'dark' ? styles.comingSoonIconCardInventoryDark : styles.comingSoonIconCardInventoryLight}`}>
+                            <Package className={`${styles.comingSoonMainIcon} ${theme === 'dark' ? styles.comingSoonMainIconInventoryDark : styles.comingSoonMainIconInventory}`} />
                           </div>
-                          <div className={`${styles.comingSoonFloatingIcon} ${styles.comingSoonFloatingIconOrange}`}></div>
+                          <div className={`${styles.comingSoonFloatingIcon} ${styles.comingSoonFloatingIconInventory}`}></div>
                         </div>
-                        <h3 className={`${styles.comingSoonTitle} ${styles.comingSoonTitleOrange}`}>
+                        <h3 className={`${styles.comingSoonTitle} ${styles.comingSoonTitleInventory}`}>
                           Smart Inventory Control
                         </h3>
                         <p className={`${styles.comingSoonDescription} ${theme === 'dark' ? styles.comingSoonDescriptionDark : styles.comingSoonDescriptionLight}`}>
@@ -562,12 +700,12 @@ export default function HomePage() {
                         <div className={styles.comingSoonActions}>
                           <button 
                             onClick={fetchInventory} 
-                            className={`${styles.primaryButton} ${styles.primaryButtonOrange}`}
+                            className={`${styles.primaryButton} ${styles.primaryButtonInventory}`}
                           >
                             <Package className="h-4 w-4" />
                             Load Inventory
                           </button>
-                          <button className={`${styles.secondaryButton} ${theme === 'dark' ? styles.secondaryButtonOrangeDark : styles.secondaryButtonOrange}`}>
+                          <button className={`${styles.secondaryButton} ${theme === 'dark' ? styles.secondaryButtonInventoryDark : styles.secondaryButtonInventory}`}>
                             Quick Scan
                           </button>
                         </div>

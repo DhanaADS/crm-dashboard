@@ -230,149 +230,287 @@ iframe {
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
-/* Navigation Tab Buttons - Add this to the end of your globals.css */
+/* ====================================
+   OFFICIAL NAVIGATION BUTTON COLORS
+   HIGHEST PRIORITY OVERRIDES
+   ==================================== */
 
-/* Gmail Button - Red */
-.nav-button.gmail,
-button[class*="gmail"],
-[data-tab="gmail"],
-button:has(.mail-icon),
-button:has([data-icon="gmail"]) {
-  background: linear-gradient(135deg, #ea4335 0%, #d33b2c 100%) !important;
+/* Gmail Button - Official Red (#EA4335) */
+[class*="tabGmail"],
+[class*="gmail"],
+button[data-tab="gmail"],
+.tab-container button:nth-child(1),
+.tabsContainer button:nth-child(1),
+.navigation button:nth-child(1),
+button:has([data-testid="Mail"]),
+button:has(svg[data-testid="Mail"]),
+button:has(.lucide-mail) {
+  background: linear-gradient(135deg, #EA4335 0%, #D33B2C 100%) !important;
   color: white !important;
-  border: 1px solid rgba(234, 67, 53, 0.3) !important;
+  border: 1px solid #EA4335 !important;
   box-shadow: 0 8px 25px -8px rgba(234, 67, 53, 0.4) !important;
 }
 
-/* WhatsApp Button - Green */
-.nav-button.whatsapp,
-button[class*="whatsapp"],
-[data-tab="whatsapp"],
-button:has(.message-icon),
-button:has([data-icon="whatsapp"]) {
-  background: linear-gradient(135deg, #25d366 0%, #20ba5a 100%) !important;
+[class*="tabGmail"] *,
+[class*="gmail"] *,
+button[data-tab="gmail"] *,
+.tab-container button:nth-child(1) *,
+.tabsContainer button:nth-child(1) *,
+button:has([data-testid="Mail"]) *,
+button:has(.lucide-mail) * {
   color: white !important;
-  border: 1px solid rgba(37, 211, 102, 0.3) !important;
+}
+
+/* WhatsApp Button - Official Green (#25D366) */
+[class*="tabWhatsapp"],
+[class*="whatsapp"],
+button[data-tab="whatsapp"],
+.tab-container button:nth-child(2),
+.tabsContainer button:nth-child(2),
+.navigation button:nth-child(2),
+button:has([data-testid="MessageSquare"]),
+button:has(svg[data-testid="MessageSquare"]),
+button:has(.lucide-message-square) {
+  background: linear-gradient(135deg, #25D366 0%, #1DA851 100%) !important;
+  color: white !important;
+  border: 1px solid #25D366 !important;
   box-shadow: 0 8px 25px -8px rgba(37, 211, 102, 0.4) !important;
 }
 
-/* Telegram Button - Blue */
-.nav-button.telegram,
-button[class*="telegram"],
-[data-tab="telegram"],
-button:has(.send-icon),
-button:has([data-icon="telegram"]) {
-  background: linear-gradient(135deg, #0088cc 0%, #006ba6 100%) !important;
+[class*="tabWhatsapp"] *,
+[class*="whatsapp"] *,
+button[data-tab="whatsapp"] *,
+.tab-container button:nth-child(2) *,
+.tabsContainer button:nth-child(2) *,
+button:has([data-testid="MessageSquare"]) *,
+button:has(.lucide-message-square) * {
   color: white !important;
-  border: 1px solid rgba(0, 136, 204, 0.3) !important;
+}
+
+/* Telegram Button - Official Blue (#0088CC) */
+[class*="tabTelegram"],
+[class*="telegram"],
+button[data-tab="telegram"],
+.tab-container button:nth-child(3),
+.tabsContainer button:nth-child(3),
+.navigation button:nth-child(3),
+button:has([data-testid="Send"]),
+button:has(svg[data-testid="Send"]),
+button:has(.lucide-send) {
+  background: linear-gradient(135deg, #0088CC 0%, #006699 100%) !important;
+  color: white !important;
+  border: 1px solid #0088CC !important;
   box-shadow: 0 8px 25px -8px rgba(0, 136, 204, 0.4) !important;
 }
 
-/* Orders Button - Orange */
-.nav-button.orders,
-button[class*="orders"],
-[data-tab="orders"],
-button:has(.clipboard-icon),
-button:has([data-icon="orders"]) {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+[class*="tabTelegram"] *,
+[class*="telegram"] *,
+button[data-tab="telegram"] *,
+.tab-container button:nth-child(3) *,
+.tabsContainer button:nth-child(3) *,
+button:has([data-testid="Send"]) *,
+button:has(.lucide-send) * {
   color: white !important;
-  border: 1px solid rgba(245, 158, 11, 0.3) !important;
-  box-shadow: 0 8px 25px -8px rgba(245, 158, 11, 0.4) !important;
 }
 
-/* Inventory Button - Purple */
-.nav-button.inventory,
-button[class*="inventory"],
-[data-tab="inventory"],
-button:has(.package-icon),
-button:has([data-icon="inventory"]) {
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+/* Orders Button - Professional Purple (#7C3AED) */
+[class*="tabOrders"],
+[class*="orders"],
+button[data-tab="orders"],
+.tab-container button:nth-child(4),
+.tabsContainer button:nth-child(4),
+.navigation button:nth-child(4),
+button:has([data-testid="ClipboardList"]),
+button:has(svg[data-testid="ClipboardList"]),
+button:has(.lucide-clipboard-list) {
+  background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%) !important;
   color: white !important;
-  border: 1px solid rgba(139, 92, 246, 0.3) !important;
-  box-shadow: 0 8px 25px -8px rgba(139, 92, 246, 0.4) !important;
+  border: 1px solid #7C3AED !important;
+  box-shadow: 0 8px 25px -8px rgba(124, 58, 237, 0.4) !important;
 }
 
-/* Active state for navigation buttons */
-.nav-button.active,
-button[data-active="true"],
-.active-tab {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 12px 30px -8px rgba(59, 130, 246, 0.5) !important;
-}
-
-/* Hover effects for navigation buttons */
-.nav-button:hover,
-button[class*="nav"]:hover {
-  transform: translateY(-1px) !important;
-  filter: brightness(1.1) !important;
-}
-
-/* Specific targeting for dashboard navigation */
-.dashboard-nav button:nth-child(1),
-[role="tablist"] button:nth-child(1),
-.tab-container button:first-child {
-  background: linear-gradient(135deg, #ea4335 0%, #d33b2c 100%) !important;
+[class*="tabOrders"] *,
+[class*="orders"] *,
+button[data-tab="orders"] *,
+.tab-container button:nth-child(4) *,
+.tabsContainer button:nth-child(4) *,
+button:has([data-testid="ClipboardList"]) *,
+button:has(.lucide-clipboard-list) * {
   color: white !important;
-  border: 1px solid rgba(234, 67, 53, 0.3) !important;
 }
 
-.dashboard-nav button:nth-child(2),
-[role="tablist"] button:nth-child(2),
-.tab-container button:nth-child(2) {
-  background: linear-gradient(135deg, #25d366 0%, #20ba5a 100%) !important;
+/* Inventory Button - Professional Orange (#F97316) */
+[class*="tabInventory"],
+[class*="inventory"],
+button[data-tab="inventory"],
+.tab-container button:nth-child(5),
+.tabsContainer button:nth-child(5),
+.navigation button:nth-child(5),
+button:has([data-testid="Package"]),
+button:has(svg[data-testid="Package"]),
+button:has(.lucide-package) {
+  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%) !important;
   color: white !important;
-  border: 1px solid rgba(37, 211, 102, 0.3) !important;
+  border: 1px solid #F97316 !important;
+  box-shadow: 0 8px 25px -8px rgba(249, 115, 22, 0.4) !important;
 }
 
-.dashboard-nav button:nth-child(3),
-[role="tablist"] button:nth-child(3),
-.tab-container button:nth-child(3) {
-  background: linear-gradient(135deg, #0088cc 0%, #006ba6 100%) !important;
+[class*="tabInventory"] *,
+[class*="inventory"] *,
+button[data-tab="inventory"] *,
+.tab-container button:nth-child(5) *,
+.tabsContainer button:nth-child(5) *,
+button:has([data-testid="Package"]) *,
+button:has(.lucide-package) * {
   color: white !important;
-  border: 1px solid rgba(0, 136, 204, 0.3) !important;
 }
 
-.dashboard-nav button:nth-child(4),
-[role="tablist"] button:nth-child(4),
-.tab-container button:nth-child(4) {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+/* ====================================
+   ENHANCED HOVER AND ACTIVE STATES
+   ==================================== */
+
+/* Gmail Hover */
+[class*="tabGmail"]:hover,
+[class*="gmail"]:hover,
+button[data-tab="gmail"]:hover,
+button:has(.lucide-mail):hover {
+  background: linear-gradient(135deg, #D33B2C 0%, #B52D20 100%) !important;
+  box-shadow: 0 12px 30px -8px rgba(234, 67, 53, 0.5) !important;
+  transform: translateY(-2px) scale(1.02) !important;
+}
+
+/* WhatsApp Hover */
+[class*="tabWhatsapp"]:hover,
+[class*="whatsapp"]:hover,
+button[data-tab="whatsapp"]:hover,
+button:has(.lucide-message-square):hover {
+  background: linear-gradient(135deg, #1DA851 0%, #128C3D 100%) !important;
+  box-shadow: 0 12px 30px -8px rgba(37, 211, 102, 0.5) !important;
+  transform: translateY(-2px) scale(1.02) !important;
+}
+
+/* Telegram Hover */
+[class*="tabTelegram"]:hover,
+[class*="telegram"]:hover,
+button[data-tab="telegram"]:hover,
+button:has(.lucide-send):hover {
+  background: linear-gradient(135deg, #006699 0%, #004466 100%) !important;
+  box-shadow: 0 12px 30px -8px rgba(0, 136, 204, 0.5) !important;
+  transform: translateY(-2px) scale(1.02) !important;
+}
+
+/* Orders Hover */
+[class*="tabOrders"]:hover,
+[class*="orders"]:hover,
+button[data-tab="orders"]:hover,
+button:has(.lucide-clipboard-list):hover {
+  background: linear-gradient(135deg, #6D28D9 0%, #5B21B6 100%) !important;
+  box-shadow: 0 12px 30px -8px rgba(124, 58, 237, 0.5) !important;
+  transform: translateY(-2px) scale(1.02) !important;
+}
+
+/* Inventory Hover */
+[class*="tabInventory"]:hover,
+[class*="inventory"]:hover,
+button[data-tab="inventory"]:hover,
+button:has(.lucide-package):hover {
+  background: linear-gradient(135deg, #EA580C 0%, #C2410C 100%) !important;
+  box-shadow: 0 12px 30px -8px rgba(249, 115, 22, 0.5) !important;
+  transform: translateY(-2px) scale(1.02) !important;
+}
+
+/* ====================================
+   BROAD SELECTOR FALLBACKS
+   ==================================== */
+
+/* Target navigation containers */
+.navigationSection button:nth-child(1),
+.tabs-container button:nth-child(1),
+nav button:nth-child(1) {
+  background: linear-gradient(135deg, #EA4335 0%, #D33B2C 100%) !important;
   color: white !important;
-  border: 1px solid rgba(245, 158, 11, 0.3) !important;
+  border: 1px solid #EA4335 !important;
 }
 
-.dashboard-nav button:nth-child(5),
-[role="tablist"] button:nth-child(5),
-.tab-container button:nth-child(5) {
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+.navigationSection button:nth-child(2),
+.tabs-container button:nth-child(2),
+nav button:nth-child(2) {
+  background: linear-gradient(135deg, #25D366 0%, #1DA851 100%) !important;
   color: white !important;
-  border: 1px solid rgba(139, 92, 246, 0.3) !important;
+  border: 1px solid #25D366 !important;
 }
 
-/* Override any conflicting button styles */
-button:has(svg + span):nth-child(1) {
-  background: linear-gradient(135deg, #ea4335 0%, #d33b2c 100%) !important;
-}
-
-button:has(svg + span):nth-child(2) {
-  background: linear-gradient(135deg, #25d366 0%, #20ba5a 100%) !important;
-}
-
-button:has(svg + span):nth-child(3) {
-  background: linear-gradient(135deg, #0088cc 0%, #006ba6 100%) !important;
-}
-
-button:has(svg + span):nth-child(4) {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
-}
-
-button:has(svg + span):nth-child(5) {
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
-}
-
-/* Force override for buttons with icons and text */
-.flex.items-center.gap-3 button,
-.flex.items-center.gap-2 button {
+.navigationSection button:nth-child(3),
+.tabs-container button:nth-child(3),
+nav button:nth-child(3) {
+  background: linear-gradient(135deg, #0088CC 0%, #006699 100%) !important;
   color: white !important;
-  font-weight: 600 !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid #0088CC !important;
+}
+
+.navigationSection button:nth-child(4),
+.tabs-container button:nth-child(4),
+nav button:nth-child(4) {
+  background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%) !important;
+  color: white !important;
+  border: 1px solid #7C3AED !important;
+}
+
+.navigationSection button:nth-child(5),
+.tabs-container button:nth-child(5),
+nav button:nth-child(5) {
+  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%) !important;
+  color: white !important;
+  border: 1px solid #F97316 !important;
+}
+
+/* Force white text on all navigation buttons */
+.navigationSection button *,
+.tabs-container button *,
+nav button *,
+[class*="tab"] button *,
+button[data-tab] * {
+  color: white !important;
+  fill: white !important;
+  stroke: white !important;
+}
+
+/* ====================================
+   EMERGENCY OVERRIDE FOR STUBBORN STYLES
+   ==================================== */
+
+/* Ultimate override for any button with these specific text contents */
+button:has-text("Gmail"),
+button[aria-label*="Gmail"],
+button[title*="Gmail"] {
+  background: linear-gradient(135deg, #EA4335 0%, #D33B2C 100%) !important;
+  color: white !important;
+}
+
+button:has-text("WhatsApp"),
+button[aria-label*="WhatsApp"],
+button[title*="WhatsApp"] {
+  background: linear-gradient(135deg, #25D366 0%, #1DA851 100%) !important;
+  color: white !important;
+}
+
+button:has-text("Telegram"),
+button[aria-label*="Telegram"],
+button[title*="Telegram"] {
+  background: linear-gradient(135deg, #0088CC 0%, #006699 100%) !important;
+  color: white !important;
+}
+
+button:has-text("Orders"),
+button[aria-label*="Orders"],
+button[title*="Orders"] {
+  background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%) !important;
+  color: white !important;
+}
+
+button:has-text("Inventory"),
+button[aria-label*="Inventory"],
+button[title*="Inventory"] {
+  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%) !important;
+  color: white !important;
 }

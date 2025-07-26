@@ -504,80 +504,181 @@
 }
 
 .tabButtonActive {
-  color: white;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  font-weight: 600;
 }
 
 .tabButtonInactive {
   border: 1px solid;
+  font-weight: 500;
 }
 
 .tabButtonInactiveDark {
-  color: #d1d5db;
   border-color: rgba(75, 85, 99, 1);
 }
 
 .tabButtonInactiveDark:hover {
-  color: white;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 .tabButtonInactiveLight {
-  color: #374151;
   border-color: rgba(209, 213, 219, 1);
 }
 
 .tabButtonInactiveLight:hover {
-  color: #111827;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
-/* Tab Colors */
+/* ====================================
+   OFFICIAL BRAND COLORS FOR NAVIGATION
+   ==================================== */
+
+/* Gmail - Official Red (#EA4335) */
 .tabGmail {
-  background: linear-gradient(135deg, #ef4444 0%, #ec4899 100%);
+  background: linear-gradient(135deg, #EA4335 0%, #D33B2C 100%) !important;
+  color: white !important;
+  border: 1px solid #EA4335 !important;
+  box-shadow: 0 4px 15px rgba(234, 67, 53, 0.3) !important;
+}
+
+.tabGmail:hover {
+  background: linear-gradient(135deg, #D33B2C 0%, #B52D20 100%) !important;
+  box-shadow: 0 6px 20px rgba(234, 67, 53, 0.4) !important;
+  transform: translateY(-2px) scale(1.05) !important;
+}
+
+.tabGmail * {
+  color: white !important;
 }
 
 .tabGmailInactive {
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.2);
+  background: rgba(234, 67, 53, 0.1) !important;
+  border: 1px solid rgba(234, 67, 53, 0.3) !important;
+  color: #EA4335 !important;
 }
 
+.tabGmailInactive:hover {
+  background: rgba(234, 67, 53, 0.2) !important;
+  border: 1px solid rgba(234, 67, 53, 0.5) !important;
+}
+
+/* WhatsApp - Official Green (#25D366) */
 .tabWhatsapp {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, #25D366 0%, #1DA851 100%) !important;
+  color: white !important;
+  border: 1px solid #25D366 !important;
+  box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3) !important;
+}
+
+.tabWhatsapp:hover {
+  background: linear-gradient(135deg, #1DA851 0%, #128C3D 100%) !important;
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4) !important;
+  transform: translateY(-2px) scale(1.05) !important;
+}
+
+.tabWhatsapp * {
+  color: white !important;
 }
 
 .tabWhatsappInactive {
-  background: rgba(16, 185, 129, 0.1);
-  border-color: rgba(16, 185, 129, 0.2);
+  background: rgba(37, 211, 102, 0.1) !important;
+  border: 1px solid rgba(37, 211, 102, 0.3) !important;
+  color: #25D366 !important;
 }
 
+.tabWhatsappInactive:hover {
+  background: rgba(37, 211, 102, 0.2) !important;
+  border: 1px solid rgba(37, 211, 102, 0.5) !important;
+}
+
+/* Telegram - Official Blue (#0088CC) */
 .tabTelegram {
-  background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+  background: linear-gradient(135deg, #0088CC 0%, #006699 100%) !important;
+  color: white !important;
+  border: 1px solid #0088CC !important;
+  box-shadow: 0 4px 15px rgba(0, 136, 204, 0.3) !important;
+}
+
+.tabTelegram:hover {
+  background: linear-gradient(135deg, #006699 0%, #004466 100%) !important;
+  box-shadow: 0 6px 20px rgba(0, 136, 204, 0.4) !important;
+  transform: translateY(-2px) scale(1.05) !important;
+}
+
+.tabTelegram * {
+  color: white !important;
 }
 
 .tabTelegramInactive {
-  background: rgba(59, 130, 246, 0.1);
-  border-color: rgba(59, 130, 246, 0.2);
+  background: rgba(0, 136, 204, 0.1) !important;
+  border: 1px solid rgba(0, 136, 204, 0.3) !important;
+  color: #0088CC !important;
 }
 
+.tabTelegramInactive:hover {
+  background: rgba(0, 136, 204, 0.2) !important;
+  border: 1px solid rgba(0, 136, 204, 0.5) !important;
+}
+
+/* Orders - Professional Purple (#7C3AED) */
 .tabOrders {
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%) !important;
+  color: white !important;
+  border: 1px solid #7C3AED !important;
+  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3) !important;
+}
+
+.tabOrders:hover {
+  background: linear-gradient(135deg, #6D28D9 0%, #5B21B6 100%) !important;
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4) !important;
+  transform: translateY(-2px) scale(1.05) !important;
+}
+
+.tabOrders * {
+  color: white !important;
 }
 
 .tabOrdersInactive {
-  background: rgba(139, 92, 246, 0.1);
-  border-color: rgba(139, 92, 246, 0.2);
+  background: rgba(124, 58, 237, 0.1) !important;
+  border: 1px solid rgba(124, 58, 237, 0.3) !important;
+  color: #7C3AED !important;
 }
 
+.tabOrdersInactive:hover {
+  background: rgba(124, 58, 237, 0.2) !important;
+  border: 1px solid rgba(124, 58, 237, 0.5) !important;
+}
+
+/* Inventory - Professional Orange (#F97316) */
 .tabInventory {
-  background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%) !important;
+  color: white !important;
+  border: 1px solid #F97316 !important;
+  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3) !important;
+}
+
+.tabInventory:hover {
+  background: linear-gradient(135deg, #EA580C 0%, #C2410C 100%) !important;
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4) !important;
+  transform: translateY(-2px) scale(1.05) !important;
+}
+
+.tabInventory * {
+  color: white !important;
 }
 
 .tabInventoryInactive {
-  background: rgba(245, 158, 11, 0.1);
-  border-color: rgba(245, 158, 11, 0.2);
+  background: rgba(249, 115, 22, 0.1) !important;
+  border: 1px solid rgba(249, 115, 22, 0.3) !important;
+  color: #F97316 !important;
 }
 
+.tabInventoryInactive:hover {
+  background: rgba(249, 115, 22, 0.2) !important;
+  border: 1px solid rgba(249, 115, 22, 0.5) !important;
+}
+
+/* Tab Icon and Text Styles */
 .tabIcon {
   width: 1.25rem;
   height: 1.25rem;
@@ -661,94 +762,71 @@
   backdrop-filter: blur(8px);
 }
 
-.comingSoonIconCardGreen {
-  border-color: rgba(34, 197, 94, 0.2);
+.comingSoonIconCardGreen,
+.comingSoonIconCardWhatsapp,
+.comingSoonIconCardWhatsappDark,
+.comingSoonIconCardWhatsappLight {
+  background: linear-gradient(135deg, #25D366, #1DA851) !important;
+  border-color: rgba(37, 211, 102, 0.3);
 }
 
-.comingSoonIconCardGreenDark {
-  background: linear-gradient(135deg, rgba(6, 78, 59, 0.3) 0%, rgba(4, 120, 87, 0.3) 100%);
+.comingSoonIconCardBlue,
+.comingSoonIconCardTelegram,
+.comingSoonIconCardTelegramDark,
+.comingSoonIconCardTelegramLight {
+  background: linear-gradient(135deg, #0088CC, #006699) !important;
+  border-color: rgba(0, 136, 204, 0.3);
 }
 
-.comingSoonIconCardGreenLight {
-  background: linear-gradient(135deg, rgba(240, 253, 244, 1) 0%, rgba(209, 250, 229, 1) 100%);
-  border-color: rgba(34, 197, 94, 1);
+.comingSoonIconCardPurple,
+.comingSoonIconCardOrders,
+.comingSoonIconCardOrdersDark,
+.comingSoonIconCardOrdersLight {
+  background: linear-gradient(135deg, #7C3AED, #6D28D9) !important;
+  border-color: rgba(124, 58, 237, 0.3);
 }
 
-.comingSoonIconCardBlue {
-  border-color: rgba(59, 130, 246, 0.2);
-}
-
-.comingSoonIconCardBlueDark {
-  background: linear-gradient(135deg, rgba(30, 58, 138, 0.3) 0%, rgba(6, 182, 212, 0.3) 100%);
-}
-
-.comingSoonIconCardBlueLight {
-  background: linear-gradient(135deg, rgba(239, 246, 255, 1) 0%, rgba(224, 242, 254, 1) 100%);
-  border-color: rgba(59, 130, 246, 1);
-}
-
-.comingSoonIconCardPurple {
-  border-color: rgba(139, 92, 246, 0.2);
-}
-
-.comingSoonIconCardPurpleDark {
-  background: linear-gradient(135deg, rgba(91, 33, 182, 0.3) 0%, rgba(124, 58, 237, 0.3) 100%);
-}
-
-.comingSoonIconCardPurpleLight {
-  background: linear-gradient(135deg, rgba(250, 245, 255, 1) 0%, rgba(243, 232, 255, 1) 100%);
-  border-color: rgba(139, 92, 246, 1);
-}
-
-.comingSoonIconCardOrange {
-  border-color: rgba(245, 158, 11, 0.2);
-}
-
-.comingSoonIconCardOrangeDark {
-  background: linear-gradient(135deg, rgba(146, 64, 14, 0.3) 0%, rgba(217, 119, 6, 0.3) 100%);
-}
-
-.comingSoonIconCardOrangeLight {
-  background: linear-gradient(135deg, rgba(255, 247, 237, 1) 0%, rgba(254, 235, 200, 1) 100%);
-  border-color: rgba(245, 158, 11, 1);
+.comingSoonIconCardOrange,
+.comingSoonIconCardInventory,
+.comingSoonIconCardInventoryDark,
+.comingSoonIconCardInventoryLight {
+  background: linear-gradient(135deg, #F97316, #EA580C) !important;
+  border-color: rgba(249, 115, 22, 0.3);
 }
 
 .comingSoonMainIcon {
   width: 4rem;
   height: 4rem;
   margin: 0 auto;
+  color: white !important;
 }
 
-.comingSoonMainIconGreen {
-  color: #10b981;
+.comingSoonMainIconGreen,
+.comingSoonMainIconGreenDark,
+.comingSoonMainIconWhatsapp,
+.comingSoonMainIconWhatsappDark {
+  color: white !important;
 }
 
-.comingSoonMainIconGreenDark {
-  color: #34d399;
+.comingSoonMainIconBlue,
+.comingSoonMainIconBlueDark,
+.comingSoonMainIconTelegram,
+.comingSoonMainIconTelegramDark {
+  color: white !important;
 }
 
-.comingSoonMainIconBlue {
-  color: #3b82f6;
+.comingSoonMainIconPurple,
+.comingSoonMainIconPurpleDark,
+.comingSoonMainIconOrders,
+.comingSoonMainIconOrdersDark {
+  color: white !important;
 }
 
-.comingSoonMainIconBlueDark {
-  color: #60a5fa;
-}
-
-.comingSoonMainIconPurple {
-  color: #8b5cf6;
-}
-
-.comingSoonMainIconPurpleDark {
-  color: #a78bfa;
-}
-
-.comingSoonMainIconOrange {
-  color: #f59e0b;
-}
-
-.comingSoonMainIconOrangeDark {
-  color: #fbbf24;
+.comingSoonMainIconOrange,
+.comingSoonMainIconOrangeDark,
+.comingSoonMainIconInventory,
+.comingSoonMainIconInventoryDark {
+  color: white !important;
 }
 
 .comingSoonFloatingIcon {
@@ -761,20 +839,24 @@
   animation: bounce 1s infinite;
 }
 
-.comingSoonFloatingIconGreen {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+.comingSoonFloatingIconGreen,
+.comingSoonFloatingIconWhatsapp {
+  background: linear-gradient(135deg, #25D366 0%, #1DA851 100%);
 }
 
-.comingSoonFloatingIconBlue {
-  background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+.comingSoonFloatingIconBlue,
+.comingSoonFloatingIconTelegram {
+  background: linear-gradient(135deg, #0088CC 0%, #006699 100%);
 }
 
-.comingSoonFloatingIconPurple {
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+.comingSoonFloatingIconPurple,
+.comingSoonFloatingIconOrders {
+  background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
 }
 
-.comingSoonFloatingIconOrange {
-  background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+.comingSoonFloatingIconOrange,
+.comingSoonFloatingIconInventory {
+  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
 }
 
 .comingSoonTitle {
@@ -786,20 +868,24 @@
   color: transparent;
 }
 
-.comingSoonTitleGreen {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+.comingSoonTitleGreen,
+.comingSoonTitleWhatsapp {
+  background: linear-gradient(135deg, #25D366 0%, #1DA851 100%);
 }
 
-.comingSoonTitleBlue {
-  background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+.comingSoonTitleBlue,
+.comingSoonTitleTelegram {
+  background: linear-gradient(135deg, #0088CC 0%, #006699 100%);
 }
 
-.comingSoonTitlePurple {
-  background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
+.comingSoonTitlePurple,
+.comingSoonTitleOrders {
+  background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
 }
 
-.comingSoonTitleOrange {
-  background: linear-gradient(135deg, #ea580c 0%, #f59e0b 100%);
+.comingSoonTitleOrange,
+.comingSoonTitleInventory {
+  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
 }
 
 .comingSoonDescription {
@@ -857,36 +943,48 @@
   transform: scale(1);
 }
 
-.primaryButtonGreen {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+.primaryButtonGreen,
+.primaryButtonWhatsapp {
+  background: linear-gradient(135deg, #25D366 0%, #1DA851 100%);
+  border: 1px solid #25D366;
 }
 
-.primaryButtonGreen:hover:not(:disabled) {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+.primaryButtonGreen:hover:not(:disabled),
+.primaryButtonWhatsapp:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1DA851 0%, #128C3D 100%);
 }
 
-.primaryButtonBlue {
-  background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+.primaryButtonBlue,
+.primaryButtonTelegram {
+  background: linear-gradient(135deg, #0088CC 0%, #006699 100%);
+  border: 1px solid #0088CC;
 }
 
-.primaryButtonBlue:hover:not(:disabled) {
-  background: linear-gradient(135deg, #2563eb 0%, #0891b2 100%);
+.primaryButtonBlue:hover:not(:disabled),
+.primaryButtonTelegram:hover:not(:disabled) {
+  background: linear-gradient(135deg, #006699 0%, #004466 100%);
 }
 
-.primaryButtonPurple {
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+.primaryButtonPurple,
+.primaryButtonOrders {
+  background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
+  border: 1px solid #7C3AED;
 }
 
-.primaryButtonPurple:hover:not(:disabled) {
-  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+.primaryButtonPurple:hover:not(:disabled),
+.primaryButtonOrders:hover:not(:disabled) {
+  background: linear-gradient(135deg, #6D28D9 0%, #5B21B6 100%);
 }
 
-.primaryButtonOrange {
-  background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+.primaryButtonOrange,
+.primaryButtonInventory {
+  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+  border: 1px solid #F97316;
 }
 
-.primaryButtonOrange:hover:not(:disabled) {
-  background: linear-gradient(135deg, #d97706 0%, #ea580c 100%);
+.primaryButtonOrange:hover:not(:disabled),
+.primaryButtonInventory:hover:not(:disabled) {
+  background: linear-gradient(135deg, #EA580C 0%, #C2410C 100%);
 }
 
 .secondaryButton {
@@ -902,75 +1000,91 @@
   transition: all 0.2s ease;
 }
 
-.secondaryButtonGreen {
-  color: #10b981;
-  border-color: rgba(16, 185, 129, 0.5);
+.secondaryButtonGreen,
+.secondaryButtonWhatsapp {
+  color: #25D366;
+  border-color: rgba(37, 211, 102, 0.5);
 }
 
-.secondaryButtonGreen:hover {
-  background: rgba(16, 185, 129, 0.1);
+.secondaryButtonGreen:hover,
+.secondaryButtonWhatsapp:hover {
+  background: rgba(37, 211, 102, 0.1);
 }
 
-.secondaryButtonGreenDark {
+.secondaryButtonGreenDark,
+.secondaryButtonWhatsappDark {
   color: #34d399;
   border-color: rgba(52, 211, 153, 0.5);
 }
 
-.secondaryButtonGreenDark:hover {
+.secondaryButtonGreenDark:hover,
+.secondaryButtonWhatsappDark:hover {
   background: rgba(52, 211, 153, 0.1);
 }
 
-.secondaryButtonBlue {
-  color: #3b82f6;
-  border-color: rgba(59, 130, 246, 0.5);
+.secondaryButtonBlue,
+.secondaryButtonTelegram {
+  color: #0088CC;
+  border-color: rgba(0, 136, 204, 0.5);
 }
 
-.secondaryButtonBlue:hover {
-  background: rgba(59, 130, 246, 0.1);
+.secondaryButtonBlue:hover,
+.secondaryButtonTelegram:hover {
+  background: rgba(0, 136, 204, 0.1);
 }
 
-.secondaryButtonBlueDark {
+.secondaryButtonBlueDark,
+.secondaryButtonTelegramDark {
   color: #60a5fa;
   border-color: rgba(96, 165, 250, 0.5);
 }
 
-.secondaryButtonBlueDark:hover {
+.secondaryButtonBlueDark:hover,
+.secondaryButtonTelegramDark:hover {
   background: rgba(96, 165, 250, 0.1);
 }
 
-.secondaryButtonPurple {
-  color: #8b5cf6;
-  border-color: rgba(139, 92, 246, 0.5);
+.secondaryButtonPurple,
+.secondaryButtonOrders {
+  color: #7C3AED;
+  border-color: rgba(124, 58, 237, 0.5);
 }
 
-.secondaryButtonPurple:hover {
-  background: rgba(139, 92, 246, 0.1);
+.secondaryButtonPurple:hover,
+.secondaryButtonOrders:hover {
+  background: rgba(124, 58, 237, 0.1);
 }
 
-.secondaryButtonPurpleDark {
+.secondaryButtonPurpleDark,
+.secondaryButtonOrdersDark {
   color: #a78bfa;
   border-color: rgba(167, 139, 250, 0.5);
 }
 
-.secondaryButtonPurpleDark:hover {
+.secondaryButtonPurpleDark:hover,
+.secondaryButtonOrdersDark:hover {
   background: rgba(167, 139, 250, 0.1);
 }
 
-.secondaryButtonOrange {
-  color: #f59e0b;
-  border-color: rgba(245, 158, 11, 0.5);
+.secondaryButtonOrange,
+.secondaryButtonInventory {
+  color: #F97316;
+  border-color: rgba(249, 115, 22, 0.5);
 }
 
-.secondaryButtonOrange:hover {
-  background: rgba(245, 158, 11, 0.1);
+.secondaryButtonOrange:hover,
+.secondaryButtonInventory:hover {
+  background: rgba(249, 115, 22, 0.1);
 }
 
-.secondaryButtonOrangeDark {
+.secondaryButtonOrangeDark,
+.secondaryButtonInventoryDark {
   color: #fbbf24;
   border-color: rgba(251, 191, 36, 0.5);
 }
 
-.secondaryButtonOrangeDark:hover {
+.secondaryButtonOrangeDark:hover,
+.secondaryButtonInventoryDark:hover {
   background: rgba(251, 191, 36, 0.1);
 }
 
@@ -1272,39 +1386,4 @@
     padding: 0.5rem 1rem;
     gap: 0.5rem;
   }
-}
-
-/* Gmail - Official Red (#EA4335) */
-.tabGmail {
-  background: linear-gradient(135deg, #EA4335, #D33B2C);
-  color: white;
-  border: 1px solid #EA4335;
-}
-
-/* WhatsApp - Official Green (#25D366) */
-.tabWhatsapp {
-  background: linear-gradient(135deg, #25D366, #1DA851);
-  color: white;
-  border: 1px solid #25D366;
-}
-
-/* Telegram - Official Blue (#0088CC) */
-.tabTelegram {
-  background: linear-gradient(135deg, #0088CC, #006699);
-  color: white;
-  border: 1px solid #0088CC;
-}
-
-/* Orders - Professional Purple (#7C3AED) */
-.tabOrders {
-  background: linear-gradient(135deg, #7C3AED, #6D28D9);
-  color: white;
-  border: 1px solid #7C3AED;
-}
-
-/* Inventory - Professional Orange (#F97316) */
-.tabInventory {
-  background: linear-gradient(135deg, #F97316, #EA580C);
-  color: white;
-  border: 1px solid #F97316;
 }
